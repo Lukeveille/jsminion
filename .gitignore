@@ -10,6 +10,7 @@
 
 # production
 /build
+/jsminion-demo
 
 # misc
 .DS_Store

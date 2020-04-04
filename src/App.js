@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import shuffle from './utils/shuffle';
-import Card from './components/card';
+import Card from './components/Card';
 import startingDeck from './data/startingDeck.js';
 import './styles/App.css';
 
@@ -21,17 +21,6 @@ function App() {
           state={state}
           onClick={() => {cardInPlay(state[i], state, oldState, newState, end)}}
         />
-        // <div
-        //   key={`card${i+1}`}
-        //   className="card-front"
-        //   style={{
-        //     backgroundColor: state[i]? state[i].cycle === 'buy'? '#dd0' : '#ccc' : '#fff',
-        //     cursor: state[i]? 'pointer' : 'default'
-        //   }}
-        //   onClick={() => { cardInPlay(state[i], state, oldState, newState, end) }}
-        // >
-        //   {state[i]? state[i].value : ''}&nbsp;
-        // </div>
       )
     }
     return cards;
