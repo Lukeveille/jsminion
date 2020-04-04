@@ -43,12 +43,11 @@ function App() {
       } else if (deck.length > 0) {
         const shuffled = shuffle(discard)
         setDiscard([]);
-        console.log(shuffled)
         newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)))
         setDeck(shuffled)
       }
-      const hasAction = newHand.map(card => (card.cycle === 'action')).includes(true);
-      hasAction? setCycle('action') : setCycle('buy');
+      const noAction = newHand.map(card => (card.cycle !== 'action')).includes(true);
+      noAction? setCycle('action') : setCycle('buy');
       setHand(newHand);
     }
   },
