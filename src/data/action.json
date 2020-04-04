@@ -1,0 +1,14 @@
+[
+  {
+    "value": "a",
+    "cycle" : "action"
+  },
+  {
+    "value": "b",
+    "cycle" : "action"
+  },
+  {
+    "value": "c",
+    "cycle" : "action"
+  }
+]

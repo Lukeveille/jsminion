@@ -1,86 +1,104 @@
 import React from 'react';
 import { useState } from 'react';
-import './App.css';
+import shuffle from './utils/shuffle';
+import Card from './components/card';
+import startingDeck from './data/startingDeck.js';
+import './styles/App.css';
 
 function App() {
-  const startingDeck = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
-  [cycle, setCycle] = useState('draw'),
-  shuffle = arr => {
-    let newArr = [...arr]
-    let index = newArr.length, temp, random;
-    while (0 !== index) {
-      random = Math.floor(Math.random() * index);
-      index -= 1;
-      temp = newArr[index];
-      newArr[index] = newArr[random];
-      newArr[random] = temp;
-    }
-    return newArr
-  },
-  [deck, setDeck] = useState(shuffle(startingDeck)),
+  const [cycle, setCycle] = useState('draw'),
+  [deck, setDeck] = useState(shuffle(startingDeck())),
   [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
-  cardDisplay = (state, action) => {
+  cardDisplay = (state, oldState, newState, end) => {
     const cards = [];
     for (let i = 0; i< 5; i++) {
       cards.push(
-        <div
+        <Card
           key={`card${i+1}`}
-          style={{...cardFrontStyle,
-            backgroundColor: state[i]? '#ccc' : '#fff',
-            cursor: state[i]? 'pointer' : 'default'
-          }}
-          onClick={e => { action(state[i]) }}
-        >
-          {state[i]? state[i] : ''}&nbsp;
-        </div>
+          index={i}
+          state={state}
+          onClick={() => {cardInPlay(state[i], state, oldState, newState, end)}}
+        />
+        // <div
+        //   key={`card${i+1}`}
+        //   className="card-front"
+        //   style={{
+        //     backgroundColor: state[i]? state[i].cycle === 'buy'? '#dd0' : '#ccc' : '#fff',
+        //     cursor: state[i]? 'pointer' : 'default'
+        //   }}
+        //   onClick={() => { cardInPlay(state[i], state, oldState, newState, end) }}
+        // >
+        //   {state[i]? state[i].value : ''}&nbsp;
+        // </div>
       )
     }
     return cards;
   },
+  cardInPlay = (value, start, oldState, newState, end) => {
+    if (value && cycle === value.cycle) {
+      const newHand = [...start],
+      removal = newHand.findIndex(card => (card === value));
+      newHand.splice(removal, 1)
+      oldState(newHand);
+      newState([...end, value]);
+    }
+  },
   dealHand = () => {
     if (cycle === 'draw') {
-      const deckSplit = [...deck],
-      hand = deckSplit.splice(0,5);
-      setDeck(deckSplit);
-      setHand(hand);
-      setCycle('action');
-    }
-  },
-  cardInPlay = val => {
-    if (cycle === 'action') {
-      const newHand = [...hand],
-      removal = newHand.findIndex(card => (card === val));
-      console.log(newHand.splice(removal, removal))
+      const deckSplit = [...deck];
+      let newHand = deckSplit.splice(0,5);
+      if (deck.length > 5) {
+        setDeck(deckSplit);
+      } else if (deck.length > 0) {
+        const shuffled = shuffle(discard)
+        setDiscard([]);
+        console.log(shuffled)
+        newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)))
+        setDeck(shuffled)
+      }
+      const hasAction = newHand.map(card => (card.cycle === 'action')).includes(true);
+      hasAction? setCycle('action') : setCycle('buy');
       setHand(newHand);
-      setInPlay([...inPlay, val]);
     }
   },
-  cardBackStyle = {
-    display: 'inline-block',
-    height: '6em',
-    width: '4em',
-    backgroundColor: '#c00',
-    cursor: 'pointer'
+  actionBuy = () => {
+    if (cycle === 'action') {
+      discardCards();
+      setCycle('buy');
+    } else if (cycle === 'buy') {
+      discardCards(true);
+      setCycle('draw');
+    };
   },
-  cardFrontStyle = {...cardBackStyle,
-    margin: '.2em',
-    border: '1px solid #000'
-  },
-  deckStyle = {
-    display: 'inline-block',
-    margin: '.5em'
+  discardCards = all => {
+    let discarded = discard.concat(inPlay);
+    if (all) {
+      discarded = discarded.concat(hand);
+      setHand([]);
+    }
+    setDiscard(discarded);
+    setInPlay([]);
   };
 
   return (
     <div className="App">
-      <div style={{...deckStyle, display: 'block'}}>{cardDisplay(inPlay)}</div>
-      <div style={cardBackStyle} onClick={dealHand}>{deck.length}</div>
-      <div style={deckStyle}>{cardDisplay(hand, cardInPlay)}</div>
-      <div style={cardBackStyle} onClick={() => {}}>{discard.length}</div>
+      <h3>{cycle} phase</h3>
+      <div>
+        <button
+          disabled={cycle === 'draw'}
+          onClick={actionBuy}
+        >
+          {cycle === 'buy'? 'Buy' : `Play Action`}
+        </button>
+      </div>
+      <div className="hand in-play">{cardDisplay(inPlay, setInPlay, setHand, hand)}</div>
+      <div className="deck" onClick={dealHand}>{deck.length}</div>
+      <div className="hand">{cardDisplay(hand, setHand, setInPlay, inPlay)}</div>
+      <div className="deck" onClick={() => {}}>{discard.length}</div>
     </div>
   );
-}
+};
 
 export default App;

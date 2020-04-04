@@ -1,0 +1,26 @@
+.App {
+  text-align: center;
+}
+
+.card-front,
+.deck {
+  display: inline-block;
+  height: 6rem;
+  width: 4rem;
+  border-radius: .3rem;
+  background-color: #c00;
+  color: #fff;
+  cursor: pointer;
+}
+.card-front {
+  margin: .2rem;
+  color: #000;
+  border: 1px solid #000;
+}
+.hand {
+  display: inline-block;
+  margin: .5rem;
+}
+.in-play {
+  display: block;
+}
