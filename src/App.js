@@ -39,32 +39,34 @@ function App() {
     return cards;
   },
   hasAction = checkHand => (checkHand.map(card => (card.action? true : false)).includes(true)),
-  dealHand = size => {
-    if (cycle === 'Draw') {
-      const deckSplit = [...deck];
-      let newHand = deckSplit.splice(0,size);
-      console.log(newHand)
-      if (deck.length > size) {
-        setDeck(deckSplit);
-      } else if (deck.length > 0) {
-        const shuffled = shuffle(discard);
-        setDiscard([]);
-        newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)));
-        setDeck(shuffled);
-      }
-      if (hasAction(newHand)) setActions(1);
-      setCycle(hasAction? 'Action' : 'Buy');
-      setHand(hand.concat(newHand));
-      setTreasure(countValue(newHand, 'treasure'));
+  rollover = (size) => {
+    const deckSplit = [...deck];
+    let newHand = deckSplit.splice(0,size);
+    if (deck.length > size) {
+      setDeck(deckSplit);
+    } else if (deck.length > 0) {
+      const shuffled = shuffle(discard);
+      setDiscard([]);
+      newHand = newHand.concat(shuffled.splice(0, (size-newHand.length)));
+      setDeck(shuffled);
     }
+    setTreasure(treasure + countValue(newHand, 'treasure'));
+    setCycle(hasAction(newHand)? 'Action' : 'Buy');
+    return newHand
+  },
+  dealCards = () => {
+    const newHand = rollover(5)
+    if (hasAction(newHand)) setActions(1);
+    setHand(hand.concat(newHand));
   },
   cardInPlay = card => {
     if (card.action) {
-      const newHand = [...hand],
-      removal = newHand.findIndex(i => (i === card));
-      let actionTotal = actions - 1;
+      let actionTotal = actions - 1,
+      newHand = [...hand];
+      const removal = newHand.findIndex(i => (i === card));
       newHand.splice(removal, 1);
       if (card.cards) {
+        newHand = newHand.concat(rollover(card.cards));
       }
       if (card.actions) {
         actionTotal += card.actions;
@@ -73,7 +75,6 @@ function App() {
       if (card.action && card.action.treasure) {}
       if (!actionTotal) setCycle('Buy');
       setActions(hasAction(newHand)? actionTotal : 0);
-      if (!hasAction(newHand)) setCycle('Buy');
       setHand(newHand);
       setInPlay([...inPlay, card]);
     }
@@ -115,7 +116,12 @@ function App() {
       <div className="hand in-play">{cardDisplay(inPlay)}</div>
       <div className="deck" onClick={() => {}}>{discard.length}</div>
       <div className="hand">{cardDisplay(hand, true)}</div>
-      <div className="deck" onClick={() => {dealHand(5); setBuys(1);}}>{deck.length}</div>
+      <div className="deck" onClick={() => {
+        if (cycle === 'Draw') {
+          dealCards(5);
+          setBuys(1);
+        }
+      }}>{deck.length}</div>
     </div>
   );
 };
