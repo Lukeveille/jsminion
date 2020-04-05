@@ -5,8 +5,8 @@
 .card-front,
 .deck {
   display: inline-block;
-  height: 6rem;
-  width: 4rem;
+  height: 9rem;
+  width: 6rem;
   border-radius: .3rem;
   background-color: #c00;
   color: #fff;

@@ -1,13 +1,15 @@
-import gold from './gold';
-import action from './action';
+import cards from './cards';
 
 export default () => {
-  const deck = [];
-  for (let i = 0; i < 8; i++) {
-    deck.push(gold[0]);
+  const startingDeck = [];
+  for (let i = 0; i < 7; i++) {
+    startingDeck.push(cards.treasure[0]);
   };
-  action.forEach(card => {
-    deck.push(card);
-  });
-  return deck;
+  for (let i = 0; i < 3; i++) {
+    startingDeck.push(cards.victory[0]);
+  };
+  for (let i = 0; i < 3; i++) {
+    startingDeck.push(cards.kingdom[0]);
+  };
+  return startingDeck;
 };

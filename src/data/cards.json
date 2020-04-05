@@ -1,0 +1,45 @@
+{
+  "victory": [
+    {
+      "name": "Estate",
+      "cost": 2,
+      "victory": 1
+    },
+    {
+      "name": "Duchy",
+      "cost": 5,
+      "victory": 3
+    },
+    {
+      "name": "Province",
+      "cost": 8,
+      "victory": 6
+    }
+  ],
+  "treasure": [
+    {
+      "name": "Copper",
+      "cost": 0,
+      "treasure": 1
+    },
+    {
+      "name": "Silver",
+      "cost": 3,
+      "treasure": 2
+    },
+    {
+      "name": "Gold",
+      "cost": 6,
+      "treasure": 3
+    }
+  ],
+  "kingdom": [
+    {
+      "name": "Village",
+      "cost": 3,
+      "actions": 2,
+      "cards": 1,
+      "action": {}
+    }
+  ]
+}

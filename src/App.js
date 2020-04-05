@@ -2,89 +2,120 @@ import React from 'react';
 import { useState } from 'react';
 import shuffle from './utils/shuffle';
 import Card from './components/Card';
-import startingDeck from './data/startingDeck.js';
+import startingDeck from './data/startingDeck';
+import cards from './data/cards';
 import './styles/App.css';
 
 function App() {
-  const [cycle, setCycle] = useState('draw'),
+  const [cycle, setCycle] = useState('Draw'),
+  countValue = (hand, value) => {
+    let total = 0;
+    hand.forEach(card => {
+      total = card[value]? total + card[value] : total;
+    });
+    return total;
+  },
   [deck, setDeck] = useState(shuffle(startingDeck())),
   [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
-  cardDisplay = (state, oldState, newState, end) => {
+  [victoryPoints, setVictoryPoints] = useState(countValue(deck, 'victory')),
+  [treasure, setTreasure] = useState(0),
+  [actions, setActions] = useState(0),
+  [buys, setBuys] = useState(0),
+  [market, setMarket] = useState(cards),
+  cardDisplay = (state, isHand) => {
     const cards = [];
-    for (let i = 0; i< 5; i++) {
+    for (let i = 0; i < hand.length; i++) {
       cards.push(
         <Card
           key={`card${i+1}`}
           index={i}
           state={state}
-          onClick={() => {cardInPlay(state[i], state, oldState, newState, end)}}
+          onClick={isHand && actions > 0? () => {cardInPlay(state[i])} : () => {}}
         />
       )
     }
     return cards;
   },
-  cardInPlay = (value, start, oldState, newState, end) => {
-    if (value && cycle === value.cycle) {
-      const newHand = [...start],
-      removal = newHand.findIndex(card => (card === value));
-      newHand.splice(removal, 1)
-      oldState(newHand);
-      newState([...end, value]);
-    }
-  },
-  dealHand = () => {
-    if (cycle === 'draw') {
+  hasAction = checkHand => (checkHand.map(card => (card.action? true : false)).includes(true)),
+  dealHand = size => {
+    if (cycle === 'Draw') {
       const deckSplit = [...deck];
-      let newHand = deckSplit.splice(0,5);
-      if (deck.length > 5) {
+      let newHand = deckSplit.splice(0,size);
+      console.log(newHand)
+      if (deck.length > size) {
         setDeck(deckSplit);
       } else if (deck.length > 0) {
-        const shuffled = shuffle(discard)
+        const shuffled = shuffle(discard);
         setDiscard([]);
-        newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)))
-        setDeck(shuffled)
+        newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)));
+        setDeck(shuffled);
       }
-      const noAction = newHand.map(card => (card.cycle !== 'action')).includes(true);
-      noAction? setCycle('action') : setCycle('buy');
+      if (hasAction(newHand)) setActions(1);
+      setCycle(hasAction? 'Action' : 'Buy');
+      setHand(hand.concat(newHand));
+      setTreasure(countValue(newHand, 'treasure'));
+    }
+  },
+  cardInPlay = card => {
+    if (card.action) {
+      const newHand = [...hand],
+      removal = newHand.findIndex(i => (i === card));
+      let actionTotal = actions - 1;
+      newHand.splice(removal, 1);
+      if (card.cards) {
+      }
+      if (card.actions) {
+        actionTotal += card.actions;
+      }
+      if (card.buys) {}
+      if (card.action && card.action.treasure) {}
+      if (!actionTotal) setCycle('Buy');
+      setActions(hasAction(newHand)? actionTotal : 0);
+      if (!hasAction(newHand)) setCycle('Buy');
       setHand(newHand);
+      setInPlay([...inPlay, card]);
     }
   },
-  actionBuy = () => {
-    if (cycle === 'action') {
-      discardCards();
-      setCycle('buy');
-    } else if (cycle === 'buy') {
-      discardCards(true);
-      setCycle('draw');
-    };
+  endAction = () => {
+    setCycle('Buy');
   },
-  discardCards = all => {
+  endBuy = () => {
+    discardCards();
+    setCycle('Draw');
+    setActions(0);
+    setBuys(0);
+    setTreasure(0);
+  },
+  discardCards = () => {
     let discarded = discard.concat(inPlay);
-    if (all) {
-      discarded = discarded.concat(hand);
-      setHand([]);
-    }
+    discarded = discarded.concat(hand);
     setDiscard(discarded);
+    setHand([]);
     setInPlay([]);
   };
 
   return (
     <div className="App">
-      <h3>{cycle} phase</h3>
+      <h3>{cycle} Phase</h3>
       <div>
-        <button
-          disabled={cycle === 'draw'}
-          onClick={actionBuy}
-        >
-          {cycle === 'buy'? 'Buy' : `Play Action`}
+        {cycle !== 'Draw'?
+        <button onClick={cycle === 'Action'? endAction : endBuy}>
+          {`End ${cycle} Phase`}
         </button>
+        : ''}
       </div>
-      <div className="hand in-play">{cardDisplay(inPlay, setInPlay, setHand, hand)}</div>
-      <div className="deck" onClick={dealHand}>{deck.length}</div>
-      <div className="hand">{cardDisplay(hand, setHand, setInPlay, inPlay)}</div>
+      <div>
+        <span>VP: {victoryPoints} - </span>
+        <span>Actions: {actions} - </span>
+        <span>Buys: {buys} - </span>
+        <span>Treasure: {treasure} </span>
+      </div>
+      <div className="hand in-play">{cardDisplay(inPlay)}</div>
       <div className="deck" onClick={() => {}}>{discard.length}</div>
+      <div className="hand">{cardDisplay(hand, true)}</div>
+      <div className="deck" onClick={() => {dealHand(5); setBuys(1);}}>{deck.length}</div>
     </div>
   );
 };
