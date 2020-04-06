@@ -29,14 +29,7 @@ function App() {
   },
   [victoryPoints] = useState(countValue(allCards(), 'victory')),
   // [victoryPoints, setVictoryPoints] = useState(countValue(allCards(), 'victory')),
-  discardHand = () => {
-    let discarded = discard.concat(inPlay);
-    discarded = discarded.concat(hand);
-    setDiscard(discarded);
-    setHand([]);
-    setInPlay([]);
-  },
-  rollover = (size) => {
+  rollover = size => {
     const deckSplit = [...deck];
     let newHand = deckSplit.splice(0,size);
     if (deck.length > size) {
@@ -63,7 +56,7 @@ function App() {
     setTreasure(card.treasure? card.treasure + treasureCount : treasureCount);
     return newHand;
   },
-  nextPhase = (card) => {
+  nextPhase = card => {
     let newHand = [];
     switch (phase) {
       case 'Action':
@@ -77,11 +70,24 @@ function App() {
         if (card.treasure) {
           moveCard(card);
         } else {
+          const deckSplit = [...deck];
+          setInPlay([]);
+          let discarded = discard.concat(inPlay);
+          discarded = discarded.concat(hand);
+          newHand = deckSplit.splice(0,5);
+          if (deck.length > 5) {
+            setDeck(deckSplit);
+          } else if (deck.length > 0) {
+            const shuffled = shuffle(discarded);
+            discarded = [];
+            newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)));
+            setDeck(shuffled);
+          }
+          setHand(newHand);
+          setDiscard(discarded);
           setActions(0);
           setBuys(0);
           setTreasure(0);
-          discardHand();
-          setHand(rollover(5));
           setPhase(null);
           // setTurn(false);
         };
