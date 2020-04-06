@@ -4,22 +4,32 @@ import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
 import startingDeck from './data/startingDeck';
-// import market from './data/market';
+// import supplies from './data/supplies';
 import CardDisplay from './components/CardDisplay'
 import './styles/App.css';
 
 function App() {
-  const [phase, setPhase] = useState('Draw'),
-  [deck, setDeck] = useState(shuffle(startingDeck())),
-  [hand, setHand] = useState([]),
+  const starting = shuffle(startingDeck()),
+  startingHand = starting.splice(0, 5),
+  [phase, setPhase] = useState(),
+  [turn] = useState(true),
+  // [turn, setTurn] = useState(true),
+  [deck, setDeck] = useState(starting),
+  [hand, setHand] = useState(startingHand),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
-  [victoryPoints] = useState(countValue(deck, 'victory')),
-  // [victoryPoints, setVictoryPoints] = useState(countValue(deck, 'victory')),
-  discardCards = () => {
+  allCards = () => {
+    let allCards = deck.concat(hand);
+    allCards = allCards.concat(inPlay);
+    allCards = allCards.concat(discard);
+    return allCards;
+  },
+  [victoryPoints] = useState(countValue(allCards(), 'victory')),
+  // [victoryPoints, setVictoryPoints] = useState(countValue(allCards(), 'victory')),
+  discardHand = () => {
     let discarded = discard.concat(inPlay);
     discarded = discarded.concat(hand);
     setDiscard(discarded);
@@ -70,27 +80,27 @@ function App() {
           setActions(0);
           setBuys(0);
           setTreasure(0);
-          discardCards();
-          setPhase('Draw');
+          discardHand();
+          setHand(rollover(5));
+          setPhase(null);
+          // setTurn(false);
         };
         break;
       default:
-        newHand = rollover(5);
-        setHand(newHand);
-        if (hasAction(newHand)) setActions(1);
-        setPhase(hasAction(newHand)? 'Action' : 'Buy');
         setBuys(1);
+        if (hasAction(hand)) setActions(1);
+        setPhase(hasAction(hand)? 'Action' : 'Buy');
         break;
     }
   };
 
   return (
     <div className="App">
-      <h3>{phase} Phase</h3>
+      <h3>{phase? `${phase} Phase` : 'Turn Over'} </h3>
       <div>
-        <span>VP: {victoryPoints} - </span>
-        <span>Actions: {actions} - </span>
-        <span>Buys: {buys} - </span>
+        <span>VP: {victoryPoints} | </span>
+        <span>Actions: {actions} | </span>
+        <span>Buys: {buys} | </span>
         <span>Treasure: {treasure} </span>
       </div>
       <div className="hand in-play">{<CardDisplay cards={inPlay}/>}</div>
@@ -98,8 +108,8 @@ function App() {
       <div className="hand">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
       <div className="deck">{deck.length}</div>
       <div>
-        <button onClick={nextPhase}>
-          {phase === 'Draw'? phase : `End ${phase} Phase`}
+        <button disabled={!turn} onClick={nextPhase}>
+          {phase? `End ${phase} Phase` : 'Start Turn'}
         </button>
       </div>
     </div>
