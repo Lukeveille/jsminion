@@ -9,7 +9,7 @@ export default () => {
     startingDeck.push(cards.victory[0]);
   };
   for (let i = 0; i < 3; i++) {
-    startingDeck.push(cards.kingdom[0]);
+    startingDeck.push(cards.kingdom[i]);
   };
   return startingDeck;
 };

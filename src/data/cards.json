@@ -1,4 +1,11 @@
 {
+  "curse": [
+    {
+      "name": "Curse",
+      "cost": 0,
+      "victory": -1
+    }
+  ],
   "victory": [
     {
       "name": "Estate",
@@ -40,6 +47,22 @@
       "actions": 2,
       "cards": 1,
       "action": {}
+    },
+    {
+      "name": "Smithy",
+      "cost": 4,
+      "cards": 3,
+      "action": {}
+    },
+    {
+      "name": "Market",
+      "cost": 5,
+      "actions": 1,
+      "cards": 1,
+      "buys": 1,
+      "action": {
+        "treasure": 1
+      }
     }
   ]
 }

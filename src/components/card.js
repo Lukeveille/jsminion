@@ -1,18 +1,18 @@
 import React from 'react';
 
-export default props => (
-  <div
+export default props => {
+  return <div
     className="card-front"
     style={{
-      backgroundColor: props.state[props.index]?
-        props.state[props.index].treasure?
+      backgroundColor: props.card?
+        props.card.treasure?
         '#dd0' :
-        props.state[props.index].victory?
+        props.card.victory?
         '#0a0' : '#ccc' : '#fff',
-      cursor: props.state[props.index]? 'pointer' : 'default'
+      cursor: props.card? 'pointer' : 'default'
     }}
     onClick={props.onClick}
   >
-    {props.state[props.index]? props.state[props.index].name : ''}&nbsp;
+    {props.card? props.card.name : ''}&nbsp;
   </div>
-);
+};
