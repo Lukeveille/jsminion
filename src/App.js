@@ -3,9 +3,9 @@ import { useState } from 'react';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
-import Card from './components/Card';
 import startingDeck from './data/startingDeck';
-// import cards from './data/cards';
+// import market from './data/market';
+import CardDisplay from './components/CardDisplay'
 import './styles/App.css';
 
 function App() {
@@ -14,24 +14,17 @@ function App() {
   [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
-  // [victoryPoints, setVictoryPoints] = useState(countValue(deck, 'victory')),
-  [victoryPoints] = useState(countValue(deck, 'victory')),
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
-  // [market, setMarket] = useState(cards),
-  cardDisplay = (cards) => {
-    const cardElements = [];
-    cards.forEach((card, i) => {
-      cardElements.push(
-        <Card
-          key={`card${i+1}`}
-          card={card}
-          onClick={() => { if (card && card.action && phase === 'Action') nextPhase(card) }}
-        />
-      )
-    })
-    return cardElements;
+  [victoryPoints] = useState(countValue(deck, 'victory')),
+  // [victoryPoints, setVictoryPoints] = useState(countValue(deck, 'victory')),
+  discardCards = () => {
+    let discarded = discard.concat(inPlay);
+    discarded = discarded.concat(hand);
+    setDiscard(discarded);
+    setHand([]);
+    setInPlay([]);
   },
   rollover = (size) => {
     const deckSplit = [...deck];
@@ -46,46 +39,45 @@ function App() {
     }
     return newHand
   },
-  discardCards = () => {
-    let discarded = discard.concat(inPlay);
-    discarded = discarded.concat(hand);
-    setDiscard(discarded);
-    setHand([]);
-    setInPlay([]);
+  moveCard = card => {
+    let newHand = [...hand],
+    treasureCount = countValue(inPlay, 'treasure');
+    const removal = newHand.findIndex(i => (i === card));
+    newHand.splice(removal, 1);
+    if (card.action) {
+      if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
+      if (card.buys) { setBuys(buys + card.buys) };
+    }
+    setHand(newHand);
+    setInPlay([...inPlay, card]);
+    setTreasure(card.treasure? card.treasure + treasureCount : treasureCount);
+    return newHand;
   },
-  nextPhase = (card = {}) => {
-    let newHand = [...hand];
+  nextPhase = (card) => {
+    let newHand = [];
     switch (phase) {
       case 'Action':
         let actionTotal = actions-1;
-        if (card.action) {
-          const removal = newHand.findIndex(i => (i === card)),
-          treasureInPlay = inPlay.map(card => (card.action));
-          let treasureCount = countValue(treasureInPlay, 'treasure');
-          newHand.splice(removal, 1);
-          if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
-          if (card.actions) { actionTotal += card.actions };
-          if (card.buys) { setBuys(buys + card.buys) };
-          if (card.action.treasure) { treasureCount += card.action.treasure};
-          setTreasure(treasureCount + countValue(newHand, 'treasure'));
-          setHand(newHand);
-          setInPlay([...inPlay, card]);
-        };
+        if (card.actions) { actionTotal += card.actions };
+        if (card.action) newHand = moveCard(card);
         setActions(hasAction(newHand)? actionTotal : 0);
         if (!actionTotal || !hasAction(newHand)) setPhase('Buy');
         break;
       case 'Buy':
-        discardCards();
-        setActions(0);
-        setBuys(0);
-        setTreasure(0);
-        setPhase('Draw');
+        if (card.treasure) {
+          moveCard(card);
+        } else {
+          setActions(0);
+          setBuys(0);
+          setTreasure(0);
+          discardCards();
+          setPhase('Draw');
+        };
         break;
       default:
         newHand = rollover(5);
         setHand(newHand);
         if (hasAction(newHand)) setActions(1);
-        setTreasure(countValue(newHand, 'treasure'));
         setPhase(hasAction(newHand)? 'Action' : 'Buy');
         setBuys(1);
         break;
@@ -101,9 +93,9 @@ function App() {
         <span>Buys: {buys} - </span>
         <span>Treasure: {treasure} </span>
       </div>
-      <div className="hand in-play">{cardDisplay(inPlay)}</div>
-      <div className="deck" onClick={() => {}}>{discard.length}</div>
-      <div className="hand">{cardDisplay(hand, true)}</div>
+      <div className="hand in-play">{<CardDisplay cards={inPlay}/>}</div>
+      <div className="deck">{discard.length}</div>
+      <div className="hand">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
       <div className="deck">{deck.length}</div>
       <div>
         <button onClick={nextPhase}>

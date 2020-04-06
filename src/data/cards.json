@@ -60,9 +60,8 @@
       "actions": 1,
       "cards": 1,
       "buys": 1,
-      "action": {
-        "treasure": 1
-      }
+      "treasure": 1,
+      "action": {}
     }
   ]
 }
