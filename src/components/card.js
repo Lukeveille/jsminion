@@ -2,17 +2,23 @@ import React from 'react';
 
 export default props => {
   return <div
-    className="card-front"
+    className={`card ${props.live? ' live' : ''}`}
     style={{
+      margin: '1rem',
       backgroundColor: props.card?
         props.card.action?
-        '#ccc' :
+        '#aaafb2' :
         props.card.victory?
-        '#0a0' : '#dd0' : '#fff',
-      cursor: props.card? 'pointer' : 'default'
+        '#76a08c' : '#f2cda2' : '#fff',
+      cursor: props.live? 'pointer' : 'default'
     }}
     onClick={props.onClick}
   >
-    {props.card? props.card.name : ''}&nbsp;
+    <p className="card-top">{props.card.name}</p>
+    <div className="card-btm">
+      <p className="card-side">{props.card.cost}</p>
+      <p>{props.card.action? 'Action' : props.card.victory? 'Victory' : 'Treasure'}</p>
+      <p className="card-side">&nbsp;</p>
+    </div>
   </div>
 };

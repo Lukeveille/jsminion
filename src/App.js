@@ -3,18 +3,16 @@ import { useState } from 'react';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
-import startingDeck from './data/startingDeck';
-// import supplies from './data/supplies';
+import startingCards from './data/startingCards';
 import CardDisplay from './components/CardDisplay'
 import './styles/App.css';
 
 function App() {
-  const starting = shuffle(startingDeck()),
-  startingHand = starting.splice(0, 5),
+  const startingDeck = shuffle(startingCards()),
+  startingHand = startingDeck.splice(0, 5).sort(),
   [phase, setPhase] = useState(),
   [turn] = useState(true),
-  // [turn, setTurn] = useState(true),
-  [deck, setDeck] = useState(starting),
+  [deck, setDeck] = useState(startingDeck),
   [hand, setHand] = useState(startingHand),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
@@ -28,7 +26,6 @@ function App() {
     return allCards;
   },
   [victoryPoints] = useState(countValue(allCards(), 'victory')),
-  // [victoryPoints, setVictoryPoints] = useState(countValue(allCards(), 'victory')),
   rollover = size => {
     const deckSplit = [...deck];
     let newHand = deckSplit.splice(0,size);
@@ -89,7 +86,6 @@ function App() {
           setBuys(0);
           setTreasure(0);
           setPhase(null);
-          // setTurn(false);
         };
         break;
       default:
@@ -102,7 +98,7 @@ function App() {
 
   return (
     <div className="App">
-      <h3>{phase? `${phase} Phase` : 'Turn Over'} </h3>
+      <h2>{phase? `${phase} Phase` : 'Turn Over'} </h2>
       <div>
         <span>VP: {victoryPoints} | </span>
         <span>Actions: {actions} | </span>
@@ -110,9 +106,15 @@ function App() {
         <span>Treasure: {treasure} </span>
       </div>
       <div className="hand in-play">{<CardDisplay cards={inPlay}/>}</div>
-      <div className="deck">{discard.length}</div>
+      <div className="deck">
+        <p>Discard</p>
+        <p>{discard.length}</p>
+      </div>
       <div className="hand">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
-      <div className="deck">{deck.length}</div>
+      <div className="deck">
+        <p>Deck</p>
+        <p>{deck.length}</p>
+      </div>
       <div>
         <button disabled={!turn} onClick={nextPhase}>
           {phase? `End ${phase} Phase` : 'Start Turn'}

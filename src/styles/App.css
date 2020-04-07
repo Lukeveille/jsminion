@@ -1,26 +1,49 @@
-.App {
-  text-align: center;
-}
-
-.card-front,
 .deck {
-  display: inline-block;
-  height: 9rem;
-  width: 6rem;
-  border-radius: .3rem;
-  background-color: #c00;
-  color: #fff;
-  cursor: pointer;
+  background-color: #121c21;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
+  height: 3.75rem;
+  width: 12.5rem;
 }
-.card-front {
+.live {
+  outline: 2px solid #f06970;
+}
+.live:hover {
+  outline: 2px solid #fff;
+}
+.card {
+  cursor: pointer;
+  font-size: 14px;
+  height: 3.75rem;
+  width: 12.5rem;
+}
+.card-top {
+  background-color: #121c21;
+  font-size: 16px;
+  width: 100%;
+  padding: .3rem 0;
+  margin: 0
+}
+.card-btm {
+  display: flex;
+  justify-content: space-between;
   margin: .2rem;
-  color: #000;
-  border: 1px solid #000;
+  color: #121c21;
+}
+.card-side {
+  margin: 0 .2rem;
+}
+.card-stack {
+  position: absolute;
+  top: -.75rem;
+  right: .75rem;
 }
 .hand {
   display: inline-block;
   margin: .5rem;
 }
 .in-play {
-  display: block;
+  display: inline-block;
 }
