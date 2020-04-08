@@ -2,28 +2,21 @@ import React from 'react';
 import Card from './Card';
 
 export default props => {
-  const compareType = (a, b) => {
-    let compare = 0;
-    if (a.type > b.type) {
-      compare = 1;
-    } else if (a.type < b.type) {
-      compare = -1;
+  const sorting = type => {
+    return (a, b) => {
+      let compare = 0;
+      if (a[type] > b[type]) {
+        compare = 1;
+      } else if (a[type] < b[type]) {
+        compare = -1;
+      }
+      return compare;
     }
-    return compare;
-  }
-  const compareName = (a, b) => {
-    let compare = 0;
-    if (a.name > b.name) {
-      compare = 1;
-    } else if (a.name < b.name) {
-      compare = -1;
-    }
-    return compare;
   }
   const cards = props.cards,
   cardElements = [];
-  cards.sort(compareType);
-  cards.sort(compareName);
+  cards.sort(sorting('type'));
+  cards.sort(sorting('name'));
   let count = 1;
   for (let i = 0; i < cards.length; i++) {
     const correctAction = (
