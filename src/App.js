@@ -43,9 +43,9 @@ function App() {
   moveCard = (card, count) => {
     let newHand = [...hand],
     treasureCount = countValue(inPlay, 'treasure');
-    const removal = newHand.findIndex(i => (i === card));
-    const size = phase === 'Action' && card.type === 'Action'? 1 : count;
-    const cards = newHand.splice(removal, size);
+    const removal = newHand.findIndex(i => (i === card)),
+    size = phase === 'Action' && card.type === 'Action'? 1 : count,
+    cards = newHand.splice(removal, size);
     treasureCount += countTreasure(cards);
     if (card.action) {
       if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
