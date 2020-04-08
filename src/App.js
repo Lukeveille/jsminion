@@ -113,19 +113,23 @@ function App() {
       <div className="in-play">{<CardDisplay cards={inPlay}/>}</div>
       <div className="combo-mat"></div>
       <div className="button-display">
-        <div className="game-button red">{phase? `${phase} Phase` : 'Turn Over'}</div>
-        <p className="instructions red">{phase? `${phase} Phase` : 'Turn Over'}</p>
-        <div className="game-button live" disabled={!turn} onClick={nextPhase}>
-          {phase? `End ${phase} Phase` : 'Start Turn'}
+        <div>
+          <div className="game-button red">{phase? `${phase} Phase` : 'Turn Over'}</div>
+          <p className="instructions red">{phase? `${phase} Phase` : 'Turn Over'}</p>
+          <div className="game-button live" disabled={!turn} onClick={nextPhase}>
+            {phase? `End ${phase} Phase` : 'Start Turn'}
+          </div>
         </div>
-        <div className="breakline"/>
-        <div className="deck">
-          <p>Deck</p>
-          <p>{deck.length}</p>
-        </div>
-        <div className="deck">
-          <p>Discard</p>
-          <p>{discard.length}</p>
+        <div>
+          <div className="breakline"/>
+          <div className="deck">
+            <p>Deck</p>
+            <p>{deck.length}</p>
+          </div>
+          <div className="deck">
+            <p>Discard</p>
+            <p>{discard.length}</p>
+          </div>
         </div>
       </div>
       <div className="hand">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>

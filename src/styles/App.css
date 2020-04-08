@@ -33,6 +33,10 @@
   margin: .5rem;
   overflow: auto;
 }
+.hand {
+  min-height: 38vh;
+  display: inline-block;
+}
 .in-play {
   height: 18vh;
 }
@@ -50,16 +54,23 @@
 .button-display {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   margin: .5rem;
 }
 .deck {
-  background-color: #121c21;
+  background-color: hsl(200, 29%, 10%);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: .5rem auto;
+  margin-top: 1rem;
   height: 3.75rem;
   width: 100%;
+}
+.breakline {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background-color: #777;
 }
 .live:hover {
   outline: 1px solid #fff;
@@ -107,13 +118,6 @@
   background-color: #121c21;
   align-items: center;
   justify-content: space-around;
-}
-.breakline {
-  display: block;
-  height: 1px;
-  width: 100%;
-  background-color: #777;
-  margin: .5rem auto;
 }
 .instructions {
   margin: .5rem;
