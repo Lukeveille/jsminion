@@ -15,3 +15,17 @@ body {
 p {
   margin: 0;
 }
+
+body::-webkit-scrollbar {
+  width: 0.7em;
+  background: #c00;
+}
+body::-webkit-scrollbar-thumb {
+  background: #c0392b;
+  height:30px;
+}
+
+body::-webkit-scrollbar-track-piece
+{
+  display:none;
+}

@@ -1,3 +1,47 @@
+.App {
+  display: grid;
+  grid-template-rows: 2.5fr .5fr 1fr 2fr;
+  grid-template-columns: 3fr 10fr 3fr;
+  max-height: 1vh;
+  max-width: 1000px;
+  margin: auto;
+}
+.supply-market,
+.info,
+.in-play {
+  grid-column-start: 1;
+  grid-column-end: span 2;
+}
+.combo-mat {
+  grid-column-start: 3;
+  grid-column-end: span 4;
+  grid-row-start: 3;
+  grid-row-end: span 4;
+}
+.supply-market {
+  height: 38vh;
+}
+.info {
+  height: 6vh;
+  display: flex;
+  justify-content: left;
+  align-items: flex-end;
+}
+.hand,
+.in-play {
+  background-color: #1c272d;
+  margin: .5rem;
+  overflow: auto;
+}
+.in-play {
+  height: 12vh;
+}
+.log,
+.trash,
+.combo-mat {
+  outline: 1px solid #777;
+  margin: .5rem;
+}
 .deck {
   background-color: #121c21;
   display: flex;
@@ -5,20 +49,20 @@
   justify-content: center;
   margin: 1rem auto;
   height: 3.75rem;
-  width: 11rem;
+  width: 12.5rem;
 }
 .live:hover {
-  outline: 2px solid #fff;
+  outline: 1px solid #fff;
 }
 .card {
   cursor: default;
   font-size: 14px;
   height: 3.75rem;
   width: 12.5rem;
-  margin: 1rem;
+  margin: 1rem .75rem;
 }
 .live {
-  outline: 2px solid #f06970;
+  outline: 1px solid #f06970;
   cursor: pointer;
 }
 .card-top {
@@ -39,22 +83,45 @@
 }
 .card-stack {
   position: absolute;
-  top: -.75rem;
-  right: .75rem;
+  top: .35rem;
+  right: .45rem;
 }
 .card-info {
   position: relative;
-}
-.card-display {
-  background-color: #1c272d;
   display: inline-block;
+}
+.game-button {
+  display: flex;
+  margin: auto;
+  height: 1.775rem;
+  padding-bottom: .1rem;
+  background-color: #121c21;
+  width: 12.5rem;
+  align-items: center;
+  justify-content: space-around;
+}
+.breakline {
+  width: 12rem;
+  border-bottom: 1px solid #777;
+  margin: 4rem auto 1rem auto;
+}
+.instructions {
   margin: .5rem;
-}
-.in-play {
-  display: inline-block;
+  padding-bottom: .1rem;
 }
 .red {
   color: #f06970;
+}
+.coin {
+  color: #f2cda2;
+  font-size: 13px;
+  border: 1px solid #f2cda2;
+  border-radius: 50%;
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
+  padding-bottom: .1rem;
+  padding-left: .01rem;
 }
 
 .Treasure {
@@ -65,4 +132,7 @@
 }
 .Victory {
   background-color: #76a08c;
+}
+.hidden {
+  display: none;
 }

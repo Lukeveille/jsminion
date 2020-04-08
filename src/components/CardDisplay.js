@@ -2,7 +2,7 @@ import React from 'react';
 import Card from './Card';
 
 export default props => {
-  const compare = (a, b) => {
+  const compareType = (a, b) => {
     let compare = 0;
     if (a.type > b.type) {
       compare = 1;
@@ -11,9 +11,19 @@ export default props => {
     }
     return compare;
   }
+  const compareName = (a, b) => {
+    let compare = 0;
+    if (a.name > b.name) {
+      compare = 1;
+    } else if (a.name < b.name) {
+      compare = -1;
+    }
+    return compare;
+  }
   const cards = props.cards,
   cardElements = [];
-  cards.sort(compare);
+  cards.sort(compareType);
+  cards.sort(compareName);
   let count = 1;
   for (let i = 0; i < cards.length; i++) {
     const correctAction = (

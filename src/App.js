@@ -25,7 +25,7 @@ function App() {
     allCards = allCards.concat(discard);
     return allCards;
   },
-  // [victoryPoints] = useState(countValue(allCards(), 'victory')),
+  [victoryPoints] = useState(countValue(allCards(), 'victory')),
   rollover = size => {
     const deckSplit = [...deck];
     let newHand = deckSplit.splice(0,size);
@@ -98,32 +98,36 @@ function App() {
 
   return (
     <div className="App">
-      <h2>{phase? `${phase} Phase` : 'Turn Over'} </h2>
-      <div>
-        {/* <span>VP: {victoryPoints} | </span> */}
-        <span>Action <span className='red'>{actions}</span> | </span>
-        <span>Buys <span className='red'>{buys}</span> | </span>
-        <span>Coin <span className='red'>{treasure}</span> </span>
+      <div className="supply-market"></div>
+      <div className="log"></div>
+      <div className="info">
+        <span className="hidden">VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
+        <span>Action <span className='red'>{actions}</span> |&nbsp;</span>
+        <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
+        <span>Coin <span className='coin'>{treasure}</span> </span>
       </div>
-      <div className="hand in-play">{<CardDisplay cards={inPlay}/>}</div>
-      
-      <div>
-        <div className="deck">
-          <p>Discard</p>
-          <p>{discard.length}</p>
-        </div>
-        <div className="deck">
-          <p>{deck.length}</p>
-          <p>Deck</p>
-        </div>
-      </div>
-
-      <div className="card-display">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
-      <div>
-        <button disabled={!turn} onClick={nextPhase}>
+      <div className="trash"></div>
+      <div className="in-play">{<CardDisplay cards={inPlay}/>}</div>
+      <div className="combo-mat"></div>
+      <div className="button-display">
+        <div className="game-button red">{phase? `${phase} Phase` : 'Turn Over'}</div>
+        <p className="instructions red">{phase? `${phase} Phase` : 'Turn Over'}</p>
+        <div className="game-button live" disabled={!turn} onClick={nextPhase}>
           {phase? `End ${phase} Phase` : 'Start Turn'}
-        </button>
+        </div>
+        <div className="breakline"/>
+        <div>
+          <div className="deck">
+            <p>Deck</p>
+            <p>{deck.length}</p>
+          </div>
+          <div className="deck">
+            <p>Discard</p>
+            <p>{discard.length}</p>
+          </div>
+        </div>
       </div>
+      <div className="hand">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
     </div>
   );
 };

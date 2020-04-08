@@ -2,7 +2,7 @@ import React from 'react';
 
 export default props => {
   return <div
-    className={`card ${props.card.type} ${props.live? ' live' : ''}`}
+    className={`card ${props.card.type} ${props.live? 'live' : ''}`}
     onClick={props.onClick}
   >
     <p className="card-top">{props.card.name}</p>
