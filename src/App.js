@@ -3,6 +3,7 @@ import { useState } from 'react';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
+import countTreasure from './utils/countTreasure';
 import startingCards from './data/startingCards';
 import CardDisplay from './components/CardDisplay'
 import './styles/App.css';
@@ -39,33 +40,35 @@ function App() {
     }
     return newHand
   },
-  moveCard = card => {
+  moveCard = (card, count) => {
     let newHand = [...hand],
     treasureCount = countValue(inPlay, 'treasure');
     const removal = newHand.findIndex(i => (i === card));
-    newHand.splice(removal, 1);
+    const size = phase !== 'Action' && card.type === 'Action'? 1 : count;
+    const cards = newHand.splice(removal, size);
+    treasureCount += countTreasure(cards);
     if (card.action) {
       if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
       if (card.buys) { setBuys(buys + card.buys) };
     }
     setHand(newHand);
-    setInPlay([...inPlay, card]);
-    setTreasure(card.treasure? card.treasure + treasureCount : treasureCount);
+    setInPlay([...inPlay].concat(cards));
+    setTreasure(treasureCount);
     return newHand;
   },
-  nextPhase = card => {
+  nextPhase = (card, count) => {
     let newHand = [];
     switch (phase) {
       case 'Action':
         let actionTotal = actions-1;
         if (card.actions) { actionTotal += card.actions };
-        if (card.action) newHand = moveCard(card);
+        if (card.action) newHand = moveCard(card, count);
         setActions(hasAction(newHand)? actionTotal : 0);
         if (!actionTotal || !hasAction(newHand)) setPhase('Buy');
         break;
       case 'Buy':
         if (card.treasure) {
-          moveCard(card);
+          moveCard(card, count);
         } else {
           const deckSplit = [...deck];
           setInPlay([]);

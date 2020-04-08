@@ -1,18 +1,8 @@
 import React from 'react';
 import Card from './Card';
+import sorting from '../utils/sorting';
 
 export default props => {
-  const sorting = type => {
-    return (a, b) => {
-      let compare = 0;
-      if (a[type] > b[type]) {
-        compare = 1;
-      } else if (a[type] < b[type]) {
-        compare = -1;
-      }
-      return compare;
-    }
-  }
   const cards = props.cards,
   cardElements = [];
   cards.sort(sorting('type'));
@@ -33,7 +23,7 @@ export default props => {
             card={cards[i]}
             live={correctAction}
             count={count}
-            onClick={() => { if (correctAction) props.nextPhase(cards[i]) }}
+            nextPhase={props.nextPhase}
           />
         </div>
       );
