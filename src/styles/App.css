@@ -19,7 +19,7 @@
   grid-row-end: span 4;
 }
 .supply-market {
-  height: 38vh;
+  height: 32vh;
 }
 .info {
   height: 6vh;
@@ -34,12 +34,22 @@
   overflow: auto;
 }
 .in-play {
-  height: 12vh;
+  height: 18vh;
 }
 .log,
 .trash,
 .combo-mat {
   outline: 1px solid #777;
+}
+.info {
+  margin: 0 .5rem;
+}
+.trash,
+.combo-mat,
+.log,
+.button-display {
+  display: flex;
+  flex-direction: column;
   margin: .5rem;
 }
 .deck {
@@ -47,9 +57,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 1rem auto;
+  margin: .5rem auto;
   height: 3.75rem;
-  width: 12.5rem;
+  width: 100%;
 }
 .live:hover {
   outline: 1px solid #fff;
@@ -92,18 +102,18 @@
 }
 .game-button {
   display: flex;
-  margin: auto;
   height: 1.775rem;
   padding-bottom: .1rem;
   background-color: #121c21;
-  width: 12.5rem;
   align-items: center;
   justify-content: space-around;
 }
 .breakline {
-  width: 12rem;
-  border-bottom: 1px solid #777;
-  margin: 4rem auto 1rem auto;
+  display: block;
+  height: 1px;
+  width: 100%;
+  background-color: #777;
+  margin: .5rem auto;
 }
 .instructions {
   margin: .5rem;

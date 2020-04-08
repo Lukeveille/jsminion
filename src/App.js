@@ -109,7 +109,7 @@ function App() {
         <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
         <span>Coin <span className='coin'>{treasure}</span> </span>
       </div>
-      <div className="trash"></div>
+      <div className="trash game-button">Trash</div>
       <div className="in-play">{<CardDisplay cards={inPlay}/>}</div>
       <div className="combo-mat"></div>
       <div className="button-display">
@@ -119,15 +119,13 @@ function App() {
           {phase? `End ${phase} Phase` : 'Start Turn'}
         </div>
         <div className="breakline"/>
-        <div>
-          <div className="deck">
-            <p>Deck</p>
-            <p>{deck.length}</p>
-          </div>
-          <div className="deck">
-            <p>Discard</p>
-            <p>{discard.length}</p>
-          </div>
+        <div className="deck">
+          <p>Deck</p>
+          <p>{deck.length}</p>
+        </div>
+        <div className="deck">
+          <p>Discard</p>
+          <p>{discard.length}</p>
         </div>
       </div>
       <div className="hand">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
