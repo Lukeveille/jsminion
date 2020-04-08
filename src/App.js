@@ -44,7 +44,7 @@ function App() {
     let newHand = [...hand],
     treasureCount = countValue(inPlay, 'treasure');
     const removal = newHand.findIndex(i => (i === card));
-    const size = phase !== 'Action' && card.type === 'Action'? 1 : count;
+    const size = phase === 'Action' && card.type === 'Action'? 1 : count;
     const cards = newHand.splice(removal, size);
     treasureCount += countTreasure(cards);
     if (card.action) {
