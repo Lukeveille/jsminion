@@ -10,34 +10,40 @@
     {
       "name": "Estate",
       "cost": 2,
-      "victory": 1
+      "victory": 1,
+      "type": "Victory"
     },
     {
       "name": "Duchy",
       "cost": 5,
-      "victory": 3
+      "victory": 3,
+      "type": "Victory"
     },
     {
       "name": "Province",
       "cost": 8,
-      "victory": 6
+      "victory": 6,
+      "type": "Victory"
     }
   ],
   "treasure": [
     {
       "name": "Copper",
       "cost": 0,
-      "treasure": 1
+      "treasure": 1,
+      "type": "Treasure"
     },
     {
       "name": "Silver",
       "cost": 3,
-      "treasure": 2
+      "treasure": 2,
+      "type": "Treasure"
     },
     {
       "name": "Gold",
       "cost": 6,
-      "treasure": 3
+      "treasure": 3,
+      "type": "Treasure"
     }
   ],
   "kingdom": [
@@ -46,13 +52,15 @@
       "cost": 3,
       "actions": 2,
       "cards": 1,
-      "action": {}
+      "action": {},
+      "type": "Action"
     },
     {
       "name": "Smithy",
       "cost": 4,
       "cards": 3,
-      "action": {}
+      "action": {},
+      "type": "Action"
     },
     {
       "name": "Market",
@@ -61,7 +69,8 @@
       "cards": 1,
       "buys": 1,
       "treasure": 1,
-      "action": {}
+      "action": {},
+      "type": "Action"
     }
   ]
 }

@@ -9,7 +9,7 @@ import './styles/App.css';
 
 function App() {
   const startingDeck = shuffle(startingCards()),
-  startingHand = startingDeck.splice(0, 5).sort(),
+  startingHand = startingDeck.splice(0, 5),
   [phase, setPhase] = useState(),
   [turn] = useState(true),
   [deck, setDeck] = useState(startingDeck),
@@ -25,7 +25,7 @@ function App() {
     allCards = allCards.concat(discard);
     return allCards;
   },
-  [victoryPoints] = useState(countValue(allCards(), 'victory')),
+  // [victoryPoints] = useState(countValue(allCards(), 'victory')),
   rollover = size => {
     const deckSplit = [...deck];
     let newHand = deckSplit.splice(0,size);
@@ -100,21 +100,25 @@ function App() {
     <div className="App">
       <h2>{phase? `${phase} Phase` : 'Turn Over'} </h2>
       <div>
-        <span>VP: {victoryPoints} | </span>
-        <span>Actions: {actions} | </span>
-        <span>Buys: {buys} | </span>
-        <span>Treasure: {treasure} </span>
+        {/* <span>VP: {victoryPoints} | </span> */}
+        <span>Action <span className='red'>{actions}</span> | </span>
+        <span>Buys <span className='red'>{buys}</span> | </span>
+        <span>Coin <span className='red'>{treasure}</span> </span>
       </div>
       <div className="hand in-play">{<CardDisplay cards={inPlay}/>}</div>
-      <div className="deck">
-        <p>Discard</p>
-        <p>{discard.length}</p>
+      
+      <div>
+        <div className="deck">
+          <p>Discard</p>
+          <p>{discard.length}</p>
+        </div>
+        <div className="deck">
+          <p>{deck.length}</p>
+          <p>Deck</p>
+        </div>
       </div>
-      <div className="hand">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
-      <div className="deck">
-        <p>Deck</p>
-        <p>{deck.length}</p>
-      </div>
+
+      <div className="card-display">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
       <div>
         <button disabled={!turn} onClick={nextPhase}>
           {phase? `End ${phase} Phase` : 'Start Turn'}

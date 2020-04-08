@@ -3,21 +3,23 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: auto;
+  margin: 1rem auto;
   height: 3.75rem;
-  width: 12.5rem;
-}
-.live {
-  outline: 2px solid #f06970;
+  width: 11rem;
 }
 .live:hover {
   outline: 2px solid #fff;
 }
 .card {
-  cursor: pointer;
+  cursor: default;
   font-size: 14px;
   height: 3.75rem;
   width: 12.5rem;
+  margin: 1rem;
+}
+.live {
+  outline: 2px solid #f06970;
+  cursor: pointer;
 }
 .card-top {
   background-color: #121c21;
@@ -40,10 +42,27 @@
   top: -.75rem;
   right: .75rem;
 }
-.hand {
+.card-info {
+  position: relative;
+}
+.card-display {
+  background-color: #1c272d;
   display: inline-block;
   margin: .5rem;
 }
 .in-play {
   display: inline-block;
+}
+.red {
+  color: #f06970;
+}
+
+.Treasure {
+  background-color: #f2cda2;
+}
+.Action {
+  background-color: #aaafb2;
+}
+.Victory {
+  background-color: #76a08c;
 }
