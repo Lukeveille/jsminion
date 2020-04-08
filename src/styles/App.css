@@ -1,9 +1,9 @@
 .App {
   display: grid;
-  grid-template-rows: 2.5fr .5fr 1fr 2fr;
-  grid-template-columns: 3fr 10fr 3fr;
+  grid-template-rows: 5fr 1fr 2fr 4fr;
+  grid-template-columns: 2fr 10fr 2fr;
   max-height: 1vh;
-  max-width: 1200px;
+  max-width: 1270px;
   margin: auto;
 }
 .supply-market,
@@ -31,7 +31,6 @@
 .in-play {
   background-color: #1c272d;
   margin: .5rem;
-  overflow: auto;
 }
 .hand {
   min-height: 38vh;
@@ -50,15 +49,22 @@
 }
 .trash,
 .combo-mat,
-.log,
 .button-display {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin: .5rem;
 }
+.log {
+  margin: .5rem;
+}
+.activeTrash:hover {
+  cursor: pointer;
+  outline: 1px solid #fff;
+  color: #fff;
+}
 .deck {
-  background-color: hsl(200, 29%, 10%);
+  background-color: #121c21;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -66,25 +72,40 @@
   height: 3.75rem;
   width: 100%;
 }
+.deck,
+.log,
+.info,
+.instructions,
+.game-button {
+  cursor: default;
+}
 .breakline {
   display: block;
   height: 1px;
-  width: 100%;
+  width: 100px;
+  top: 0;
   background-color: #777;
+  width: 100%;
+  margin-top: .25rem;
 }
 .live:hover {
-  outline: 1px solid #fff;
+  outline: 1px solid #aaafb2;
 }
 .card {
   cursor: default;
   font-size: 14px;
   height: 3.75rem;
   width: 12.5rem;
-  margin: 1rem .75rem;
+  margin: 1rem .3rem;
 }
 .live {
   outline: 1px solid #f06970;
   cursor: pointer;
+}
+.log {
+  background-color: #121c21;
+  padding: .3rem;
+  position: relative;
 }
 .card-top {
   background-color: #121c21;
@@ -105,7 +126,7 @@
 .card-stack {
   position: absolute;
   top: .35rem;
-  right: .45rem;
+  right: .02rem;
 }
 .card-info {
   position: relative;

@@ -5,8 +5,8 @@ import sorting from '../utils/sorting';
 export default props => {
   const cards = props.cards,
   cardElements = [];
-  cards.sort(sorting('type'));
   cards.sort(sorting('name'));
+  cards.sort(sorting('type'));
   let count = 1;
   for (let i = 0; i < cards.length; i++) {
     const correctAction = (

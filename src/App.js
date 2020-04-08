@@ -102,7 +102,10 @@ function App() {
   return (
     <div className="App">
       <div className="supply-market"></div>
-      <div className="log"></div>
+      <div className="log">
+        <p>Log</p>
+        <div className="breakline"/>
+      </div>
       <div className="info">
         <span className="hidden">VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
         <span>Action <span className='red'>{actions}</span> |&nbsp;</span>
