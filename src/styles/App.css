@@ -135,9 +135,19 @@
   margin: 0 .2rem;
 }
 .card-stack {
+  cursor: default;
+}
+.card-stack,
+.card-stack-live {
   position: absolute;
   top: .35rem;
   right: .02rem;
+}
+.card-stack-live {
+  cursor: pointer;
+}
+.card-stack-live:hover {
+  outline: 1px solid #f06970;
 }
 .card-info {
   position: relative;
@@ -184,4 +194,10 @@
 }
 .hidden {
   display: none;
+}
+.top-spaced {
+  margin-top: .5rem;
+}
+.inline {
+  display: inline-block;
 }

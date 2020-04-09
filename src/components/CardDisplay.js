@@ -24,8 +24,7 @@ export default props => {
         count++;
       } else {
         cardElements[i].push(
-          <div className="card-info" key={`card${i}${j}`}>
-            {count > 1? <p className="card-stack">{count}</p> : ''}
+          <div key={`card${i}${j}`} className="inline">
             <Card
               card={card}
               live={correctAction}

@@ -26,6 +26,10 @@ function App() {
     allCards = allCards.concat(discard);
     return allCards;
   },
+  treasureInHand = () => {
+    const handTreasures = hand.filter(card => (card.type === 'Treasure'))
+    return countValue(handTreasures, 'treasure');
+  },
   [victoryPoints] = useState(countValue(allCards(), 'victory')),
   rollover = size => {
     const deckSplit = [...deck];
@@ -97,7 +101,14 @@ function App() {
         setPhase(hasAction(hand)? 'Action' : 'Buy');
         break;
     }
-  };
+  },
+  instructions = phase === 'Action'?
+    'Choose Actions to play' :
+    phase === 'Discard'?
+    'Select up to ? Card(s) to Trash' :
+    phase === 'Buy'?
+    `Choose Cards to Buy (${buys})` :
+    '';
 
   return (
     <div className="App">
@@ -117,10 +128,15 @@ function App() {
       <div className="combo-mat"></div>
       <div className="button-display">
         <div>
-          <div className="game-button red">{phase? `${phase} Phase` : 'Turn Over'}</div>
-          <p className="instructions red">{phase? `${phase} Phase` : 'Turn Over'}</p>
+          <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
+          <p className="instructions red">{instructions}&nbsp;</p>
           <div className="game-button live" disabled={!turn} onClick={nextPhase}>
             {phase? `End ${phase} Phase` : 'Start Turn'}
+          </div>
+          <div
+            className={`game-button live top-spaced ${phase === 'Buy' && treasureInHand() > 0? '' : ' hidden'}`}
+          >
+            {`Play All Treasure (${treasureInHand()})`}
           </div>
         </div>
         <div>
