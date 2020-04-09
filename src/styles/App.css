@@ -1,9 +1,9 @@
 .App {
   display: grid;
   grid-template-rows: 5fr 1fr 2fr 4fr;
-  grid-template-columns: 2fr 10fr 2fr;
+  grid-template-columns: 1fr 4fr 1fr;
   max-height: 1vh;
-  max-width: 1270px;
+  max-width: 1300px;
   margin: auto;
 }
 .supply-market,
@@ -35,9 +35,16 @@
 .hand {
   min-height: 38vh;
   display: inline-block;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
 }
 .in-play {
-  height: 18vh;
+  height: 20vh;
 }
 .log,
 .trash,
@@ -60,8 +67,7 @@
 }
 .activeTrash:hover {
   cursor: pointer;
-  outline: 1px solid #fff;
-  color: #fff;
+  outline: 1px solid #f06970;
 }
 .deck {
   background-color: #121c21;
@@ -88,6 +94,10 @@
   width: 100%;
   margin-top: .25rem;
 }
+.hand,
+.in-play {
+  overflow: auto;
+}
 .live:hover {
   outline: 1px solid #aaafb2;
 }
@@ -97,6 +107,7 @@
   height: 3.75rem;
   width: 12.5rem;
   margin: 1rem .3rem;
+  margin-bottom: 0;
 }
 .live {
   outline: 1px solid #f06970;
@@ -104,7 +115,7 @@
 }
 .log {
   background-color: #121c21;
-  padding: .3rem;
+  padding: .3rem .5rem;
   position: relative;
 }
 .card-top {
@@ -135,14 +146,17 @@
 .game-button {
   display: flex;
   height: 1.775rem;
-  padding-bottom: .1rem;
   background-color: #121c21;
   align-items: center;
   justify-content: space-around;
 }
 .instructions {
   margin: .5rem;
+}
+.instructions,
+.game-button {
   padding-bottom: .1rem;
+  font-size: 14px;
 }
 .red {
   color: #f06970;

@@ -112,7 +112,7 @@ function App() {
         <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
         <span>Coin <span className='coin'>{treasure}</span> </span>
       </div>
-      <div className="trash game-button">Trash</div>
+      <div className="trash game-button activeTrash">Trash</div>
       <div className="in-play">{<CardDisplay cards={inPlay}/>}</div>
       <div className="combo-mat"></div>
       <div className="button-display">
@@ -135,7 +135,7 @@ function App() {
           </div>
         </div>
       </div>
-      <div className="hand">{<CardDisplay cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
+      <div className="hand">{<CardDisplay stacked={true} cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
     </div>
   );
 };

@@ -3,7 +3,8 @@
     {
       "name": "Curse",
       "cost": 0,
-      "victory": -1
+      "victory": -1,
+      "type": "Victory"
     }
   ],
   "victory": [
