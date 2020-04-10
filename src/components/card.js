@@ -1,7 +1,9 @@
 import React from 'react';
+import { useState } from 'react';
 
 export default props => {
-  // return <div className="card-info">
+  const [showFullCard, setShowFullCard] = useState(false);
+
   return <div className="card-info">
     {props.count > 1? <p onClick={e => {
       if (props.live) {
@@ -12,12 +14,35 @@ export default props => {
     <div
       className={`card ${props.card.type} ${props.live? 'live' : ''}`}
       onClick={() => {if (props.live) { props.nextPhase(props.card, 1) }}}
+      onMouseOver={() => {
+        setShowFullCard(true);
+      }}
+      onMouseOut={() => {
+        setShowFullCard(false);
+      }}
     >
       <p className="card-top">{props.card.name}</p>
       <div className="card-btm">
         <p className="card-side">{props.card.cost}</p>
         <p>{props.card.type}</p>
         <p className="card-side">&nbsp;</p>
+      </div>
+      <div className={`full-card-wrapper  ${props.stacked? 'lower-card' : ''}`}>
+        <div className={`full-card ${props.card.type} ${showFullCard && props.altKey? '' : 'hidden'} ${props.live? 'full-card-live' : ''}`}>
+          <div className="card-top">
+            <p>{props.card.name}</p>
+            <div className={`${props.card.type === 'Action'? 'action' : 'card'}-image`} />
+            {props.card.type === 'Action'? <div className="card-innstructions">
+              <div className="perks"></div>
+              <div className="instructions">{props.card.instructions}</div>
+            </div> : ''}
+          </div>
+          <div className="card-btm">
+            <p className="card-side">{props.card.cost}</p>
+            <p>{props.card.type}</p>
+            <p className="card-side">&nbsp;</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

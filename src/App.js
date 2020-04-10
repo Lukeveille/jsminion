@@ -12,6 +12,7 @@ function App() {
   const startingDeck = shuffle(startingCards()),
   startingHand = startingDeck.splice(0, 5),
   [phase, setPhase] = useState(),
+  [altKey, setAltKey] = useState(false),
   [turn] = useState(true),
   [deck, setDeck] = useState(startingDeck),
   [hand, setHand] = useState(startingHand),
@@ -119,6 +120,13 @@ function App() {
     `Choose Cards to Buy (${buys})` :
     '';
 
+  window.onkeydown = e => {
+    if (e.keyCode === 18) setAltKey(true);
+  }
+  window.onkeyup = e => {
+    if (e.keyCode === 18) setAltKey(false);
+  }
+
   return (
     <div className="App">
       <div className="supply-market"></div>
@@ -133,7 +141,7 @@ function App() {
         <span>Coin <span className='coin'>{treasure}</span> </span>
       </div>
       <div className="trash game-button active-trash">Trash</div>
-      <div className="in-play">{<CardDisplay cards={inPlay}/>}</div>
+      <div className="in-play">{<CardDisplay altKey={altKey} cards={inPlay}/>}</div>
       <div className="combo-mat"></div>
       <div className="button-display">
         <div>
@@ -161,7 +169,13 @@ function App() {
           </div>
         </div>
       </div>
-      <div className="hand">{<CardDisplay stacked={true} cards={hand} phase={phase} nextPhase={nextPhase}/>}</div>
+      <div className="hand">{<CardDisplay
+        altKey={altKey}
+        stacked={true}
+        cards={hand}
+        phase={phase}
+        nextPhase={nextPhase}
+      />}</div>
     </div>
   );
 };

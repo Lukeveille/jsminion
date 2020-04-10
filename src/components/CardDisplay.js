@@ -26,9 +26,11 @@ export default props => {
         cardElements[i].push(
           <div key={`card${i}${j}`} className="inline">
             <Card
+              altKey={props.altKey}
               card={card}
               live={correctAction}
               count={count}
+              stacked={props.stacked}
               nextPhase={props.nextPhase}
             />
           </div>
