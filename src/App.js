@@ -44,6 +44,15 @@ function App() {
     }
     return newHand
   },
+  playTreasure = () => {
+    let newHand = [...hand];
+    const treasures = newHand.filter(card => (card.type === 'Treasure')),
+    newPlay = [...inPlay].concat(treasures);
+    newHand = newHand.filter(card => (card.type !== 'Treasure'));
+    setTreasure(countTreasure(newPlay));
+    setInPlay(newPlay);
+    setHand(newHand);
+  },
   moveCard = (card, count) => {
     let newHand = [...hand],
     treasureCount = countValue(inPlay, 'treasure');
@@ -123,7 +132,7 @@ function App() {
         <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
         <span>Coin <span className='coin'>{treasure}</span> </span>
       </div>
-      <div className="trash game-button activeTrash">Trash</div>
+      <div className="trash game-button active-trash">Trash</div>
       <div className="in-play">{<CardDisplay cards={inPlay}/>}</div>
       <div className="combo-mat"></div>
       <div className="button-display">
@@ -135,6 +144,7 @@ function App() {
           </div>
           <div
             className={`game-button live top-spaced ${phase === 'Buy' && treasureInHand() > 0? '' : ' hidden'}`}
+            onClick={playTreasure}
           >
             {`Play All Treasure (${treasureInHand()})`}
           </div>

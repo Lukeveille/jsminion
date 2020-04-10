@@ -65,7 +65,7 @@
 .log {
   margin: .5rem;
 }
-.activeTrash:hover {
+.active-trash:hover {
   cursor: pointer;
   outline: 1px solid #f06970;
 }
@@ -145,9 +145,10 @@
 }
 .card-stack-live {
   cursor: pointer;
+  color: #f06970;
 }
 .card-stack-live:hover {
-  outline: 1px solid #f06970;
+  color: #aaafb2;
 }
 .card-info {
   position: relative;
