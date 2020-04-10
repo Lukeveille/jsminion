@@ -146,6 +146,7 @@
 .card-stack-live {
   cursor: pointer;
   color: #f06970;
+  text-shadow: .1rem .1rem .1rem #000;
 }
 .card-stack-live:hover {
   color: #aaafb2;
