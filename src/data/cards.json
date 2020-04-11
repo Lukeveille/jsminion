@@ -1,12 +1,4 @@
 {
-  "curse": [
-    {
-      "name": "Curse",
-      "cost": 0,
-      "victory": -1,
-      "type": "Victory"
-    }
-  ],
   "victory": [
     {
       "name": "Estate",
@@ -24,6 +16,12 @@
       "name": "Province",
       "cost": 8,
       "victory": 6,
+      "type": "Victory"
+    },
+    {
+      "name": "Curse",
+      "cost": 0,
+      "victory": -1,
       "type": "Victory"
     }
   ],
@@ -47,7 +45,7 @@
       "type": "Treasure"
     }
   ],
-  "kingdom": [
+  "action": [
     {
       "name": "Village",
       "cost": 3,

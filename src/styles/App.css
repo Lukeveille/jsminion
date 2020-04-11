@@ -156,13 +156,16 @@
   justify-content: center;
   margin-top: .5rem;
 }
+.action-image,
+.card-image {
+  background-position: center;
+  background-size: cover;
+}
 .action-image {
   height: 8rem;
-  background-color: #aaafb2;
 }
 .card-image {
   height: 16.2rem;
-  background-color: #aaafb2;
 }
 .card-btm {
   display: flex;

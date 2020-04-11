@@ -3,8 +3,8 @@ import { useState } from 'react';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
-import countTreasure from './utils/countTreasure';
 import startingCards from './data/startingCards';
+import countTreasure from './utils/countTreasure';
 import CardDisplay from './components/CardDisplay';
 import './styles/App.css';
 

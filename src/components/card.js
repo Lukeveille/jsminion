@@ -31,7 +31,12 @@ export default props => {
         <div className={`full-card ${props.card.type} ${showFullCard && props.altKey? '' : 'hidden'} ${props.live? 'full-card-live' : ''}`}>
           <div className="card-top">
             <p>{props.card.name}</p>
-            <div className={`${props.card.type === 'Action'? 'action' : 'card'}-image`} />
+            <div
+              className={`${props.card.type === 'Action'? 'action' : 'card'}-image`}
+              style={{
+                backgroundImage: `url(${props.card.path})`
+              }}
+            />
             {props.card.type === 'Action'? <div className="card-innstructions">
               <div className="perks"></div>
               <div className="instructions">{props.card.instructions}</div>
