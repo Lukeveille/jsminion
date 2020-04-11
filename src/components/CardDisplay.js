@@ -20,7 +20,6 @@ export default props => {
         (props.phase === 'Action' && card.action !== undefined) ||
         (props.phase === 'Buy' && card.treasure !== undefined && card.action === undefined)
       );
-      // image = allCards.filter();
       if (cards[j+1] && cards[j+1].name === card.name) {
         count++;
       } else {

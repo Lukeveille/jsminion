@@ -13,7 +13,7 @@ export default props => {
     }}className={`card-stack${props.live && props.card.type !== 'Action'? '-live' : ''}`}>{props.count}</p> : ''}
     <div
       className={`card ${props.card.type} ${props.live? 'live' : ''}`}
-      onClick={() => {if (props.live) { props.nextPhase(props.card, 1) }}}
+      onClick={() => { if (props.live) { props.nextPhase(props.card, 1) }}}
       onMouseOver={() => {
         setShowFullCard(true);
       }}
@@ -37,8 +37,13 @@ export default props => {
                 backgroundImage: `url(${props.card.path})`
               }}
             />
-            {props.card.type === 'Action'? <div className="card-innstructions">
-              <div className="perks"></div>
+            {props.card.type === 'Action'? <div className="card-instructions">
+              <div className="perks">
+              {props.card.cards? <p>+{props.card.cards} Card{props.card.cards > 1? 's' : ''}</p> : ''}
+              {props.card.actions? <p>+{props.card.actions} Action{props.card.actions > 1? 's' : ''}</p> : ''}
+              {props.card.buys? <p>+{props.card.buys} Buy{props.card.buys > 1? 's' : ''}</p> : ''}
+              {props.card.treasure? <p>+<span className='coin'>{props.card.treasure}</span></p> : ''}
+              </div>
               <div className="instructions">{props.card.instructions}</div>
             </div> : ''}
           </div>

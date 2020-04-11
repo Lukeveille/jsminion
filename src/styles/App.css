@@ -151,10 +151,12 @@
 .card-top p {
   margin-bottom: .25rem;
 }
-.card-innstructions {
+.card-instructions {
   display: flex;
   justify-content: center;
-  margin-top: .5rem;
+  align-items: center;
+  min-height: 8rem;
+  font-size: 14px;
 }
 .action-image,
 .card-image {
