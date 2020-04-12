@@ -1,10 +1,6 @@
 import React from 'react';
-import { useEffect } from 'react';
 
 export default props => {
-  useEffect(() => {
-    console.log(props);
-  }, [props.children])
   return <div
     style={{display: props.show? 'flex' : 'none' }}
     className="modal-bg"

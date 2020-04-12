@@ -160,7 +160,7 @@ function App() {
           };
         }}
       >Trash ({trash.length})</div>
-      <div className="in-play">{<CardDisplay altKey={altKey} cards={inPlay}/>}</div>
+      <div className="in-play">{<CardDisplay sort={true} altKey={altKey} cards={inPlay}/>}</div>
       <div className="combo-mat"></div>
       <div className="button-display">
         <div>
@@ -200,6 +200,7 @@ function App() {
         {<CardDisplay
           altKey={altKey}
           stacked={true}
+          sort={true}
           cards={hand}
           phase={phase}
           nextPhase={nextPhase}
