@@ -105,7 +105,7 @@ function App() {
           setSupply(newSupply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
-          victory = victory + card.victory
+          victory = card.victory? victory + card.victory : victory;
         } else if (card.type === 'Treasure') {
           playCard(card, count);
         } else {
