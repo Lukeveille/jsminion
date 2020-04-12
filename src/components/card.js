@@ -11,19 +11,22 @@ export default props => {
     }, [props.altKey])
 
   return <div className="card-info">
-    {props.count > 1? <p onClick={e => {
-      if (props.live) {
-        props.nextPhase(props.card, props.count);
-        e.stopPropagation();
-      }
-    }}className={`card-stack${props.live && props.card.type !== 'Action'? '-live' : ''}`}>{props.count}</p> : ''}
+    {props.count > 1? <p
+      onClick={e => {
+        if (props.live) {
+          props.onClick(props.card, props.count);
+          e.stopPropagation();
+        }
+      }}
+      className={`card-stack${props.live && props.card.type !== 'Action' && props.stacked? '-live' : ''}`}
+    >
+      {props.count}
+    </p> : ''}
     <div
-      className={`card ${props.card.type} ${props.live? 'live' : ''}`}
-      onClick={() => { if (props.live) { props.nextPhase(props.card, 1) }}}
+      className={`card ${props.card.type} ${props.card.name === 'Curse'? 'curse' : ''} ${props.live? 'live' : ''}`}
+      onClick={() => { if (props.live) props.onClick(props.card, 1, props.supply? true : false) }}
       onMouseOver={() => {
         setShowFullCard(true);
-        // console.log(`OVER ${showFullCard}`)
-        // console.log(`ALT ${props.altKey}`)
       }}
       onMouseOut={() => {
         setShowFullCard(false);
@@ -36,7 +39,7 @@ export default props => {
         <p className="card-side">&nbsp;</p>
       </div>
       <div className={`full-card-wrapper  ${props.stacked? 'lower-card' : ''}`}>
-        <div className={`full-card ${props.card.type} ${showFullCard && altKey? '' : 'hidden'} ${props.live? 'full-card-live' : ''}`}>
+        <div className={`full-card ${props.card.type} ${showFullCard && altKey? '' : 'hidden'} ${props.live? 'full-card-live' : ''} ${props.card.name === 'Curse'? 'curse' : ''}`}>
           <div className="card-top">
             <p>{props.card.name}</p>
             <div

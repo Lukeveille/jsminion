@@ -3,8 +3,8 @@ import { useState } from 'react';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
-import startingCards from './data/startingCards';
 import countTreasure from './utils/countTreasure';
+import { startingCards, supplies } from './data/cardSets';
 import CardDisplay from './components/CardDisplay';
 import Modal from './components/Modal';
 import './styles/App.css';
@@ -22,6 +22,8 @@ function App() {
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
   [trash, setTrash] = useState([]),
+  [supply, setSupply] = useState(supplies()),
+  [bought, setBought] = useState(0),
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
@@ -42,7 +44,7 @@ function App() {
     const handTreasures = hand.filter(card => (card.type === 'Treasure'));
     return handTreasures.length;
   },
-  [victoryPoints] = useState(countValue(allCards(), 'victory')),
+  [victoryPoints, setVictoryPoints] = useState(countValue(allCards(), 'victory')),
   rollover = size => {
     const deckSplit = [...deck];
     let newHand = deckSplit.splice(0,size);
@@ -81,23 +83,39 @@ function App() {
     setTreasure(treasureCount);
     return newHand;
   },
-  nextPhase = (card, count) => {
+  nextPhase = (card, count, supplyOn) => {
     let newHand = [];
     switch (phase) {
       case 'Action':
         let actionTotal = actions-1;
         if (card.actions) { actionTotal += card.actions };
-        if (card.action) newHand = playCard(card, count);
+        if (card.type === 'Action') newHand = playCard(card, count);
         setActions(hasAction(newHand)? actionTotal : 0);
         if (!actionTotal || !hasAction(newHand)) setPhase('Buy');
         break;
       case 'Buy':
-        if (card.treasure) {
+        let buysLeft = buys,
+        victory = victoryPoints,
+        discarded = discard;
+        if (supplyOn) {
+          const newSupply = [...supply];
+          let cardBought = supply.findIndex(i => (i === card));
+          cardBought = newSupply.splice(cardBought, 1)
+          discarded = [...discard].concat(cardBought);
+          setSupply(newSupply);
+          setBought(bought + card.cost);
+          buysLeft = buysLeft - 1;
+          victory = victory + card.victory
+        } else if (card.type === 'Treasure') {
           playCard(card, count);
         } else {
+          buysLeft = 0;
+        };
+        if (buysLeft < 1 || (treasure - bought - card.cost) < 1) {
+          buysLeft = 0;
           const deckSplit = [...deck];
           setInPlay([]);
-          let discarded = discard.concat(inPlay);
+          discarded = discarded.concat(inPlay);
           discarded = discarded.concat(hand);
           newHand = deckSplit.splice(0,5);
           if (deck.length > 5) {
@@ -109,12 +127,14 @@ function App() {
             setDeck(shuffled);
           }
           setHand(newHand);
-          setDiscard(discarded);
           setActions(0);
-          setBuys(0);
+          setBought(0);
           setTreasure(0);
           setPhase(null);
-        };
+        }
+        setVictoryPoints(victory);
+        setDiscard(discarded);
+        setBuys(buysLeft);
         break;
       default:
         setBuys(1);
@@ -132,24 +152,38 @@ function App() {
     '';
 
   window.onkeydown = e => {
-    if (e.keyCode === 18) setAltKey(true);
-  }
+    if (e.keyCode === 18) {
+      setAltKey(true);
+    } else if (e.keyCode === 27) {
+      setShowModal(false);
+    };
+  };
   window.onkeyup = e => {
     if (e.keyCode === 18) setAltKey(false);
-  }
+  };
 
   return (
     <div className="App">
-      <div className="supply-market"></div>
+      <div className="supply-market">
+        <CardDisplay
+          coin={treasure - bought}
+          phase={phase}
+          onClick={nextPhase}
+          sort={true}
+          supply={true}
+          altKey={altKey}
+          cards={supply}
+        />
+      </div>
       <div className="log">
         <p>Log</p>
         <div className="breakline"/>
       </div>
       <div className="info">
-        <span className="hidden">VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
+        <span>VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
         <span>Action <span className='red'>{actions}</span> |&nbsp;</span>
         <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
-        <span>Coin <span className='coin'>{treasure}</span> </span>
+        <span>Coin <span className='coin'>{treasure - bought}</span> </span>
       </div>
       <div
         className={`trash game-button ${trash.length > 0? 'active' : ''}`}
@@ -160,7 +194,7 @@ function App() {
           };
         }}
       >Trash ({trash.length})</div>
-      <div className="in-play">{<CardDisplay sort={true} altKey={altKey} cards={inPlay}/>}</div>
+      <div className="in-play"><CardDisplay sort={true} altKey={altKey} cards={inPlay}/></div>
       <div className="combo-mat"></div>
       <div className="button-display">
         <div>
@@ -203,7 +237,7 @@ function App() {
           sort={true}
           cards={hand}
           phase={phase}
-          nextPhase={nextPhase}
+          onClick={nextPhase}
         />}
       </div>
       {currentModal(modalContent)}
