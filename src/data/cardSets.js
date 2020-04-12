@@ -1,5 +1,7 @@
 import cardList from './cards.json';
 
+export const standardGame = ['Market', 'Village', 'Smithy'];
+
 const importAll = files => {
   return files.keys().map(files)
 },
@@ -10,39 +12,36 @@ extract = data => {
   }
 },
 cardImages = importAll(require.context(`../media`)),
-allCards = {
+cardTypes = ['treasure', 'victory'],
+allCards = (set = []) => ({
   victory: cardList.victory.map(extract(cardImages)),
   treasure: cardList.treasure.map(extract(cardImages)),
-  action: cardList.action.map(extract(cardImages))
-};
+  action: cardList.action.map(extract(cardImages)).filter(card => ( set.includes(card.name) ))
+});
 
-export const startingCards =  () => {
+export const startingCards = () => {
   const startingDeck = [];
-  for (let j = 0; j < 7; j++) {
-    startingDeck.push(allCards.treasure[0]);
-  };
-  for (let i = 0; i < 3; i++) {
-    startingDeck.push(allCards.victory[0]);
-  };
+  cardTypes.forEach(type => {
+    for (let j = 0; j < (type === 'treasure'? 7 : 3); j++) {
+      startingDeck.push(allCards()[type][0]);
+    };
+  });
   return startingDeck;
 };
 
-export const supplies =  () => {
-  const allSupplies = [];
-  for (let j = 0; j < allCards.treasure.length; j++) {
-    for (let i = 0; i < 20 * (3-j); i++) {
-      allSupplies.push(allCards.treasure[j]);
-    };
+export const supplies = (set = []) => {
+  const allCardTypes = cardTypes.concat('action'),
+  allSupplies = [],
+  setSupplies = type => {
+    allCards(set)[type].forEach((cardType, i) => {
+      const equation = type === 'treasure'? 20 * (3-i) : type === 'action' || cardType.name === 'Curse'? 10 : 8;
+      for (let j = 0; j < equation; j++) {
+        allSupplies.push(cardType);
+      };
+    });
   };
-  for (let j = 0; j < allCards.victory.length; j++) {
-    for (let i = 0; i < (j === 3? 10 : 8); i++) {
-      allSupplies.push(allCards.victory[j]);
-    };
-  };
-  for (let j = 0; j < allCards.action.length; j++) {
-    for (let i = 0; i < 10; i++) {
-      allSupplies.push(allCards.action[j]);
-    };
-  };
+
+  allCardTypes.forEach(setSupplies);
+
   return allSupplies;
-}
+};

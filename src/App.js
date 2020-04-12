@@ -4,7 +4,7 @@ import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
 import countTreasure from './utils/countTreasure';
-import { startingCards, supplies } from './data/cardSets';
+import { startingCards, supplies, standardGame } from './data/cardSets';
 import CardDisplay from './components/CardDisplay';
 import Modal from './components/Modal';
 import './styles/App.css';
@@ -21,8 +21,8 @@ function App() {
   [hand, setHand] = useState(startingHand),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
-  [trash, setTrash] = useState([]),
-  [supply, setSupply] = useState(supplies()),
+  [trash] = useState([]),
+  [supply, setSupply] = useState(supplies(standardGame)),
   [bought, setBought] = useState(0),
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
@@ -180,7 +180,7 @@ function App() {
         <div className="breakline"/>
       </div>
       <div className="info">
-        <span>VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
+        <span className="hidden">VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
         <span>Action <span className='red'>{actions}</span> |&nbsp;</span>
         <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
         <span>Coin <span className='coin'>{treasure - bought}</span> </span>
