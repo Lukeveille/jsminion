@@ -1,8 +1,14 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 
 export default props => {
   const [showFullCard, setShowFullCard] = useState(false);
+  const [altKey, setAltKey] = useState(false);
+
+    useEffect(e => {
+      setAltKey(props.altKey)
+    }, [props.altKey])
 
   return <div className="card-info">
     {props.count > 1? <p onClick={e => {
@@ -16,6 +22,8 @@ export default props => {
       onClick={() => { if (props.live) { props.nextPhase(props.card, 1) }}}
       onMouseOver={() => {
         setShowFullCard(true);
+        // console.log(`OVER ${showFullCard}`)
+        // console.log(`ALT ${props.altKey}`)
       }}
       onMouseOut={() => {
         setShowFullCard(false);
@@ -28,7 +36,7 @@ export default props => {
         <p className="card-side">&nbsp;</p>
       </div>
       <div className={`full-card-wrapper  ${props.stacked? 'lower-card' : ''}`}>
-        <div className={`full-card ${props.card.type} ${showFullCard && props.altKey? '' : 'hidden'} ${props.live? 'full-card-live' : ''}`}>
+        <div className={`full-card ${props.card.type} ${showFullCard && altKey? '' : 'hidden'} ${props.live? 'full-card-live' : ''}`}>
           <div className="card-top">
             <p>{props.card.name}</p>
             <div

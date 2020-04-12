@@ -1,7 +1,11 @@
 import React from 'react';
+import { useEffect } from 'react';
 
-export default props => (
-  <div
+export default props => {
+  useEffect(() => {
+    console.log(props);
+  }, [props.children])
+  return <div
     style={{display: props.show? 'flex' : 'none' }}
     className="modal-bg"
     onClick={() => props.setShow(false)}
@@ -13,4 +17,4 @@ export default props => (
       <div className="modal-content">{props.children}</div>
     </div>
   </div>
-);
+};

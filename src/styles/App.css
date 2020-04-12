@@ -265,6 +265,8 @@
   display: inline-block;
   border: 1px solid #777;
   background-color: #1e2e36;
+  max-width: 80vw;
+  position: relative;
 }
 .modal-content {
   margin: 2.5em;
@@ -272,10 +274,6 @@
 .modal-box h3,
 .modal-box h4 {
   margin: .2em;
-}
-.modal-top-row {
-  position: relative;
-  text-align: right;
 }
 .x-close-button {
   display: inline-block;
@@ -285,14 +283,8 @@
   cursor: pointer;
   color: #aaafb2;
   font-family: Arial, Helvetica, sans-serif;
-
   font-size: 14px;
   font-weight: 500;
   background-color: #121c21;
   padding: .3rem .5rem;
 }
-/* .x-close-button:hover {
-  background-color: #ddd;
-  color: #444;
-  border-color: #444;
-} */

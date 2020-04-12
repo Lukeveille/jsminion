@@ -14,7 +14,7 @@ function App() {
   startingHand = startingDeck.splice(0, 5),
   [phase, setPhase] = useState(),
   [showModal, setShowModal] = useState(false),
-  [modalContent, setModalContent] = useState(<p>hi</p>),
+  [modalContent, setModalContent] = useState([]),
   [altKey, setAltKey] = useState(false),
   [turn] = useState(true),
   [deck, setDeck] = useState(startingDeck),
@@ -25,6 +25,13 @@ function App() {
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
+  currentModal = cards => {
+    return <Modal
+      show={showModal}
+      setShow={setShowModal}
+      children={<CardDisplay altKey={altKey} cards={cards} />}
+    />
+  },
   allCards = () => {
     let allCards = deck.concat(hand);
     allCards = allCards.concat(inPlay);
@@ -145,12 +152,14 @@ function App() {
         <span>Coin <span className='coin'>{treasure}</span> </span>
       </div>
       <div
-        className="trash game-button active"
+        className={`trash game-button ${trash.length > 0? 'active' : ''}`}
         onClick={() => {
-          setModalContent(<p>trash</p>);
-          setShowModal(true);
+          if (trash.length > 0) {
+            setModalContent(trash);
+            setShowModal(true);
+          };
         }}
-      >Trash</div>
+      >Trash ({trash.length})</div>
       <div className="in-play">{<CardDisplay altKey={altKey} cards={inPlay}/>}</div>
       <div className="combo-mat"></div>
       <div className="button-display">
@@ -177,9 +186,9 @@ function App() {
             className={`deck ${discard.length > 0? 'active' : ''}`}
             onClick={() => {
               if (discard.length > 0) {
-                setModalContent(<p>discard</p>);
+                setModalContent(discard);
                 setShowModal(true);
-              }
+              };
             }}
           >
             <p>Discard</p>
@@ -187,16 +196,16 @@ function App() {
           </div>
         </div>
       </div>
-      <div className="hand">{<CardDisplay
-        altKey={altKey}
-        stacked={true}
-        cards={hand}
-        phase={phase}
-        nextPhase={nextPhase}
-      />}</div>
-
-        <Modal show={showModal} setShow={setShowModal} children={modalContent} />
-      
+      <div className="hand">
+        {<CardDisplay
+          altKey={altKey}
+          stacked={true}
+          cards={hand}
+          phase={phase}
+          nextPhase={nextPhase}
+        />}
+      </div>
+      {currentModal(modalContent)}
     </div>
   );
 };
