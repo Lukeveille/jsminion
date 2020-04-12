@@ -6,18 +6,22 @@ import hasAction from './utils/hasAction';
 import startingCards from './data/startingCards';
 import countTreasure from './utils/countTreasure';
 import CardDisplay from './components/CardDisplay';
+import Modal from './components/Modal';
 import './styles/App.css';
 
 function App() {
   const startingDeck = shuffle(startingCards()),
   startingHand = startingDeck.splice(0, 5),
   [phase, setPhase] = useState(),
+  [showModal, setShowModal] = useState(false),
+  [modalContent, setModalContent] = useState(<p>hi</p>),
   [altKey, setAltKey] = useState(false),
   [turn] = useState(true),
   [deck, setDeck] = useState(startingDeck),
   [hand, setHand] = useState(startingHand),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
+  [trash, setTrash] = useState([]),
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
@@ -140,7 +144,13 @@ function App() {
         <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
         <span>Coin <span className='coin'>{treasure}</span> </span>
       </div>
-      <div className="trash game-button active-trash">Trash</div>
+      <div
+        className="trash game-button active"
+        onClick={() => {
+          setModalContent(<p>trash</p>);
+          setShowModal(true);
+        }}
+      >Trash</div>
       <div className="in-play">{<CardDisplay altKey={altKey} cards={inPlay}/>}</div>
       <div className="combo-mat"></div>
       <div className="button-display">
@@ -163,7 +173,15 @@ function App() {
             <p>Deck</p>
             <p>{deck.length}</p>
           </div>
-          <div className="deck">
+          <div
+            className={`deck ${discard.length > 0? 'active' : ''}`}
+            onClick={() => {
+              if (discard.length > 0) {
+                setModalContent(<p>discard</p>);
+                setShowModal(true);
+              }
+            }}
+          >
             <p>Discard</p>
             <p>{discard.length}</p>
           </div>
@@ -176,6 +194,9 @@ function App() {
         phase={phase}
         nextPhase={nextPhase}
       />}</div>
+
+        <Modal show={showModal} setShow={setShowModal} children={modalContent} />
+      
     </div>
   );
 };
