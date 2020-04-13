@@ -281,7 +281,7 @@
   position: relative;
 }
 .modal-content {
-  margin: 2.5em;
+  margin: 0 2.5em 1.25rem;
 }
 .modal-box h3,
 .modal-box h4 {

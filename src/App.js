@@ -27,8 +27,11 @@ function App() {
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
+  [gameOver, setGameOver] = useState(false),
+  [emptySupply, setEmptySupply] = useState(0),
   currentModal = cards => {
     return <Modal
+      close={true}
       show={showModal}
       setShow={setShowModal}
       children={<CardDisplay altKey={altKey} cards={cards} />}
@@ -100,24 +103,22 @@ function App() {
         if (supplyOn) {
           let newSupply = [...supply];
           let cardBought = supply.findIndex(i => (i === card));
-          
           cardBought = newSupply.splice(cardBought, 1);
           const cardsLeft = newSupply.filter(newCard => newCard.name === card.name).length;
-
+          victory = card.victory? victory + card.victory : victory;
           if (!cardsLeft) {
+            setEmptySupply(emptySupply + 1)
             cardBought = {...cardBought[0], empty: true}
             newSupply = newSupply.concat(cardBought)
+          if (card.name === 'Province' || emptySupply === 2) setGameOver(<div><h1>Game Over</h1><p>{victory} Victory Points</p></div>);
           } else {
             discarded = [...discard].concat(cardBought);
           }
-          
           setSupply(newSupply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
-          victory = card.victory? victory + card.victory : victory;
         } else if (card.type === 'Treasure') {
           playCard(card, count);
-          console.log(buysLeft)
         } else {
           buysLeft = 0;
         };
@@ -125,8 +126,7 @@ function App() {
           buysLeft = 0;
           const deckSplit = [...deck];
           setInPlay([]);
-          discarded = discarded.concat(inPlay);
-          discarded = discarded.concat(hand);
+          discarded = discarded.concat(inPlay).concat(hand);
           newHand = deckSplit.splice(0,5);
           if (deck.length > 5) {
             setDeck(deckSplit);
@@ -250,6 +250,11 @@ function App() {
           onClick={nextPhase}
         />}
       </div>
+      <Modal
+        show={gameOver? true : false}
+        setShow={() => {}}
+        children={gameOver}
+      />
       {currentModal(modalContent)}
     </div>
   );
