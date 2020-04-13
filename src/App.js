@@ -123,9 +123,9 @@ function App() {
           cardBought = newSupply.splice(cardBought, 1);
           const cardsLeft = newSupply.filter(newCard => newCard.name === card.name).length;
           victory = card.victory? victory + card.victory : victory;
+          discarded = [...discard].concat(cardBought);
           if (!cardsLeft) {
             setEmptySupply(emptySupply + 1)
-            discarded = [...discard].concat(cardBought);
             cardBought = {...cardBought[0], empty: true}
             newSupply = newSupply.concat(cardBought)
             if (card.name === 'Province' || emptySupply === 2) {
@@ -221,7 +221,6 @@ function App() {
       </div>
       <div className="info">
         <span className="hidden">VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
-        {/* <span>VP <span className='red'>{victoryPoints}</span> |&nbsp;</span> */}
         <span>Action <span className='red'>{actions}</span> |&nbsp;</span>
         <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
         <span>Coin <span className='coin'>{treasure - bought}</span> </span>
