@@ -108,10 +108,12 @@ function App() {
           victory = card.victory? victory + card.victory : victory;
         } else if (card.type === 'Treasure') {
           playCard(card, count);
+          console.log(buysLeft)
         } else {
           buysLeft = 0;
         };
-        if (buysLeft < 1 || (treasure - bought - card.cost) < 1) {
+        if (buysLeft < 1 || ((treasure - bought - card.cost) < 1 && supplyOn)) {
+          alert('did it!')
           buysLeft = 0;
           const deckSplit = [...deck];
           setInPlay([]);
