@@ -10,21 +10,21 @@ export default props => {
       setAltKey(props.altKey)
     }, [props.altKey])
 
-  return <div className="card-info">
-    {props.count > 1? <p
+  return <div className={`card-info ${props.card.empty? 'transparent' : ''}`}>
+    {props.count > 1 || props.supply? <p
       onClick={e => {
-        if (props.live) {
+        if (props.live && !props.card.empty) {
           props.onClick(props.card, props.count);
           e.stopPropagation();
         }
       }}
       className={`card-stack${props.live && props.card.type !== 'Action' && props.stacked? '-live' : ''}`}
     >
-      {props.count}
+      {props.card.empty? 0 : props.count}
     </p> : ''}
     <div
-      className={`card ${props.card.type} ${props.card.name === 'Curse'? 'curse' : ''} ${props.live? 'live' : ''}`}
-      onClick={() => { if (props.live) props.onClick(props.card, 1, props.supply? true : false) }}
+      className={`card ${props.card.type} ${props.card.name === 'Curse'? 'curse' : ''} ${props.live && !props.card.empty? 'live' : ''}`}
+      onClick={() => { if (props.live && !props.card.empty) props.onClick(props.card, 1, props.supply? true : false) }}
       onMouseOver={() => {
         setShowFullCard(true);
       }}

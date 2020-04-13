@@ -257,6 +257,9 @@
 .inline {
   display: inline-block;
 }
+.transparent {
+  opacity: .5;
+}
 
 /* Modals */
 .modal-bg {

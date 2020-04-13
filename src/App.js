@@ -98,10 +98,19 @@ function App() {
         victory = victoryPoints,
         discarded = discard;
         if (supplyOn) {
-          const newSupply = [...supply];
+          let newSupply = [...supply];
           let cardBought = supply.findIndex(i => (i === card));
-          cardBought = newSupply.splice(cardBought, 1)
-          discarded = [...discard].concat(cardBought);
+          
+          cardBought = newSupply.splice(cardBought, 1);
+          const cardsLeft = newSupply.filter(newCard => newCard.name === card.name).length;
+
+          if (!cardsLeft) {
+            cardBought = {...cardBought[0], empty: true}
+            newSupply = newSupply.concat(cardBought)
+          } else {
+            discarded = [...discard].concat(cardBought);
+          }
+          
           setSupply(newSupply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
@@ -113,7 +122,6 @@ function App() {
           buysLeft = 0;
         };
         if (buysLeft < 1 || ((treasure - bought - card.cost) < 1 && supplyOn)) {
-          alert('did it!')
           buysLeft = 0;
           const deckSplit = [...deck];
           setInPlay([]);
