@@ -10,25 +10,48 @@ import Modal from './components/Modal';
 import './styles/App.css';
 
 function App() {
-  const startingDeck = shuffle(startingCards()),
-  startingHand = startingDeck.splice(0, 5),
-  [phase, setPhase] = useState(),
+  const [phase, setPhase] = useState(),
   [showModal, setShowModal] = useState(false),
   [modalContent, setModalContent] = useState([]),
   [altKey, setAltKey] = useState(false),
   [turn] = useState(true),
-  [deck, setDeck] = useState(startingDeck),
-  [hand, setHand] = useState(startingHand),
+  [deck, setDeck] = useState([]),
+  [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
   [trash] = useState([]),
-  [supply, setSupply] = useState(supplies(standardGame)),
+  [supply, setSupply] = useState([]),
   [bought, setBought] = useState(0),
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
-  [gameOver, setGameOver] = useState(false),
-  [emptySupply, setEmptySupply] = useState(0),
+  [emptySupply, setEmptySupply] = useState(),
+  startGame = () => {
+    const startingDeck = shuffle(startingCards());
+    setVictoryPoints(countValue(startingDeck, 'victory'));
+    const startingHand = startingDeck.splice(0, 5);
+    setSupply(supplies(standardGame));
+    setHand(startingHand);
+    setDeck(startingDeck);
+    setDiscard([]);
+    setInPlay([]);
+    setMenuScreen(null);
+    setPhase(null);
+    setEmptySupply(0);
+    setTreasure(0);
+    setBuys(0);
+  },
+  startScreen = <div>
+    <h2 className="title">Let's Play</h2>
+    <h1>Dominion</h1>
+    <div
+      className="game-button start-button live"
+      onClick={startGame}
+    >
+      Start Game
+    </div>
+  </div>,
+  [menuScreen, setMenuScreen] = useState(startScreen),
   currentModal = cards => {
     return <Modal
       close={true}
@@ -37,17 +60,11 @@ function App() {
       children={<CardDisplay altKey={altKey} cards={cards} />}
     />
   },
-  allCards = () => {
-    let allCards = deck.concat(hand);
-    allCards = allCards.concat(inPlay);
-    allCards = allCards.concat(discard);
-    return allCards;
-  },
   treasureInHand = () => {
     const handTreasures = hand.filter(card => (card.type === 'Treasure'));
     return handTreasures.length;
   },
-  [victoryPoints, setVictoryPoints] = useState(countValue(allCards(), 'victory')),
+  [victoryPoints, setVictoryPoints] = useState(),
   rollover = size => {
     const deckSplit = [...deck];
     let newHand = deckSplit.splice(0,size);
@@ -108,12 +125,25 @@ function App() {
           victory = card.victory? victory + card.victory : victory;
           if (!cardsLeft) {
             setEmptySupply(emptySupply + 1)
+            discarded = [...discard].concat(cardBought);
             cardBought = {...cardBought[0], empty: true}
             newSupply = newSupply.concat(cardBought)
-          if (card.name === 'Province' || emptySupply === 2) setGameOver(<div><h1>Game Over</h1><p>{victory} Victory Points</p></div>);
-          } else {
-            discarded = [...discard].concat(cardBought);
-          }
+            if (card.name === 'Province' || emptySupply === 2) {
+              setMenuScreen(
+                <div>
+                  <h1 className="title">Game Over</h1>
+                  <p>{victory} Victory Points!</p>
+                  <div
+                    className="game-button start-button live"
+                    onClick={startGame}
+                  >
+                    Play Again
+                  </div>
+                </div>
+              );
+              break;
+            };
+          };
           setSupply(newSupply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
@@ -142,9 +172,9 @@ function App() {
           setTreasure(0);
           setPhase(null);
         }
+        setBuys(buysLeft);
         setVictoryPoints(victory);
         setDiscard(discarded);
-        setBuys(buysLeft);
         break;
       default:
         setBuys(1);
@@ -191,6 +221,7 @@ function App() {
       </div>
       <div className="info">
         <span className="hidden">VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
+        {/* <span>VP <span className='red'>{victoryPoints}</span> |&nbsp;</span> */}
         <span>Action <span className='red'>{actions}</span> |&nbsp;</span>
         <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
         <span>Coin <span className='coin'>{treasure - bought}</span> </span>
@@ -204,7 +235,9 @@ function App() {
           };
         }}
       >Trash ({trash.length})</div>
-      <div className="in-play"><CardDisplay sort={true} altKey={altKey} cards={inPlay}/></div>
+      <div className="in-play">
+        <CardDisplay sort={true} altKey={altKey} cards={inPlay}/>
+      </div>
       <div className="combo-mat"></div>
       <div className="button-display">
         <div>
@@ -241,19 +274,19 @@ function App() {
         </div>
       </div>
       <div className="hand">
-        {<CardDisplay
+        <CardDisplay
           altKey={altKey}
           stacked={true}
           sort={true}
           cards={hand}
           phase={phase}
           onClick={nextPhase}
-        />}
+        />
       </div>
       <Modal
-        show={gameOver? true : false}
+        show={menuScreen? true : false}
         setShow={() => {}}
-        children={gameOver}
+        children={menuScreen}
       />
       {currentModal(modalContent)}
     </div>

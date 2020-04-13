@@ -34,7 +34,7 @@ export const supplies = (set = []) => {
   allSupplies = [],
   setSupplies = type => {
     allCards(set)[type].forEach((cardType, i) => {
-      const equation = type === 'treasure'? 20 * (3-i) : type === 'action' || cardType.name === 'Curse'? 10 : 8;
+      const equation = type === 'treasure'? 20 * (3-i) : type === 'action' || cardType.name === 'Curse'? 1 : 1;
       for (let j = 0; j < equation; j++) {
         allSupplies.push(cardType);
       };

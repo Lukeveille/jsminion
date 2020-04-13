@@ -213,6 +213,13 @@
   align-items: center;
   justify-content: space-around;
 }
+.start-button {
+  max-width: 8rem;
+  margin: 2rem auto;
+}
+.title {
+  margin-top: 2rem;
+}
 .instructions {
   margin: .5rem;
 }
