@@ -1,11 +1,12 @@
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-export const colors = ['red', 'blue', 'orange', 'green'],
+export const dotdotdot = [<p key={`log${uuidv4().slice(0,8)}`}>...</p>],
+spacer = <div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>;
+
+const colors = ['red', 'blue', 'orange', 'green'],
 logActions = ['actions', 'cards', 'buys', 'treasure'],
 capital = str => (str.charAt(0).toUpperCase() + str.slice(1)),
-dotdotdot = [<p key={`log${uuidv4().slice(0,8)}`}>...</p>],
-spacer = <div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>,
 generateLog = (gameState, cards, cardAction, num, actionLog) => {
   const size = num? num : cards? cards.length : 1;
   let action = cards && cards[0].end? cards[0].end : cardAction? cardAction : 'plays';

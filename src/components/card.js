@@ -3,12 +3,26 @@ import { useState, useEffect } from 'react';
 
 
 export default props => {
-  const [showFullCard, setShowFullCard] = useState(false);
-  const [altKey, setAltKey] = useState(false);
+  const [showFullCard, setShowFullCard] = useState(false),
+  [altKey, setAltKey] = useState(false),
+  instructionText = () => {
+    let newText = props.card.instructions? props.card.instructions : '';
+    if (newText.includes('coin-')) {
+      newText = newText.split("coin-");
 
-    useEffect(e => {
-      setAltKey(props.altKey)
-    }, [props.altKey])
+      let remainder = newText[1].length > 1? newText[1].split(' ') : [newText[1]];
+      const beginning = newText[0],
+      coinValue = remainder.shift();
+
+      remainder = remainder.length > 0? remainder.join(' ') : '';
+      newText = <div>{beginning}<span className='coin'>{coinValue}</span> {remainder}</div>
+    }
+    return newText;
+  }
+
+  useEffect(() => {
+    setAltKey(props.altKey)
+  }, [props.altKey])
 
   return <div className={`card-info ${props.card.empty? 'transparent' : ''}`}>
     {props.count > 1 || props.supply? <p
@@ -55,7 +69,9 @@ export default props => {
               {props.card.buys? <p>+{props.card.buys} Buy{props.card.buys > 1? 's' : ''}</p> : ''}
               {props.card.treasure? <p>+<span className='coin'>{props.card.treasure}</span></p> : ''}
               </div>
-              <div className="instructions">{props.card.instructions}</div>
+              <div className="instructions">
+                {instructionText()}
+              </div>
             </div> : ''}
           </div>
           <div className="card-btm">

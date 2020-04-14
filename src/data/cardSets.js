@@ -1,6 +1,6 @@
 import cardList from './cards.json';
 
-export const standardGame = ['Market', 'Village', 'Smithy'];
+export const standardGame = ['Market', 'Village', 'Smithy', 'Workshop', 'Mine'];
 
 const importAll = files => {
   return files.keys().map(files)

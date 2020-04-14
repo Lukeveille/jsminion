@@ -12,12 +12,13 @@ import Modal from './components/Modal';
 import './styles/App.css';
 
 function App() {
-  const [phase, setPhase] = useState(),
+  const player = 1,
+  [phase, setPhase] = useState(),
   [showModal, setShowModal] = useState(false),
   [modalContent, setModalContent] = useState([]),
   [altKey, setAltKey] = useState(false),
   [logs, setLogs] = useState([]),
-  [gameState, setGameState] = useState({turn: 1, player: 1, turnPlayer: 1}),
+  [gameState, setGameState] = useState({turn: 1, player, turnPlayer: 1}),
   [deck, setDeck] = useState([]),
   [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
