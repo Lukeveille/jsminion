@@ -31,7 +31,7 @@
   margin: .5rem;
 }
 .hand {
-  min-height: 38vh;
+  min-height: 37vh;
   flex-direction: row;
 }
 .hand,
@@ -287,7 +287,7 @@
 }
 .spacer {
   display: inline-block;
-  height: 12px;
+  height: 6px;
 }
 
 /* Modals */

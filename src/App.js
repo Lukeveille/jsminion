@@ -15,7 +15,7 @@ function App() {
   [showModal, setShowModal] = useState(false),
   [modalContent, setModalContent] = useState([]),
   [altKey, setAltKey] = useState(false),
-  // [thisPlayer] = useState(1),
+  [thisPlayer] = useState(1),
   [logs, setLogs] = useState([]),
   [currentPlayer] = useState(1),
   [turnNumber, setTurnNumber] = useState(1),
@@ -31,8 +31,8 @@ function App() {
   [buys, setBuys] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
   colors = ['red', 'blue', 'orange', 'green'],
-  printLog = (cards, cardAction) => {
-    const size = cards? cards.length : 1;
+  printLog = (cards, cardAction, num) => {
+    const size = num? num : cards? cards.length : 1;
     let action = cards && cards[0].end? cards[0].end : cardAction? cardAction : 'plays';
 
     return [
@@ -138,7 +138,7 @@ function App() {
   },
   nextPhase = (card, count, supplyOn) => {
     let newHand = [],
-    cardLog = printLog();
+    cardLog = [];
 
     switch (phase) {
       case 'Action':
@@ -150,6 +150,7 @@ function App() {
         }
         setActions(hasAction(newHand)? actionTotal : 0);
         if (!actionTotal || !hasAction(newHand)) {
+          cardLog = [cardLog, printLog([{name: 'Buy Phase', end: 'enters'}])];
           setPhase('Buy');
         }
         break;
@@ -196,9 +197,10 @@ function App() {
           cardLog = printLog(cardBought, 'buys');
         } else if (card.type === 'Treasure') {
           playCard(card, count);
-          cardLog = printLog([card]);
+          cardLog = printLog([card], null, count);
         } else {
           buysLeft = 0;
+          cardLog = []
         };
         
         if (buysLeft < 1 || ((treasure - bought - card.cost) < 1 && supplyOn)) {
@@ -224,8 +226,7 @@ function App() {
           setTurnNumber(turnNumber + 1);
           cardLog = [
             cardLog,
-            printLog([{name: 'turn', end: 'ends'}]),
-            <div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>
+            printLog([{name: 'turn', end: 'ends'}])
           ];
         }
         setBuys(buysLeft);
@@ -234,7 +235,8 @@ function App() {
         break;
 
       default:
-        cardLog = printLog();
+        const spacer = turnNumber === 1 && currentPlayer === 1? [] : <div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>
+        cardLog = [spacer, printLog()];
         setBuys(1);
         if (hasAction(hand)) {
           setActions(1);
@@ -249,12 +251,18 @@ function App() {
     setLogs([...logs].concat(cardLog));
   },
   instructions = phase === 'Action'?
-    'Choose Actions to play' :
-    phase === 'Discard'?
-    'Select up to ? Card(s) to Trash' :
-    phase === 'Buy'?
-    `Choose Cards to Buy (${buys})` :
-    '';
+  'Choose Actions to play' :
+  phase === 'Discard'?
+  'Select up to ? Card(s) to Trash' :
+  phase === 'Buy'?
+  `Choose Cards to Buy (${buys})` :
+  '',
+  logDisplay = () => {
+    const reduced = logs.length > 1? [...logs].reduce((prev, cur) => ( prev.concat(cur) )) : [...logs],
+    shorter = reduced.length > 11? dotdotdot.concat([...reduced].splice(reduced.length-11, 11)) : [...reduced];
+    return shorter.map(log => (log))
+  },
+  dotdotdot = [<p key={`log${uuidv4().slice(0,8)}`}>...</p>];
 
   window.onkeydown = e => {
     if (e.keyCode === 18) {
@@ -284,7 +292,7 @@ function App() {
         <p>Log</p>
         <div className="breakline"/>
         <div className="log-readout">
-          {logs.map(log => (log))}
+          {logDisplay()}
         </div>
       </div>
       <div className="info">
