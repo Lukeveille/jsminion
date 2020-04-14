@@ -1,11 +1,12 @@
 import React from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
+import { startingCards, supplies, standardGame } from './data/cardSets';
+import { dotdotdot, spacer } from './utils/printLog';
+import printLog from './utils/printLog';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
 import countTreasure from './utils/countTreasure';
-import { startingCards, supplies, standardGame } from './data/cardSets';
 import CardDisplay from './components/CardDisplay';
 import Modal from './components/Modal';
 import './styles/App.css';
@@ -15,10 +16,8 @@ function App() {
   [showModal, setShowModal] = useState(false),
   [modalContent, setModalContent] = useState([]),
   [altKey, setAltKey] = useState(false),
-  [thisPlayer] = useState(1),
   [logs, setLogs] = useState([]),
-  [currentPlayer] = useState(1),
-  [turnNumber, setTurnNumber] = useState(1),
+  [gameState, setGameState] = useState({turn: 1, player: 1, turnPlayer: 1}),
   [deck, setDeck] = useState([]),
   [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
@@ -31,40 +30,13 @@ function App() {
   [buys, setBuys] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
   [victoryPoints, setVictoryPoints] = useState(),
-  colors = ['red', 'blue', 'orange', 'green'],
-  printLog = (cards, cardAction, num) => {
-    let newLogs = [];
-    newLogs = newLogs.concat(generateLog(cards, cardAction, num));
-    if (cards && cards[0] && cards[0].type === 'Action' && cardAction !== 'buys') {
-      if (cards[0].actions) newLogs = newLogs.concat(generateLog([{...cards[0], name: 'Action'}], 'gets', cards[0].actions, true));
-      if (cards[0].cards) newLogs = newLogs.concat(generateLog([{...cards[0], name: 'Card'}], 'draws', cards[0].cards, true));
-      if (cards[0].buys) newLogs = newLogs.concat(generateLog([{...cards[0], name: 'Buy'}], 'gets', cards[0].buys, true));
-      if (cards[0].treasure) newLogs = newLogs.concat(generateLog([{...cards[0], name: 'Coin'}], 'gets', cards[0].treasure, true));
-    };
-    return newLogs;
-  },
-  generateLog = (cards, cardAction, num, actionLog) => {
-    const size = num? num : cards? cards.length : 1;
-    let action = cards && cards[0].end? cards[0].end : cardAction? cardAction : 'plays';
-
-    return [
-      <div
-        className="log"
-        key={`log${uuidv4().slice(0,8)}`}
-      >
-        <p className={`${cards? '' : 'turn-log'}`}>
-          {cards? actionLog? '•' : '' : <span>Turn {turnNumber} -&nbsp;</span>}
-          <span className={`${colors[currentPlayer-1]}`}>P{thisPlayer}</span>
-          {cards?
-          <span>&nbsp;{action} {cards && (cards[0].name === 'Action' || cards[0].name === 'Buy' || cards[0].name === 'Coin')? '+' : ''}{cards && cards[0].end? 'their' : size === 1 && !actionLog? 'a' : size}
-            <span className={`${cards[0].type}-text`}>&nbsp;{cards[0].name}{size > 1 && cards[0].type !== 'Treasure'? 's' : ''}</span>
-          </span>
-          :
-          ''}
-        </p>
-      </div>
-    ];
-  },
+  instructions = phase === 'Action'?
+  'Choose Actions to play' :
+  phase === 'Discard'?
+  'Select up to ? Card(s) to Trash' :
+  phase === 'Buy'?
+  `Choose Cards to Buy (${buys})` :
+  '',
   logDisplay = () => {
     const reduced = logs.length > 1? [...logs].reduce((prev, cur) => ( prev.concat(cur) )) : [...logs],
     shortLogs = reduced.length > 13? dotdotdot.concat([...reduced].splice(reduced.length-12, 12)) : [...reduced];
@@ -132,7 +104,7 @@ function App() {
     newHand = hand.filter(card => (card.type !== 'Treasure'));
 
     treasureNames.forEach(tresur => {
-      newLogs = newLogs.concat(printLog(treasures.filter(card => (tresur.name === card.name))))
+      newLogs = newLogs.concat(printLog(gameState, treasures.filter(card => (tresur.name === card.name))))
     });
     setTreasure(countTreasure(newPlay));
     setInPlay(newPlay);
@@ -167,11 +139,11 @@ function App() {
         if (card.actions) { actionTotal += card.actions };
         if (card.type === 'Action') {
           newHand = playCard(card, count);
-          cardLog = printLog([card]);
+          cardLog = printLog(gameState, [card]);
         }
         setActions(hasAction(newHand)? actionTotal : 0);
         if (!actionTotal || !hasAction(newHand)) {
-          cardLog = [cardLog, printLog([{name: 'Buy Phase', end: 'enters'}])];
+          cardLog = [cardLog, printLog(gameState, [{name: 'Buy Phase', end: 'enters'}])];
           setPhase('Buy');
         }
         break;
@@ -215,10 +187,10 @@ function App() {
           setSupply(newSupply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
-          cardLog = printLog(cardBought, 'buys');
+          cardLog = printLog(gameState, cardBought, 'buys');
         } else if (card.type === 'Treasure') {
           playCard(card, count);
-          cardLog = printLog([card], null, count);
+          cardLog = printLog(gameState, [card], null, count);
         } else {
           buysLeft = 0;
           cardLog = []
@@ -244,10 +216,10 @@ function App() {
           setBought(0);
           setTreasure(0);
           setPhase(null);
-          setTurnNumber(turnNumber + 1);
+          setGameState({...gameState, turn: gameState.turn + 1});
           cardLog = [
             cardLog,
-            printLog([{name: 'turn', end: 'ends'}])
+            printLog(gameState, [{name: 'turn', end: 'ends'}])
           ];
         }
         setBuys(buysLeft);
@@ -256,28 +228,20 @@ function App() {
         break;
 
       default:
-        const spacer = turnNumber === 1 && currentPlayer === 1? [] : <div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>
-        cardLog = [spacer, printLog()];
+        const setSpacer = gameState.turn === 1 && gameState.turnPlayer === 1? [] : spacer;
+        cardLog = [setSpacer, printLog(gameState)];
         setBuys(1);
         if (hasAction(hand)) {
           setActions(1);
           setPhase('Action');
         } else {
           setPhase('Buy');
-          cardLog = [cardLog, printLog([{name: 'Buy Phase', end: 'enters'}])];
+          cardLog = [cardLog, printLog(gameState, [{name: 'Buy Phase', end: 'enters'}])];
         }
         break;
     };
     setLogs([...logs].concat(cardLog));
-  },
-  instructions = phase === 'Action'?
-  'Choose Actions to play' :
-  phase === 'Discard'?
-  'Select up to ? Card(s) to Trash' :
-  phase === 'Buy'?
-  `Choose Cards to Buy (${buys})` :
-  '',
-  dotdotdot = [<p key={`log${uuidv4().slice(0,8)}`}>...</p>];
+  };
 
   window.onkeydown = e => {
     if (e.keyCode === 18) {
