@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
@@ -14,7 +15,10 @@ function App() {
   [showModal, setShowModal] = useState(false),
   [modalContent, setModalContent] = useState([]),
   [altKey, setAltKey] = useState(false),
-  [turn] = useState(true),
+  // [thisPlayer] = useState(1),
+  [logs, setLogs] = useState([]),
+  [currentPlayer] = useState(1),
+  [turnNumber, setTurnNumber] = useState(1),
   [deck, setDeck] = useState([]),
   [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
@@ -26,6 +30,24 @@ function App() {
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
+  colors = ['red', 'blue', 'orange', 'green'],
+  printLog = (cards, cardAction) => {
+    const size = cards? cards.length : 1;
+    let action = cards && cards[0].end? cards[0].end : cardAction? cardAction : 'plays';
+
+    return [
+      <div
+        className="log"
+        key={`log${uuidv4().slice(0,8)}`}
+      >
+        <p className={`${cards? '' : 'turn-log'}`}>
+          {cards? '' : <span>Turn {turnNumber} -&nbsp;</span>}
+          <span className={`${colors[currentPlayer-1]}`}>P{currentPlayer}</span>
+          {cards? <span> {action} {cards && cards[0].end? 'their' : size === 1? 'a' : size} {cards[0].name}</span> : ''}
+        </p>
+      </div>
+    ];
+  },
   startGame = () => {
     const startingDeck = shuffle(startingCards());
     setVictoryPoints(countValue(startingDeck, 'victory'));
@@ -68,6 +90,7 @@ function App() {
   rollover = size => {
     const deckSplit = [...deck];
     let newHand = deckSplit.splice(0,size);
+
     if (deck.length > size) {
       setDeck(deckSplit);
     } else if (deck.length > 0) {
@@ -79,20 +102,30 @@ function App() {
     return newHand;
   },
   playTreasure = () => {
-    let newHand = [...hand];
-    const treasures = newHand.filter(card => (card.type === 'Treasure')),
-    newPlay = [...inPlay].concat(treasures);
-    newHand = newHand.filter(card => (card.type !== 'Treasure'));
+    const treasures = hand.filter(card => (card.type === 'Treasure')),
+    newPlay = [...inPlay].concat(treasures),
+    unique = (val, i, self) => ( self.indexOf(val) === i );
+
+    let newLogs = [...logs],
+    treasureNames = treasures.filter(unique),
+    newHand = hand.filter(card => (card.type !== 'Treasure'));
+
+    treasureNames.forEach(tresur => {
+      newLogs = newLogs.concat(printLog(treasures.filter(card => (tresur.name === card.name))))
+    });
     setTreasure(countTreasure(newPlay));
     setInPlay(newPlay);
     setHand(newHand);
+    setLogs(newLogs);
   },
   playCard = (card, count) => {
     let newHand = [...hand],
     treasureCount = countValue(inPlay, 'treasure');
+
     const removal = newHand.findIndex(i => (i === card)),
     size = phase === 'Action' && card.type === 'Action'? 1 : count,
     cards = newHand.splice(removal, size);
+    
     treasureCount += countTreasure(cards);
     if (card.action) {
       if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
@@ -104,31 +137,44 @@ function App() {
     return newHand;
   },
   nextPhase = (card, count, supplyOn) => {
-    let newHand = [];
+    let newHand = [],
+    cardLog = printLog();
+
     switch (phase) {
       case 'Action':
         let actionTotal = actions-1;
         if (card.actions) { actionTotal += card.actions };
-        if (card.type === 'Action') newHand = playCard(card, count);
+        if (card.type === 'Action') {
+          newHand = playCard(card, count);
+          cardLog = printLog([card]);
+        }
         setActions(hasAction(newHand)? actionTotal : 0);
-        if (!actionTotal || !hasAction(newHand)) setPhase('Buy');
+        if (!actionTotal || !hasAction(newHand)) {
+          setPhase('Buy');
+        }
         break;
+
       case 'Buy':
         let buysLeft = buys,
         victory = victoryPoints,
         discarded = discard;
+
         if (supplyOn) {
-          let newSupply = [...supply];
-          let cardBought = supply.findIndex(i => (i === card));
+          let newSupply = [...supply],
+          cardBought = supply.findIndex(i => (i === card));
           cardBought = newSupply.splice(cardBought, 1);
+
           const cardsLeft = newSupply.filter(newCard => newCard.name === card.name).length;
           victory = card.victory? victory + card.victory : victory;
           discarded = [...discard].concat(cardBought);
+
           if (!cardsLeft) {
-            setEmptySupply(emptySupply + 1)
-            cardBought = {...cardBought[0], empty: true}
-            newSupply = newSupply.concat(cardBought)
+            setEmptySupply(emptySupply + 1);
+            cardBought = {...cardBought[0], empty: true};
+            newSupply = newSupply.concat(cardBought);
+
             if (card.name === 'Province' || emptySupply === 2) {
+              setSupply(newSupply);
               setMenuScreen(
                 <div>
                   <h1 className="title">Game Over</h1>
@@ -147,17 +193,21 @@ function App() {
           setSupply(newSupply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
+          cardLog = printLog(cardBought, 'buys');
         } else if (card.type === 'Treasure') {
           playCard(card, count);
+          cardLog = printLog([card]);
         } else {
           buysLeft = 0;
         };
+        
         if (buysLeft < 1 || ((treasure - bought - card.cost) < 1 && supplyOn)) {
-          buysLeft = 0;
           const deckSplit = [...deck];
+          buysLeft = 0;
           setInPlay([]);
           discarded = discarded.concat(inPlay).concat(hand);
           newHand = deckSplit.splice(0,5);
+
           if (deck.length > 5) {
             setDeck(deckSplit);
           } else if (deck.length > 0) {
@@ -165,23 +215,38 @@ function App() {
             discarded = [];
             newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)));
             setDeck(shuffled);
-          }
+          };
           setHand(newHand);
           setActions(0);
           setBought(0);
           setTreasure(0);
           setPhase(null);
+          setTurnNumber(turnNumber + 1);
+          cardLog = [
+            cardLog,
+            printLog([{name: 'turn', end: 'ends'}]),
+            <div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>
+          ];
         }
         setBuys(buysLeft);
         setVictoryPoints(victory);
         setDiscard(discarded);
         break;
+
       default:
+        cardLog = printLog();
         setBuys(1);
-        if (hasAction(hand)) setActions(1);
-        setPhase(hasAction(hand)? 'Action' : 'Buy');
+        if (hasAction(hand)) {
+          setActions(1);
+          setPhase('Action');
+        } else {
+          setPhase('Buy');
+          cardLog = [cardLog, printLog([{name: 'Buy Phase', end: 'enters'}])];
+        }
         break;
-    }
+    };
+
+    setLogs([...logs].concat(cardLog));
   },
   instructions = phase === 'Action'?
     'Choose Actions to play' :
@@ -215,9 +280,12 @@ function App() {
           cards={supply}
         />
       </div>
-      <div className="log">
+      <div className="logs">
         <p>Log</p>
         <div className="breakline"/>
+        <div className="log-readout">
+          {logs.map(log => (log))}
+        </div>
       </div>
       <div className="info">
         <span className="hidden">VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
@@ -242,7 +310,7 @@ function App() {
         <div>
           <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
           <p className="instructions red">{instructions}&nbsp;</p>
-          <div className="game-button live" disabled={!turn} onClick={nextPhase}>
+          <div className="game-button live" onClick={nextPhase}>
             {phase? `End ${phase} Phase` : 'Start Turn'}
           </div>
           <div

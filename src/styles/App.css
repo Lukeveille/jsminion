@@ -53,7 +53,7 @@
 .in-play {
   height: 20vh;
 }
-.log,
+.logs,
 .trash,
 .combo-mat {
   outline: 1px solid #777;
@@ -69,8 +69,17 @@
   justify-content: space-between;
   margin: .5rem;
 }
-.log {
+.logs {
   margin: .5rem;
+}
+.log-readout {
+  text-align: left;
+}
+.log {
+  font-size: 12px;
+}
+.turn-log {
+ font-weight: bold;
 }
 .active:hover {
   cursor: pointer;
@@ -86,7 +95,7 @@
   width: 100%;
 }
 .deck,
-.log,
+.logs,
 .info,
 .instructions,
 .game-button {
@@ -140,7 +149,7 @@
   outline: 1px solid #f06970;
   cursor: pointer;
 }
-.log {
+.logs {
   background-color: #121c21;
   padding: .3rem .5rem;
   position: relative;
@@ -228,9 +237,6 @@
   padding-bottom: .1rem;
   font-size: 14px;
 }
-.red {
-  color: #f06970;
-}
 .coin {
   color: #f2cda2;
   font-size: 13px;
@@ -243,6 +249,18 @@
   padding-left: .01rem;
 }
 
+.red {
+  color: #f06970;
+}
+.blue {
+  color: #718c97;
+}
+.orange {
+  color: #fa9a6a;
+}
+.green {
+  color: #76a08c;
+}
 .Treasure {
   background-color: #f2cda2;
 }
@@ -266,6 +284,10 @@
 }
 .transparent {
   opacity: .5;
+}
+.spacer {
+  display: inline-block;
+  height: 12px;
 }
 
 /* Modals */
