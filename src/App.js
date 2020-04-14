@@ -42,7 +42,7 @@ function App() {
       >
         <p className={`${cards? '' : 'turn-log'}`}>
           {cards? '' : <span>Turn {turnNumber} -&nbsp;</span>}
-          <span className={`${colors[currentPlayer-1]}`}>P{currentPlayer}</span>
+          <span className={`${colors[currentPlayer-1]}`}>P{thisPlayer}</span>
           {cards? <span> {action} {cards && cards[0].end? 'their' : size === 1? 'a' : size} {cards[0].name}</span> : ''}
         </p>
       </div>
@@ -259,7 +259,7 @@ function App() {
   '',
   logDisplay = () => {
     const reduced = logs.length > 1? [...logs].reduce((prev, cur) => ( prev.concat(cur) )) : [...logs],
-    shorter = reduced.length > 11? dotdotdot.concat([...reduced].splice(reduced.length-11, 11)) : [...reduced];
+    shorter = reduced.length > 13? dotdotdot.concat([...reduced].splice(reduced.length-12, 12)) : [...reduced];
     return shorter.map(log => (log))
   },
   dotdotdot = [<p key={`log${uuidv4().slice(0,8)}`}>...</p>];
