@@ -30,8 +30,20 @@ function App() {
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
+  [victoryPoints, setVictoryPoints] = useState(),
   colors = ['red', 'blue', 'orange', 'green'],
   printLog = (cards, cardAction, num) => {
+    let newLogs = [];
+    newLogs = newLogs.concat(generateLog(cards, cardAction, num));
+    if (cards && cards[0] && cards[0].type === 'Action' && cardAction !== 'buys') {
+      if (cards[0].actions) newLogs = newLogs.concat(generateLog([{...cards[0], name: 'Action'}], 'gets', cards[0].actions, true));
+      if (cards[0].cards) newLogs = newLogs.concat(generateLog([{...cards[0], name: 'Card'}], 'draws', cards[0].cards, true));
+      if (cards[0].buys) newLogs = newLogs.concat(generateLog([{...cards[0], name: 'Buy'}], 'gets', cards[0].buys, true));
+      if (cards[0].treasure) newLogs = newLogs.concat(generateLog([{...cards[0], name: 'Coin'}], 'gets', cards[0].treasure, true));
+    };
+    return newLogs;
+  },
+  generateLog = (cards, cardAction, num, actionLog) => {
     const size = num? num : cards? cards.length : 1;
     let action = cards && cards[0].end? cards[0].end : cardAction? cardAction : 'plays';
 
@@ -41,12 +53,22 @@ function App() {
         key={`log${uuidv4().slice(0,8)}`}
       >
         <p className={`${cards? '' : 'turn-log'}`}>
-          {cards? '' : <span>Turn {turnNumber} -&nbsp;</span>}
+          {cards? actionLog? '•' : '' : <span>Turn {turnNumber} -&nbsp;</span>}
           <span className={`${colors[currentPlayer-1]}`}>P{thisPlayer}</span>
-          {cards? <span> {action} {cards && cards[0].end? 'their' : size === 1? 'a' : size} <span className={`${cards[0].type}-text`}>{cards[0].name}</span></span> : ''}
+          {cards?
+          <span>&nbsp;{action} {cards && (cards[0].name === 'Action' || cards[0].name === 'Buy' || cards[0].name === 'Coin')? '+' : ''}{cards && cards[0].end? 'their' : size === 1 && !actionLog? 'a' : size}
+            <span className={`${cards[0].type}-text`}>&nbsp;{cards[0].name}{size > 1 && cards[0].type !== 'Treasure'? 's' : ''}</span>
+          </span>
+          :
+          ''}
         </p>
       </div>
     ];
+  },
+  logDisplay = () => {
+    const reduced = logs.length > 1? [...logs].reduce((prev, cur) => ( prev.concat(cur) )) : [...logs],
+    shortLogs = reduced.length > 13? dotdotdot.concat([...reduced].splice(reduced.length-12, 12)) : [...reduced];
+    return shortLogs.map(log => (log))
   },
   startGame = () => {
     const startingDeck = shuffle(startingCards());
@@ -86,7 +108,6 @@ function App() {
     const handTreasures = hand.filter(card => (card.type === 'Treasure'));
     return handTreasures.length;
   },
-  [victoryPoints, setVictoryPoints] = useState(),
   rollover = size => {
     const deckSplit = [...deck];
     let newHand = deckSplit.splice(0,size);
@@ -247,7 +268,6 @@ function App() {
         }
         break;
     };
-
     setLogs([...logs].concat(cardLog));
   },
   instructions = phase === 'Action'?
@@ -257,11 +277,6 @@ function App() {
   phase === 'Buy'?
   `Choose Cards to Buy (${buys})` :
   '',
-  logDisplay = () => {
-    const reduced = logs.length > 1? [...logs].reduce((prev, cur) => ( prev.concat(cur) )) : [...logs],
-    shorter = reduced.length > 13? dotdotdot.concat([...reduced].splice(reduced.length-12, 12)) : [...reduced];
-    return shorter.map(log => (log))
-  },
   dotdotdot = [<p key={`log${uuidv4().slice(0,8)}`}>...</p>];
 
   window.onkeydown = e => {
