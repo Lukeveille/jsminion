@@ -268,11 +268,17 @@
 .Treasure {
   background-color: #f2cda2;
 }
+.Victory {
+  background-color: #76a08c;
+}
 .Action {
   background-color: #aaafb2;
 }
-.Victory {
-  background-color: #76a08c;
+.Treasure-text {
+  color: #f2cda2;
+}
+.Victory-text {
+  color: #76a08c;
 }
 .curse {
   background-color: #cdb4ce;

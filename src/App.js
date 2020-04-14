@@ -43,7 +43,7 @@ function App() {
         <p className={`${cards? '' : 'turn-log'}`}>
           {cards? '' : <span>Turn {turnNumber} -&nbsp;</span>}
           <span className={`${colors[currentPlayer-1]}`}>P{thisPlayer}</span>
-          {cards? <span> {action} {cards && cards[0].end? 'their' : size === 1? 'a' : size} {cards[0].name}</span> : ''}
+          {cards? <span> {action} {cards && cards[0].end? 'their' : size === 1? 'a' : size} <span className={`${cards[0].type}-text`}>{cards[0].name}</span></span> : ''}
         </p>
       </div>
     ];
