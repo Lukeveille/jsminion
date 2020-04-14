@@ -39,8 +39,7 @@ function App() {
   `Choose Cards to Buy (${buys})` :
   '',
   logDisplay = () => {
-    const reduced = logs.length > 1? [...logs].reduce((prev, cur) => ( prev.concat(cur) )) : [...logs],
-    shortLogs = reduced.length > 13? dotdotdot.concat([...reduced].splice(reduced.length-12, 12)) : [...reduced];
+    const shortLogs = logs.length > 13? dotdotdot.concat([...logs].splice(logs.length-13, 14)) : [...logs];
     return shortLogs.map(log => (log))
   },
   startGame = () => {
@@ -144,7 +143,7 @@ function App() {
         }
         setActions(hasAction(newHand)? actionTotal : 0);
         if (!actionTotal || !hasAction(newHand)) {
-          cardLog = [cardLog, printLog(gameState, [{name: 'Buy Phase', end: 'enters'}])];
+          cardLog = cardLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
           setPhase('Buy');
         }
         break;
@@ -218,10 +217,7 @@ function App() {
           setTreasure(0);
           setPhase(null);
           setGameState({...gameState, turn: gameState.turn + 1});
-          cardLog = [
-            cardLog,
-            printLog(gameState, [{name: 'turn', end: 'ends'}])
-          ];
+          cardLog = cardLog.concat(printLog(gameState, [{name: 'turn', end: 'ends'}]));
         }
         setBuys(buysLeft);
         setVictoryPoints(victory);
@@ -229,15 +225,15 @@ function App() {
         break;
 
       default:
-        const setSpacer = gameState.turn === 1 && gameState.turnPlayer === 1? [] : spacer;
-        cardLog = [setSpacer, printLog(gameState)];
+        const setSpacer = gameState.turn === 1 && gameState.turnPlayer === 1? [] : spacer();
+        cardLog = setSpacer.concat(printLog(gameState));
         setBuys(1);
         if (hasAction(hand)) {
           setActions(1);
           setPhase('Action');
         } else {
           setPhase('Buy');
-          cardLog = [cardLog, printLog(gameState, [{name: 'Buy Phase', end: 'enters'}])];
+          cardLog = cardLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
         }
         break;
     };
@@ -249,6 +245,8 @@ function App() {
       setAltKey(true);
     } else if (e.keyCode === 27) {
       setShowModal(false);
+    } else if (e.keyCode === 13) {
+      if (menuScreen) startGame();
     };
   };
   window.onkeyup = e => {
