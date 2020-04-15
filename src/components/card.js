@@ -25,8 +25,8 @@ export default props => {
     setAltKey(props.altKey)
   }, [props.altKey])
 
-  return <div className={`card-info ${props.card.empty? 'transparent' : ''}`}>
-    {props.count > 1 || props.supply? <p
+  return <div className={`card-info ${props.card.empty || props.queued? 'transparent' : ''}`}>
+    {props.count > 1 || props.supply || props.queued? <p
       onClick={e => {
         if (props.live && !props.card.empty) {
           props.onClick(props.card, props.count);

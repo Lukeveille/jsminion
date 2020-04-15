@@ -1,18 +1,18 @@
 import cardList from './cards.json';
 
 export const standardGame = [
-  'Cellar',
-  'Chapel',
+  'Cellar', // discard
+  // 'Vassal', // discard *modal option
+  'Mine', // trash
+  'Chapel', // trash
+  // 'Moneylender', // trash
+  // 'Remodel', // trash
+  // 'Workshop',
   // 'Harbinger',
   // 'Merchant',
-  'Vassal',
-  'Village',
-  // 'Workshop',
-  'Moneylender',
-  'Remodel',
   // 'Smithy',
-  'Market',
-  'Mine'
+  // 'Market',
+  // 'Village',
 ];
 
 const importAll = files => {

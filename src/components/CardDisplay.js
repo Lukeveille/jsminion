@@ -20,16 +20,27 @@ export default props => {
 
   stacks.forEach((cards, i) => {
     cards.forEach((card, j) => {
-      const correctAction = (
+      let correctAction = (
         (props.phase === 'Action' && card.type === 'Action' && !props.supply) ||
         (props.phase === 'Buy' && card.type === 'Treasure' && !props.supply) ||
         (props.phase === 'Buy' && props.coin >= card.cost && props.supply) ||
-        props.discardTrashState === 'discard' ||
-        props.discardTrashState === 'trash'
+        props.discardTrashState
       );
+      
       if (cards[j+1] && cards[j+1].name === card.name) {
         count++;
       } else {
+        const cardQueue = props.cardQueue? props.cardQueue : [];
+
+        if (cardQueue.length > 0) {
+          let reduce = 0;
+          cardQueue.forEach(spentCard => {
+            if (spentCard.name === card.name) reduce += 1;
+          });
+          count = count - reduce;
+          correctAction = count > 0;
+        };
+
         cardElements[i].push(
           <div key={`card${i}${j}`} className="inline">
             <Card
@@ -40,6 +51,7 @@ export default props => {
               stacked={props.stacked}
               onClick={props.onClick}
               supply={props.supply}
+              queued={cardQueue.includes(card)}
             />
           </div>
         );

@@ -33,13 +33,24 @@ function App() {
   [buys, setBuys] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
   [victoryPoints, setVictoryPoints] = useState(),
-  instructions = phase === 'Action'?
-  'Choose Actions to play' :
-  phase === 'Discard'?
-  'Select up to ? Card(s) to Trash' :
-  phase === 'Buy'?
-  `Choose Cards to Buy (${buys})` :
-  '',
+  instructions = () => {
+    let message = '';
+    if (discardTrashState) {
+      let modifier = '',
+      amount = discardTrashState[1];
+      if (amount.includes('|')) {
+        amount = discardTrashState[1].split('|')[0];
+        modifier = `${discardTrashState[1].split('|')[1].split('-').join(' ')} `;
+      };
+      const plural = amount && isNaN(amount)? '(s)' : amount > 1? 's' : '';
+      message = `Select ${modifier}${amount} card${plural} to ${discardTrashState[0]}`;
+    } else if (phase === 'Buy') {
+      message = `Choose Cards to Buy (${buys})`;
+    } else {
+      message = 'Choose Actions to play';
+    }
+    return message;
+  },
   logDisplay = () => {
     const shortLogs = logs.length > 16? dotdotdot.concat([...logs].splice(logs.length-16, 17)) : [...logs];
     return shortLogs.map(log => (log))
@@ -118,18 +129,17 @@ function App() {
     treasureCount = countValue(inPlay, 'treasure');
 
     const removal = newHand.findIndex(i => (i === card)),
-    size = phase === 'Action' && card.type === 'Action'? 1 : count,
+    size = phase === card.type? 1 : count,
     cards = newHand.splice(removal, size);
     
     treasureCount += countTreasure(cards);
     if (card.type === 'Action') {
       if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
       if (card.buys) { setBuys(buys + card.buys) };
-      if (card.discard) {
-        setDiscardTrashState('discard')
-      };
-      if (card.trash) {
-        setDiscardTrashState('trash')
+      
+      if (card.discard || card.trash) {
+        const actionInfo = card.discard? card.discard.split(' ') : card.trash.split(' ');
+        setDiscardTrashState([card.discard? 'discard' : 'trash'].concat(actionInfo))
       };
     }
     setHand(newHand);
@@ -137,7 +147,17 @@ function App() {
     setTreasure(treasureCount);
     return newHand;
   },
-  discardTrash = () => {
+  discardTrash = (card, size = 1) => {
+    let newQueue = [...discardTrashQueue],
+    newHand = [...hand];
+    
+    const removal = newHand.findIndex(i => (i === card)),
+    cards = newHand.splice(removal, size);
+
+    newQueue = newQueue.concat(cards);
+    setDiscardTrashQueue(newQueue);
+  },
+  discardTrashCards = () => {
     console.log(discardTrashState)
   },
   nextPhase = (card, count, supplyOn) => {
@@ -306,15 +326,15 @@ function App() {
       <div className="button-display">
         <div>
           <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
-          <p className="instructions red">{instructions}&nbsp;</p>
-          <div className="game-button live" onClick={nextPhase}>
-            {phase? `End ${phase} Phase` : 'Start Turn'}
+          <p className="instructions red">{instructions()}&nbsp;</p>
+          <div className="game-button live" onClick={discardTrashState? discardTrashCards : nextPhase}>
+            {discardTrashState? `Confirm Card${isNaN(discardTrashState[1]) || discardTrashState[1] > 1? 's' : ''} to ${discardTrashState[0]} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
           </div>
           <div
-            className={`game-button live top-spaced ${phase === 'Buy' && treasureInHand() > 0? '' : ' hidden'}`}
-            onClick={playTreasure}
+            className={`game-button live top-spaced ${(phase === 'Buy' && treasureInHand() > 0) || discardTrashState? '' : ' hidden'}`}
+            onClick={discardTrashState? () => { setDiscardTrashQueue([]) } : playTreasure}
           >
-            {`Play All Treasure (${treasureInHand()})`}
+            {discardTrashState? `Choose different cards` : `Play All Treasure (${treasureInHand()})`}
           </div>
         </div>
         <div>
@@ -344,6 +364,7 @@ function App() {
           phase={phase}
           onClick={discardTrashState? discardTrash : nextPhase}
           discardTrashState={discardTrashState}
+          cardQueue={discardTrashQueue}
         />
       </div>
       <Modal
