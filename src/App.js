@@ -15,6 +15,7 @@ function App() {
   const player = 1,
   [phase, setPhase] = useState(),
   [showModal, setShowModal] = useState(false),
+  [discardTrashState, setDiscardTrashState] = useState(null),
   [modalContent, setModalContent] = useState([]),
   [altKey, setAltKey] = useState(false),
   [logs, setLogs] = useState([]),
@@ -39,7 +40,7 @@ function App() {
   `Choose Cards to Buy (${buys})` :
   '',
   logDisplay = () => {
-    const shortLogs = logs.length > 13? dotdotdot.concat([...logs].splice(logs.length-13, 14)) : [...logs];
+    const shortLogs = logs.length > 16? dotdotdot.concat([...logs].splice(logs.length-16, 17)) : [...logs];
     return shortLogs.map(log => (log))
   },
   startGame = () => {
@@ -120,14 +121,20 @@ function App() {
     cards = newHand.splice(removal, size);
     
     treasureCount += countTreasure(cards);
-    if (card.action) {
+    if (card.type === 'Action') {
       if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
       if (card.buys) { setBuys(buys + card.buys) };
+      if (card.discard) {
+        setDiscardTrashState('discard')
+      };
     }
     setHand(newHand);
     setInPlay([...inPlay].concat(cards));
     setTreasure(treasureCount);
     return newHand;
+  },
+  discardCard = () => {
+    console.log('yadun did it')
   },
   nextPhase = (card, count, supplyOn) => {
     let newHand = [],
@@ -142,7 +149,7 @@ function App() {
           cardLog = printLog(gameState, [card]);
         }
         setActions(hasAction(newHand)? actionTotal : 0);
-        if (!actionTotal || !hasAction(newHand)) {
+        if ((!actionTotal || !hasAction(newHand)) && !card.trash && !card.discard) {
           cardLog = cardLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
           setPhase('Buy');
         }
@@ -259,7 +266,7 @@ function App() {
         <CardDisplay
           coin={treasure - bought}
           phase={phase}
-          onClick={nextPhase}
+          playCard={nextPhase}
           sort={true}
           supply={true}
           altKey={altKey}
@@ -267,7 +274,7 @@ function App() {
         />
       </div>
       <div className="logs">
-        <p>Log</p>
+        <p className="log-title">Log</p>
         <div className="breakline"/>
         <div className="log-readout">
           {logDisplay()}
@@ -309,8 +316,7 @@ function App() {
         <div>
           <div className="breakline"/>
           <div className="deck">
-            <p>Deck</p>
-            <p>{deck.length}</p>
+            <p>Deck ({deck.length})</p>
           </div>
           <div
             className={`deck ${discard.length > 0? 'active' : ''}`}
@@ -321,8 +327,7 @@ function App() {
               };
             }}
           >
-            <p>Discard</p>
-            <p>{discard.length}</p>
+            <p>Discard ({discard.length})</p>
           </div>
         </div>
       </div>
@@ -333,7 +338,9 @@ function App() {
           sort={true}
           cards={hand}
           phase={phase}
-          onClick={nextPhase}
+          playCard={nextPhase}
+          discardTrashState={discardTrashState}
+          discardCard={discardCard}
         />
       </div>
       <Modal

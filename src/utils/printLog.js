@@ -1,12 +1,12 @@
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import capital from './capital';
 
 export const dotdotdot = [<p className="dotdotdot"key={`log${uuidv4().slice(0,8)}`}>. . .</p>],
 spacer = () => ([<div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>]);
 
 const colors = ['red', 'blue', 'orange', 'green'],
 logActions = ['actions', 'cards', 'buys', 'treasure'],
-capital = str => (str.charAt(0).toUpperCase() + str.slice(1)),
 generateLog = (gameState, cards, cardAction, num, actionLog) => {
   const size = num? num : cards? cards.length : 1;
   let action = cards && cards[0].end? cards[0].end : cardAction? cardAction : 'plays';
@@ -37,11 +37,12 @@ generateLog = (gameState, cards, cardAction, num, actionLog) => {
 export default (gameState, cards, cardAction, num) => {
   let newLogs = [];
   newLogs = newLogs.concat(generateLog(gameState, cards, cardAction, num));
-  if (cards && cards[0] && cards[0].type === 'Action' && cardAction !== 'buys') {
+  if (cards && cards[0].type === 'Action' && cardAction !== 'buys') {
     logActions.forEach(action => {
       const descriptor = action === 'cards'? 'draws' : 'gets',
-      name =  action === 'treasure'? 'Coin': capital(action).slice(0, -1);
-      if (cards[0][action]) newLogs = newLogs.concat(generateLog(gameState, [{...cards[0], name}], descriptor, cards[0][action], true));
+      name =  action === 'treasure'? 'Coin': capital(action).slice(0, -1),
+      invalid = action === 'cards' && cards && isNaN(cards[0].cards);
+      if (cards[0][action] && !invalid) newLogs = newLogs.concat(generateLog(gameState, [{...cards[0], name}], descriptor, cards[0][action], true));
     })
   };
   return newLogs;

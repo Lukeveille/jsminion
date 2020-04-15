@@ -23,7 +23,9 @@ export default props => {
       const correctAction = (
         (props.phase === 'Action' && card.type === 'Action' && !props.supply) ||
         (props.phase === 'Buy' && card.type === 'Treasure' && !props.supply) ||
-        (props.phase === 'Buy' && props.coin >= card.cost && props.supply)
+        (props.phase === 'Buy' && props.coin >= card.cost && props.supply) ||
+        props.discardTrashState === 'discard' ||
+        props.discardTrashState === 'trash'
       );
       if (cards[j+1] && cards[j+1].name === card.name) {
         count++;
@@ -36,7 +38,7 @@ export default props => {
               live={correctAction}
               count={count}
               stacked={props.stacked}
-              onClick={props.onClick}
+              onClick={props.discardTrashState? props.discardCard : props.playCard}
               supply={props.supply}
             />
           </div>

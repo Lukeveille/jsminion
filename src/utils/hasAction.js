@@ -1,3 +1,3 @@
 export default checkHand => (
-  checkHand.map(card => (card.action? true : false)).includes(true)
+  checkHand.map(card => (card.type === 'Action'? true : false)).includes(true)
 );

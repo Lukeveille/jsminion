@@ -47,48 +47,48 @@
   ],
   "action": [
     {
+      "name": "Cellar",
+      "cost": 2,
+      "actions": 1,
+      "cards": "discard",
+      "instructions": "Discard any number of cards, then draw that many.",
+      "discard": "any",
+      "type": "Action"
+    },
+    {
+      "name": "Chapel",
+      "cost": 2,
+      "instructions": "Trash up to 4 cards from your hand.",
+      "trash": "< 4",
+      "type": "Action"
+    },
+    {
       "name": "Village",
       "cost": 3,
       "actions": 2,
-      "cards": 1,
-      "action": {},
+      "cards": "1",
       "type": "Action"
     },
     {
       "name": "Smithy",
       "cost": 4,
-      "cards": 3,
-      "action": {},
+      "cards": "3",
       "type": "Action"
     },
     {
       "name": "Market",
       "cost": 5,
       "actions": 1,
-      "cards": 1,
+      "cards": "1",
       "buys": 1,
       "treasure": 1,
-      "action": {},
       "type": "Action"
     },
     {
       "name": "Workshop",
       "cost": 3,
       "instructions": "Gain a card costing up to coin-4",
-      "action": {
-        "supply": 4
-      },
-      "type": "Action"
-    },
-    {
-      "name": "Cellar",
-      "cost": 2,
-      "actions": 1,
-      "cards": "discard",
-      "instructions": "Discard any number of cards, then draw that many.",
-      "action": {
-        "discard": "any"
-      },
+      "supply": "4",
       "type": "Action"
     },
     {
@@ -96,39 +96,54 @@
       "cost": 3,
       "treasure": 2,
       "instructions": "Discard the top card of your deck. If it's an Action card, you may play it.",
-      "action": {
-        "discard": "top",
-        "play": "discard Action"
-      },
+      "discard": "deck 0",
+      "play": "discard Action",
       "type": "Action"
     },
     {
       "name": "Mine",
       "cost": 5,
       "instructions": "You may trash a Treasure from your hand. Gain a Treasure to your hand costing up to coin-3 more than it.",
-      "action": {
-        "trash": "Treasure",
-        "supply": "trash +3"
-      },
+      "trash": "Treasure hand",
+      "supply": "trash +3 hand",
       "type": "Action"
     },
     {
       "name": "Moneylender",
       "cost": 4,
       "treasure": 3,
-      "instructions": "You may trash a Copper from your hand for +coint-3",
-      "action": {
-        "trash": "Copper"
-      },
+      "instructions": "You may trash a Copper from your hand for +coin-3",
+      "trash": "Copper",
+      "type": "Action",
+      "hidden": "treasure"
+    },
+    {
+      "name": "Remodel",
+      "cost": 4,
+      "instructions": "Trash a cards from your hand. Gain a card costing up to coin-2 more than it.",
+      "trash": "1",
+      "supply": "trash +2",
       "type": "Action"
     },
     {
-      "name": "Chapel",
-      "cost": 2,
-      "instructions": "Trash up to 4 cards from your hand",
-      "action": {
-        "trash": "< 4"
-      },
+      "name": "Harbinger",
+      "cost": 3,
+      "cards": "1",
+      "actions": "1",
+      "instructions": "Look through your discard pile. You may put a card from it onto your deck.",
+      "deck": "discard",
+      "supply": "trash +2",
+      "type": "Action"
+    },
+    {
+      "name": "Merchant",
+      "cost": 3,
+      "treasure": "Silver 1",
+      "cards": "1",
+      "actions": "1",
+      "instructions": "The first time you play a Silver this turn, +coin-1",
+      "deck": "discard",
+      "supply": "trash +2",
       "type": "Action"
     }
   ]
