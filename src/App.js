@@ -16,6 +16,7 @@ function App() {
   [phase, setPhase] = useState(),
   [showModal, setShowModal] = useState(false),
   [discardTrashState, setDiscardTrashState] = useState(null),
+  [discardTrashQueue, setDiscardTrashQueue] = useState([]),
   [modalContent, setModalContent] = useState([]),
   [altKey, setAltKey] = useState(false),
   [logs, setLogs] = useState([]),
@@ -127,14 +128,17 @@ function App() {
       if (card.discard) {
         setDiscardTrashState('discard')
       };
+      if (card.trash) {
+        setDiscardTrashState('trash')
+      };
     }
     setHand(newHand);
     setInPlay([...inPlay].concat(cards));
     setTreasure(treasureCount);
     return newHand;
   },
-  discardCard = () => {
-    console.log('yadun did it')
+  discardTrash = () => {
+    console.log(discardTrashState)
   },
   nextPhase = (card, count, supplyOn) => {
     let newHand = [],
@@ -266,7 +270,7 @@ function App() {
         <CardDisplay
           coin={treasure - bought}
           phase={phase}
-          playCard={nextPhase}
+          onClick={nextPhase}
           sort={true}
           supply={true}
           altKey={altKey}
@@ -338,9 +342,8 @@ function App() {
           sort={true}
           cards={hand}
           phase={phase}
-          playCard={nextPhase}
+          onClick={discardTrashState? discardTrash : nextPhase}
           discardTrashState={discardTrashState}
-          discardCard={discardCard}
         />
       </div>
       <Modal

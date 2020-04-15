@@ -38,7 +38,7 @@ export default props => {
               live={correctAction}
               count={count}
               stacked={props.stacked}
-              onClick={props.discardTrashState? props.discardCard : props.playCard}
+              onClick={props.onClick}
               supply={props.supply}
             />
           </div>
