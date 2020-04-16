@@ -144,7 +144,9 @@ function App() {
           modifier = amount[1];
           amount = amount[0];
         };
-
+        
+        amount = isNaN(amount)? amount : parseInt(amount);
+        
         const actionObject = {
           type: card.discard? 'discard' : 'trash',
           amount,
@@ -172,12 +174,11 @@ function App() {
   },
   discardTrashCards = () => {
     const newHand = [...hand];
-    let newLog = [...logs];
+    let newLog = [...logs],
+    actionName = 'trashes';
     discardTrashQueue.forEach(card => {
       newHand.splice(newHand.findIndex(i => (i === card)), 1);
     });
-
-    let actionName = 'trashes';
 
     if (discardTrashState.type === 'discard') {
       const newDiscard = [...discard].concat(discardTrashQueue);
@@ -311,7 +312,9 @@ function App() {
         break;
     };
     setLogs([...logs].concat(cardLog));
-  };
+  },
+  noLimit = discardTrashState && (discardTrashState.modifier === 'up-to' || discardTrashState.amount === 'any'),
+  rightAmount = discardTrashState && discardTrashState.amount === discardTrashQueue.length;
 
   window.onkeydown = e => {
     if (e.keyCode === 18) {
@@ -369,7 +372,10 @@ function App() {
         <div>
           <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
           <p className="instructions red">{instructions()}&nbsp;</p>
-          <div className="game-button live" onClick={discardTrashState? discardTrashCards : nextPhase}>
+          <div
+            className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live`}
+            onClick={discardTrashState? noLimit || rightAmount? discardTrashCards : () => {} : nextPhase}
+          >
             {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
           </div>
           <div
