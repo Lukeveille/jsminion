@@ -52,7 +52,7 @@
       "actions": 1,
       "instructions": "Discard any number of cards, then draw that many.",
       "discard": "any draw",
-      "draw": "#discard",
+      "draw": "discard",
       "type": "Action"
     },
     {
@@ -105,7 +105,7 @@
       "cost": 5,
       "instructions": "You may trash a Treasure from your hand. Gain a Treasure to your hand costing up to coin-3 more than it.",
       "trash": "1 supply Treasure",
-      "supply": "#trash +coin-3 Treasure",
+      "supply": "trash +coin-3 Treasure",
       "type": "Action"
     },
     {

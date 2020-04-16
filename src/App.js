@@ -151,7 +151,7 @@ function App() {
           type: card.discard? 'discard' : 'trash',
           amount,
           modifier,
-          next: actionInfo[1],
+          next: actionInfo[1]? [actionInfo[1], card[actionInfo[1]]] : [],
           restriction: actionInfo[2]
         };
         setDiscardTrashState(actionObject);
@@ -173,8 +173,8 @@ function App() {
     setDiscardTrashQueue(newQueue);
   },
   discardTrashCards = () => {
-    const newHand = [...hand];
-    let newLog = [...logs],
+    let newHand = [...hand],
+    newLog = [...logs],
     actionName = 'trashes';
     discardTrashQueue.forEach(card => {
       newHand.splice(newHand.findIndex(i => (i === card)), 1);
@@ -189,6 +189,19 @@ function App() {
       setTrash(newTrash);
     };
     newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], actionName, discardTrashQueue.length, true));
+
+    if (discardTrashState.next) {
+      switch (discardTrashState.next[0]) {
+        case 'draw':
+          const newSize = !isNaN(discardTrashState.next[1])? discardTrashState.next[1] : discardTrashQueue.length;
+          newHand = newHand.concat(rollover(newSize));
+          newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], 'draws', discardTrashQueue.length, true));
+          break;
+        case 'play':
+        case 'supply':
+        default:
+      }
+    }
 
     setDiscardTrashQueue([]);
     setDiscardTrashState(null);

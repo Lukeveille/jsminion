@@ -3,10 +3,10 @@ import cardList from './cards.json';
 export const standardGame = [
   'Cellar', // discard
   // 'Vassal', // discard *modal option
-  'Mine', // trash
+  // 'Mine', // trash
   'Chapel', // trash
   // 'Moneylender', // trash
-  'Remodel', // trash
+  // 'Remodel', // trash
   // 'Workshop',
   // 'Harbinger',
   // 'Merchant',
