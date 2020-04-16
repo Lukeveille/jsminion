@@ -192,8 +192,10 @@ function App() {
     setDiscardTrashQueue([]);
     setDiscardTrashState(null);
     setHand(newHand);
-    if (!actions && !hasAction(newHand)) {
+
+    if (!actions || !hasAction(newHand)) {
       setPhase('Buy');
+      setActions(0);
       newLog = newLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
     }
     setLogs(newLog);
@@ -208,7 +210,7 @@ function App() {
         if (card.actions) { actionTotal += card.actions };
         if (card.type === 'Action') {
           newHand = playCard(card, count);
-          cardLog = printLog({...gameState, trash: card.trash, discard: card.discard}, [card]);
+          cardLog = printLog(gameState, [card]);
         }
 
         setActions(hasAction(newHand)? actionTotal : 0);

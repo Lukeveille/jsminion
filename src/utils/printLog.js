@@ -6,7 +6,7 @@ export const dotdotdot = [<p className="dotdotdot"key={`log${uuidv4().slice(0,8)
 spacer = () => ([<div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>]);
 
 const colors = ['red', 'blue', 'orange', 'green'],
-logActions = ['actions', 'cards', 'buys', 'treasure', 'trash', 'discard'];
+logActions = ['actions', 'cards', 'buys', 'treasure'];
 
 export const generateLog = (gameState, cards, cardAction, num, actionLog) => {
   const size = num || num === 0? num : cards? cards.length : 1;
@@ -40,9 +40,7 @@ export default (gameState, cards, cardAction, num) => {
   let newLogs = [];
   newLogs = newLogs.concat(generateLog(gameState, cards, cardAction, num));
   
-  if (gameState.trash || gameState.discard) {
-
-  } else if (cards && cards[0].type === 'Action' && cardAction !== 'buys') {
+  if (cards && cards[0].type === 'Action' && cardAction !== 'buys') {
     logActions.forEach(action => {
       const descriptor = action === 'cards'? 'draws' : 'gets',
       name =  action === 'treasure'? 'Coin': capital(action).slice(0, -1),
