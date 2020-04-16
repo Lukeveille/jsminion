@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { startingCards, supplies, standardGame } from './data/cardSets';
 import { dotdotdot, spacer } from './utils/printLog';
+import { generateLog } from './utils/printLog';
 import printLog from './utils/printLog';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
@@ -171,18 +172,26 @@ function App() {
   },
   discardTrashCards = () => {
     const newHand = [...hand];
+    let newLog = [...logs];
     discardTrashQueue.forEach(card => {
       newHand.splice(newHand.findIndex(i => (i === card)), 1);
     });
 
-    if (discardTrashState.type === 'discard') {
-      const newDiscard = [...discard].concat(discardTrashQueue)
-      setDiscard(newDiscard)
-    } else {
-      const newTrash = [...trash].concat(discardTrashQueue)
-      setTrash(newTrash);
-    }
+    let actionName = 'trashes';
 
+    if (discardTrashState.type === 'discard') {
+      const newDiscard = [...discard].concat(discardTrashQueue);
+      actionName = 'discards';
+      setDiscard(newDiscard);
+    } else {
+      const newTrash = [...trash].concat(discardTrashQueue);
+      setTrash(newTrash);
+    };
+    newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], actionName, discardTrashQueue.length, true));
+
+    
+
+    setLogs(newLog)
     setDiscardTrashQueue([]);
     setDiscardTrashState(null);
     setHand(newHand);
@@ -199,7 +208,7 @@ function App() {
         if (card.actions) { actionTotal += card.actions };
         if (card.type === 'Action') {
           newHand = playCard(card, count);
-          cardLog = printLog(gameState, [card]);
+          cardLog = printLog({...gameState, trash: card.trash, discard: card.discard}, [card]);
         }
 
         setActions(hasAction(newHand)? actionTotal : 0);

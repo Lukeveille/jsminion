@@ -6,10 +6,12 @@ export const dotdotdot = [<p className="dotdotdot"key={`log${uuidv4().slice(0,8)
 spacer = () => ([<div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>]);
 
 const colors = ['red', 'blue', 'orange', 'green'],
-logActions = ['actions', 'cards', 'buys', 'treasure'],
-generateLog = (gameState, cards, cardAction, num, actionLog) => {
+logActions = ['actions', 'cards', 'buys', 'treasure', 'trash', 'discard'];
+
+export const generateLog = (gameState, cards, cardAction, num, actionLog) => {
   const size = num? num : cards? cards.length : 1;
   let action = cards && cards[0].end? cards[0].end : cardAction? cardAction : 'plays';
+
   return [
     <div
       className="log"
@@ -21,7 +23,11 @@ generateLog = (gameState, cards, cardAction, num, actionLog) => {
         {cards?
         <span>
           &nbsp;{action} {cards && (cards[0].name === 'Action' || cards[0].name === 'Buy' || cards[0].name === 'Coin')? '+' : ''}
+
+
           {cards && cards[0].end? 'their' : size === 1 && !actionLog? 'a' : size}
+          
+
           <span className={`${cards[0].type}-text`}>
             &nbsp;{cards[0].name}
             {size > 1 && cards[0].type !== 'Treasure'? 's' : ''}
@@ -37,7 +43,10 @@ generateLog = (gameState, cards, cardAction, num, actionLog) => {
 export default (gameState, cards, cardAction, num) => {
   let newLogs = [];
   newLogs = newLogs.concat(generateLog(gameState, cards, cardAction, num));
-  if (cards && cards[0].type === 'Action' && cardAction !== 'buys') {
+  
+  if (gameState.trash || gameState.discard) {
+
+  } else if (cards && cards[0].type === 'Action' && cardAction !== 'buys') {
     logActions.forEach(action => {
       const descriptor = action === 'cards'? 'draws' : 'gets',
       name =  action === 'treasure'? 'Coin': capital(action).slice(0, -1),

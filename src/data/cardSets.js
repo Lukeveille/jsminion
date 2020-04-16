@@ -11,7 +11,7 @@ export const standardGame = [
   // 'Harbinger',
   // 'Merchant',
   'Smithy',
-  // 'Market',
+  'Market',
   'Village',
 ];
 
