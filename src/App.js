@@ -189,14 +189,14 @@ function App() {
     };
     newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], actionName, discardTrashQueue.length, true));
 
-    
-
-    setLogs(newLog)
     setDiscardTrashQueue([]);
     setDiscardTrashState(null);
     setHand(newHand);
-    if (!actions && !hasAction(newHand)) setPhase('Buy');
-    
+    if (!actions && !hasAction(newHand)) {
+      setPhase('Buy');
+      newLog = newLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
+    }
+    setLogs(newLog);
   },
   nextPhase = (card, count, supplyOn) => {
     let newHand = [],

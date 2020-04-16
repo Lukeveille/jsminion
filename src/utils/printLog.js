@@ -9,7 +9,7 @@ const colors = ['red', 'blue', 'orange', 'green'],
 logActions = ['actions', 'cards', 'buys', 'treasure', 'trash', 'discard'];
 
 export const generateLog = (gameState, cards, cardAction, num, actionLog) => {
-  const size = num? num : cards? cards.length : 1;
+  const size = num || num === 0? num : cards? cards.length : 1;
   let action = cards && cards[0].end? cards[0].end : cardAction? cardAction : 'plays';
 
   return [
@@ -23,14 +23,10 @@ export const generateLog = (gameState, cards, cardAction, num, actionLog) => {
         {cards?
         <span>
           &nbsp;{action} {cards && (cards[0].name === 'Action' || cards[0].name === 'Buy' || cards[0].name === 'Coin')? '+' : ''}
-
-
           {cards && cards[0].end? 'their' : size === 1 && !actionLog? 'a' : size}
-          
-
           <span className={`${cards[0].type}-text`}>
             &nbsp;{cards[0].name}
-            {size > 1 && cards[0].type !== 'Treasure'? 's' : ''}
+            {size !== 1 && cards[0].type !== 'Treasure'? 's' : ''}
           </span>
         </span>
         :
