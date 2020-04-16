@@ -6,13 +6,13 @@ export const standardGame = [
   'Mine', // trash
   'Chapel', // trash
   // 'Moneylender', // trash
-  // 'Remodel', // trash
+  'Remodel', // trash
   // 'Workshop',
   // 'Harbinger',
   // 'Merchant',
-  // 'Smithy',
+  'Smithy',
   // 'Market',
-  // 'Village',
+  'Village',
 ];
 
 const importAll = files => {

@@ -36,14 +36,9 @@ function App() {
   instructions = () => {
     let message = '';
     if (discardTrashState) {
-      let modifier = '',
-      amount = discardTrashState[1];
-      if (amount.includes('|')) {
-        amount = discardTrashState[1].split('|')[0];
-        modifier = `${discardTrashState[1].split('|')[1].split('-').join(' ')} `;
-      };
-      const plural = amount && isNaN(amount)? '(s)' : amount > 1? 's' : '';
-      message = `Select ${modifier}${amount} card${plural} to ${discardTrashState[0]}`;
+      const modifier = discardTrashState.modifier? `${discardTrashState.modifier.split('-').join(' ')} ` : '',
+      plural = discardTrashState.amount && isNaN(discardTrashState.amount)? '(s)' : discardTrashState.amount > 1? 's' : '';
+      message = `Select ${modifier}${discardTrashState.amount} card${plural} to ${discardTrashState.type}`;
     } else if (phase === 'Buy') {
       message = `Choose Cards to Buy (${buys})`;
     } else {
@@ -138,8 +133,25 @@ function App() {
       if (card.buys) { setBuys(buys + card.buys) };
       
       if (card.discard || card.trash) {
-        const actionInfo = card.discard? card.discard.split(' ') : card.trash.split(' ');
-        setDiscardTrashState([card.discard? 'discard' : 'trash'].concat(actionInfo))
+
+        let actionInfo = card.discard? card.discard.split(' ') : card.trash.split(' '),
+        amount = actionInfo[0],
+        modifier = '';
+        
+        if (amount.includes('|')){
+          amount = amount.split('|');
+          modifier = amount[1];
+          amount = amount[0];
+        };
+
+        const actionObject = {
+          type: card.discard? 'discard' : 'trash',
+          amount,
+          modifier,
+          next: actionInfo[1],
+          restriction: actionInfo[2]
+        };
+        setDiscardTrashState(actionObject);
       };
     }
     setHand(newHand);
@@ -172,7 +184,10 @@ function App() {
           newHand = playCard(card, count);
           cardLog = printLog(gameState, [card]);
         }
+
+        // action counts before discard is done
         setActions(hasAction(newHand)? actionTotal : 0);
+
         if ((!actionTotal || !hasAction(newHand)) && !card.trash && !card.discard) {
           cardLog = cardLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
           setPhase('Buy');
@@ -328,10 +343,10 @@ function App() {
           <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
           <p className="instructions red">{instructions()}&nbsp;</p>
           <div className="game-button live" onClick={discardTrashState? discardTrashCards : nextPhase}>
-            {discardTrashState? `Confirm Card${isNaN(discardTrashState[1]) || discardTrashState[1] > 1? 's' : ''} to ${discardTrashState[0]} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
+            {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
           </div>
           <div
-            className={`game-button live top-spaced ${(phase === 'Buy' && treasureInHand() > 0) || discardTrashState? '' : ' hidden'}`}
+            className={`game-button live top-spaced ${(phase === 'Buy' && treasureInHand() > 0) || (discardTrashState && discardTrashQueue.length > 0)? '' : ' hidden'}`}
             onClick={discardTrashState? () => { setDiscardTrashQueue([]) } : playTreasure}
           >
             {discardTrashState? `Choose different cards` : `Play All Treasure (${treasureInHand()})`}

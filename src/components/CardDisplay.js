@@ -32,15 +32,19 @@ export default props => {
       } else {
         const cardQueue = props.cardQueue? props.cardQueue : [];
 
+        let limit = Number.MAX_SAFE_INTEGER;
+
+        if (props.discardTrashState && !isNaN(props.discardTrashState.amount)) limit = parseInt(props.discardTrashState.amount);
+
         if (cardQueue.length > 0) {
           let reduce = 0;
           cardQueue.forEach(spentCard => {
             if (spentCard.name === card.name) reduce += 1;
           });
           count = count - reduce;
-          correctAction = count > 0;
+          correctAction = count > 0 && cardQueue.length < limit;
         };
-
+        
         cardElements[i].push(
           <div key={`card${i}${j}`} className="inline">
             <Card
@@ -51,7 +55,8 @@ export default props => {
               stacked={props.stacked}
               onClick={props.onClick}
               supply={props.supply}
-              queued={cardQueue.includes(card)}
+              queued={cardQueue}
+              limit={limit}
             />
           </div>
         );

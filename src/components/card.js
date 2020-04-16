@@ -25,11 +25,20 @@ export default props => {
     setAltKey(props.altKey)
   }, [props.altKey])
 
-  return <div className={`card-info ${props.card.empty || props.queued? 'transparent' : ''}`}>
-    {props.count > 1 || props.supply || props.queued? <p
+  return <div className={`card-info ${props.card.empty || props.queued.includes(props.card)? 'transparent' : ''}`}>
+    {props.count > 1 || props.supply || props.queued.includes(props.card)? <p
       onClick={e => {
         if (props.live && !props.card.empty) {
-          props.onClick(props.card, props.count);
+          const trueLimit = props.limit - props.queued.length,
+          count = trueLimit > props.count? props.count : trueLimit;
+
+          // const count = props.count;
+
+          console.log(trueLimit)
+          // console.log(count)
+          // console.log(allQueued.length)
+
+          props.onClick(props.card, count);
           e.stopPropagation();
         }
       }}
