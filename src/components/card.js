@@ -31,13 +31,6 @@ export default props => {
         if (props.live && !props.card.empty) {
           const trueLimit = props.limit - props.queued.length,
           count = trueLimit > props.count? props.count : trueLimit;
-
-          // const count = props.count;
-
-          console.log(trueLimit)
-          // console.log(count)
-          // console.log(allQueued.length)
-
           props.onClick(props.card, count);
           e.stopPropagation();
         }

@@ -17,7 +17,7 @@ function App() {
   [showModal, setShowModal] = useState(false),
   [discardTrashState, setDiscardTrashState] = useState(null),
   [discardTrashQueue, setDiscardTrashQueue] = useState([]),
-  [modalContent, setModalContent] = useState([]),
+  [modalContent, setModalContent] = useState([[]]),
   [altKey, setAltKey] = useState(false),
   [logs, setLogs] = useState([]),
   [gameState, setGameState] = useState({turn: 1, player, turnPlayer: 1}),
@@ -25,7 +25,7 @@ function App() {
   [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
-  [trash] = useState([]),
+  [trash, setTrash] = useState([]),
   [supply, setSupply] = useState([]),
   [bought, setBought] = useState(0),
   [treasure, setTreasure] = useState(0),
@@ -81,7 +81,7 @@ function App() {
       close={true}
       show={showModal}
       setShow={setShowModal}
-      children={<CardDisplay altKey={altKey} cards={cards} />}
+      children={<CardDisplay altKey={altKey} cards={cards[0]} title={modalContent[1]} />}
     />
   },
   treasureInHand = () => {
@@ -170,7 +170,24 @@ function App() {
     setDiscardTrashQueue(newQueue);
   },
   discardTrashCards = () => {
-    console.log(discardTrashState)
+    const newHand = [...hand];
+    discardTrashQueue.forEach(card => {
+      newHand.splice(newHand.findIndex(i => (i === card)), 1);
+    });
+
+    if (discardTrashState.type === 'discard') {
+      const newDiscard = [...discard].concat(discardTrashQueue)
+      setDiscard(newDiscard)
+    } else {
+      const newTrash = [...trash].concat(discardTrashQueue)
+      setTrash(newTrash);
+    }
+
+    setDiscardTrashQueue([]);
+    setDiscardTrashState(null);
+    setHand(newHand);
+    if (!actions && !hasAction(newHand)) setPhase('Buy');
+    
   },
   nextPhase = (card, count, supplyOn) => {
     let newHand = [],
@@ -185,7 +202,6 @@ function App() {
           cardLog = printLog(gameState, [card]);
         }
 
-        // action counts before discard is done
         setActions(hasAction(newHand)? actionTotal : 0);
 
         if ((!actionTotal || !hasAction(newHand)) && !card.trash && !card.discard) {
@@ -329,7 +345,7 @@ function App() {
         className={`trash game-button ${trash.length > 0? 'active' : ''}`}
         onClick={() => {
           if (trash.length > 0) {
-            setModalContent(trash);
+            setModalContent([trash, 'Trash']);
             setShowModal(true);
           };
         }}
@@ -361,7 +377,7 @@ function App() {
             className={`deck ${discard.length > 0? 'active' : ''}`}
             onClick={() => {
               if (discard.length > 0) {
-                setModalContent(discard);
+                setModalContent([discard, 'Discard']);
                 setShowModal(true);
               };
             }}

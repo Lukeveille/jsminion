@@ -64,6 +64,10 @@ export default props => {
       };
     });
   });
+
+  const allCards = cardElements[0].concat(cardElements[1]).concat(cardElements[2]),
+  title = props.title? <p className="red top-spaced">{props.title} ({allCards.length})</p> : '';
+
   return props.stacked?
   cardElements.map((stack, i) => {
     return <div key={`stack${i}`} className="stack">{stack}</div>
@@ -73,5 +77,8 @@ export default props => {
       return <div key={`supply${i}`} className="supply">{stack}</div>
     })
   :
-  cardElements[0].concat(cardElements[1]).concat(cardElements[2]);
+  <div>
+    {title}
+    {allCards}
+  </div>
 };

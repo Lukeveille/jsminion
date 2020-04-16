@@ -219,6 +219,7 @@
 .game-button {
   display: flex;
   height: 1.775rem;
+  width: 12.5rem;
   background-color: #121c21;
   align-items: center;
   justify-content: space-around;
@@ -345,4 +346,10 @@
   font-weight: 500;
   background-color: #121c21;
   padding: .3rem .5rem;
+}
+
+@media screen and (max-width: 1260px) {
+  .card {
+    width: 10.5rem;
+  }
 }
