@@ -60,6 +60,8 @@ function App() {
     setDeck(startingDeck);
     setDiscard([]);
     setInPlay([]);
+    setLogs([]);
+    setTrash([]);
     setMenuScreen(null);
     setPhase(null);
     setEmptySupply(0);
