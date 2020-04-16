@@ -105,7 +105,7 @@
       "cost": 5,
       "instructions": "You may trash a Treasure from your hand. Gain a Treasure to your hand costing up to coin-3 more than it.",
       "trash": "1 supply Treasure",
-      "supply": "trash +coin-3 Treasure",
+      "supply": "trash 3 Treasure",
       "type": "Action"
     },
     {
@@ -122,7 +122,7 @@
       "cost": 4,
       "instructions": "Trash a card from your hand. Gain a card costing up to coin-2 more than it.",
       "trash": "1 supply",
-      "supply": "cost-trash +coin-2",
+      "supply": "trash 2",
       "type": "Action"
     },
     {
