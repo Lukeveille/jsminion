@@ -46,22 +46,7 @@
     }
   ],
   "action": [
-    {
-      "name": "Cellar",
-      "cost": 2,
-      "actions": 1,
-      "instructions": "Discard any number of cards, then draw that many.",
-      "discard": "any draw",
-      "draw": "discard",
-      "type": "Action"
-    },
-    {
-      "name": "Chapel",
-      "cost": 2,
-      "instructions": "Trash up to 4 cards from your hand.",
-      "trash": "4|up-to",
-      "type": "Action"
-    },
+    
     {
       "name": "Village",
       "cost": 3,
@@ -85,19 +70,27 @@
       "type": "Action"
     },
     {
-      "name": "Workshop",
-      "cost": 3,
-      "instructions": "Gain a card costing up to coin-4",
-      "supply": "4",
+      "name": "Chapel",
+      "cost": 2,
+      "instructions": "Trash up to 4 cards from your hand.",
+      "trash": "4|up-to",
       "type": "Action"
     },
     {
-      "name": "Vassal",
-      "cost": 3,
-      "treasure": 2,
-      "instructions": "Discard the top card of your deck. If it's an Action card, you may play it.",
-      "discard": "1|deck[0 play",
-      "play": "Action? modal",
+      "name": "Cellar",
+      "cost": 2,
+      "actions": 1,
+      "instructions": "Discard any number of cards, then draw that many.",
+      "discard": "any draw",
+      "draw": "discard",
+      "type": "Action"
+    },
+    {
+      "name": "Remodel",
+      "cost": 4,
+      "instructions": "Trash a card from your hand. Gain a card costing up to coin-2 more than it.",
+      "trash": "1 supply",
+      "supply": "trash 2",
       "type": "Action"
     },
     {
@@ -118,26 +111,19 @@
       "hidden": "treasure"
     },
     {
-      "name": "Remodel",
-      "cost": 4,
-      "instructions": "Trash a card from your hand. Gain a card costing up to coin-2 more than it.",
-      "trash": "1 supply",
-      "supply": "trash 2",
+      "name": "Vassal",
+      "cost": 3,
+      "treasure": 2,
+      "instructions": "Discard the top card of your deck. If it's an Action card, you may play it.",
+      "discard": "1|deck[0 play",
+      "play": "Action? modal",
       "type": "Action"
     },
     {
-      "name": "Festival",
-      "cost": 5,
-      "actions": "2",
-      "buys": "1",
-      "treasures": "2",
-      "type": "Action"
-    },
-    {
-      "name": "Laboratory",
-      "cost": 5,
-      "cards": "2",
-      "actions": "1",
+      "name": "Workshop",
+      "cost": 3,
+      "instructions": "Gain a card costing up to coin-4",
+      "supply": "4",
       "type": "Action"
     },
     {
@@ -156,6 +142,21 @@
       "actions": "1",
       "instructions": "The first time you play a Silver this turn, +coin-1",
       "buyPhase": "1 first Silver",
+      "type": "Action"
+    },
+    {
+      "name": "Festival",
+      "cost": 5,
+      "actions": "2",
+      "buys": "1",
+      "treasures": "2",
+      "type": "Action"
+    },
+    {
+      "name": "Laboratory",
+      "cost": 5,
+      "cards": "2",
+      "actions": "1",
       "type": "Action"
     }
   ]

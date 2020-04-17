@@ -2,8 +2,7 @@ import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import capital from './capital';
 
-export const dotdotdot = [<p className="dotdotdot"key={`log${uuidv4().slice(0,8)}`}>. . .</p>],
-spacer = () => ([<div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>]);
+export const spacer = () => ([<div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>]);
 
 const colors = ['red', 'blue', 'orange', 'green'],
 logActions = ['actions', 'cards', 'buys', 'treasure'];

@@ -1,7 +1,7 @@
 import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { startingCards, supplies, standardGame } from './data/cardSets';
-import { dotdotdot, spacer } from './utils/printLog';
+import { spacer } from './utils/printLog';
 import { generateLog } from './utils/printLog';
 import printLog from './utils/printLog';
 import shuffle from './utils/shuffle';
@@ -34,7 +34,6 @@ function App() {
   [buys, setBuys] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
   [victoryPoints, setVictoryPoints] = useState(),
-  logRef = useRef(null),
   instructions = () => {
     let message = '';
     if (discardTrashState) {
@@ -48,10 +47,6 @@ function App() {
     }
     return message;
   },
-  // logDisplay = () => {
-  //   const shortLogs = logs.length > 16? dotdotdot.concat([...logs].splice(logs.length-16, 17)) : [...logs];
-  //   return shortLogs.map(log => (log))
-  // },
   startGame = () => {
     const startingDeck = shuffle(startingCards());
     setVictoryPoints(countValue(startingDeck, 'victory'));
@@ -330,7 +325,8 @@ function App() {
     setLogs([...logs].concat(cardLog));
   },
   noLimit = discardTrashState && (discardTrashState.modifier === 'up-to' || discardTrashState.amount === 'any'),
-  rightAmount = discardTrashState && discardTrashState.amount === discardTrashQueue.length;
+  rightAmount = discardTrashState && discardTrashState.amount === discardTrashQueue.length,
+  logSticker = document.getElementById('log-sticker');
 
   window.onkeydown = e => {
     if (e.keyCode === 18) {
@@ -345,11 +341,9 @@ function App() {
     if (e.keyCode === 18) setAltKey(false);
   };
 
-  const elemental = document.getElementById('log-sticker');
-
   useEffect(() => {
-    if (elemental) elemental.scrollIntoView();
-  }, [logs, elemental]);
+    if (logSticker) logSticker.scrollIntoView();
+  }, [logs, logSticker]);
 
   return (
     <div className="App">
@@ -369,7 +363,7 @@ function App() {
         <div className="breakline"/>
         <div className="log-readout">
           {logs.length >1? logs : <div className="spacer"/>}
-          <div id="log-sticker" ref={logRef} />
+          <div id="log-sticker" />
         </div>
       </div>
       <div className="info">
@@ -396,17 +390,26 @@ function App() {
           <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
           <p className="instructions red">{instructions()}&nbsp;</p>
           <div
-            className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live`}
+            className={`game-button live ${(phase === 'Buy' && treasureInHand() > 0)? '' : ' hidden'}`}
+            onClick={playTreasure}
+          >
+            {`Play All Treasure (${treasureInHand()})`}
+          </div>
+
+          <div
+            className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${(phase === 'Buy' && treasureInHand() > 0)? ' top-spaced' : ''}`}
             onClick={discardTrashState? noLimit || rightAmount? discardTrashCards : () => {} : nextPhase}
           >
             {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
           </div>
+
           <div
-            className={`game-button live top-spaced ${(phase === 'Buy' && treasureInHand() > 0) || (discardTrashState && discardTrashQueue.length > 0)? '' : ' hidden'}`}
-            onClick={discardTrashState? () => { setDiscardTrashQueue([]) } : playTreasure}
+            className={`game-button live top-spaced ${(discardTrashState && discardTrashQueue.length > 0)? '' : ' hidden'}`}
+            onClick={setDiscardTrashQueue}
           >
-            {discardTrashState? `Choose different cards` : `Play All Treasure (${treasureInHand()})`}
+            {`Choose different cards`}
           </div>
+
         </div>
         <div>
           <div className="breakline"/>
