@@ -215,9 +215,13 @@
   position: relative;
   display: inline-block;
 }
+.button-space {
+  display: inline-block;
+  height: 1.65rem;
+}
 .game-button {
-  display: flex;
   height: 1.775rem;
+  display: flex;
   width: 12.5rem;
   background-color: #121c21;
   align-items: center;
@@ -332,6 +336,10 @@
 .modal-box h3,
 .modal-box h4 {
   margin: .2em;
+}
+.x-close-button:hover {
+  background-color: #f06970;
+  color: #121c21;
 }
 .x-close-button {
   display: inline-block;

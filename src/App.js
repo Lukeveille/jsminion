@@ -390,14 +390,14 @@ function App() {
           <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
           <p className="instructions red">{instructions()}&nbsp;</p>
           <div
-            className={`game-button live ${(phase === 'Buy' && treasureInHand() > 0)? '' : ' hidden'}`}
+            className={(treasureInHand() > 0)? `game-button live ${(phase === 'Buy'? '' : ' hidden')}` : 'button-space'}
             onClick={playTreasure}
           >
-            {`Play All Treasure (${treasureInHand()})`}
+            {treasureInHand() > 0? `Play All Treasure (${treasureInHand()})` : ' '}
           </div>
 
           <div
-            className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${(phase === 'Buy' && treasureInHand() > 0)? ' top-spaced' : ''}`}
+            className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${(phase === 'Buy'? ' top-spaced' : '')}`}
             onClick={discardTrashState? noLimit || rightAmount? discardTrashCards : () => {} : nextPhase}
           >
             {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
