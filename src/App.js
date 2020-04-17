@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { startingCards, supplies, standardGame } from './data/cardSets';
 import { dotdotdot, spacer } from './utils/printLog';
 import { generateLog } from './utils/printLog';
@@ -34,6 +34,7 @@ function App() {
   [buys, setBuys] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
   [victoryPoints, setVictoryPoints] = useState(),
+  logRef = useRef(null),
   instructions = () => {
     let message = '';
     if (discardTrashState) {
@@ -47,10 +48,10 @@ function App() {
     }
     return message;
   },
-  logDisplay = () => {
-    const shortLogs = logs.length > 16? dotdotdot.concat([...logs].splice(logs.length-16, 17)) : [...logs];
-    return shortLogs.map(log => (log))
-  },
+  // logDisplay = () => {
+  //   const shortLogs = logs.length > 16? dotdotdot.concat([...logs].splice(logs.length-16, 17)) : [...logs];
+  //   return shortLogs.map(log => (log))
+  // },
   startGame = () => {
     const startingDeck = shuffle(startingCards());
     setVictoryPoints(countValue(startingDeck, 'victory'));
@@ -344,6 +345,12 @@ function App() {
     if (e.keyCode === 18) setAltKey(false);
   };
 
+  const elemental = document.getElementById('log-sticker');
+
+  useEffect(() => {
+    if (elemental) elemental.scrollIntoView();
+  }, [logs, elemental]);
+
   return (
     <div className="App">
       <div className="supply-market">
@@ -361,7 +368,8 @@ function App() {
         <p className="log-title">Log</p>
         <div className="breakline"/>
         <div className="log-readout">
-          {logDisplay()}
+          {logs.length >1? logs : <div className="spacer"/>}
+          <div id="log-sticker" ref={logRef} />
         </div>
       </div>
       <div className="info">
