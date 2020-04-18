@@ -31,7 +31,7 @@
   margin: .5rem;
 }
 .hand {
-  min-height: 32vh;
+  height: 32vh;
   flex-direction: row;
 }
 .hand {
@@ -39,7 +39,7 @@
   justify-content: center;
 }
 .supply-market {
-  min-height: 39vh;
+  min-height: 19rem;
   overflow: auto
 }
 .supply {

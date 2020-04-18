@@ -55,7 +55,7 @@ export default props => {
         <p>{props.card.type}</p>
         <p className="card-side">&nbsp;</p>
       </div>
-      <div className={`full-card-wrapper  ${props.stacked? 'lower-card' : ''}`}>
+      <div className={`full-card-wrapper ${props.stacked? 'lower-card' : ''}`}>
         <div className={`full-card ${props.card.type} ${showFullCard && altKey? '' : 'hidden'} ${props.live? 'full-card-live' : ''} ${props.card.name === 'Curse'? 'curse' : ''}`}>
           <div className="card-top">
             <p>{props.card.name}</p>

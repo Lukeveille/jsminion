@@ -20,6 +20,7 @@ function App() {
   [discardTrashQueue, setDiscardTrashQueue] = useState([]),
   [modalContent, setModalContent] = useState([[]]),
   [altKey, setAltKey] = useState(false),
+  [actionSupply, setActionSupply] = useState(false),
   [logs, setLogs] = useState([]),
   [gameState, setGameState] = useState({turn: 1, player, turnPlayer: 1}),
   [deck, setDeck] = useState([]),
@@ -40,6 +41,8 @@ function App() {
       const modifier = discardTrashState.modifier? `${discardTrashState.modifier.split('-').join(' ')} ` : '',
       plural = discardTrashState.amount && isNaN(discardTrashState.amount)? '(s)' : discardTrashState.amount > 1? 's' : '';
       message = `Select ${modifier}${discardTrashState.amount} card${plural} to ${discardTrashState.type}`;
+    } else if (actionSupply) {
+      message = `Choose a Card`;
     } else if (phase === 'Buy') {
       message = `Choose Cards to Buy (${buys})`;
     } else {
@@ -194,23 +197,36 @@ function App() {
           const newSize = !isNaN(discardTrashState.next[1])? discardTrashState.next[1] : discardTrashQueue.length;
           newHand = newHand.concat(rollover(newSize));
           newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], 'draws', discardTrashQueue.length, true));
+          newLog = newLog.concat(cleanup(newHand));
           break;
         case 'play':
         case 'supply':
+          // const supplyMsg = inPlay[0]['supply'].split(' ');
+          // let newCoin = supplyMsg[0] === 'discard' || 'trash'? discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];
+          // setActionSupply({treasure, count: discardTrashState.amount, restriction: supplyMsg[2]});
+          // setTreasure(newCoin);
+          break;
+        case discardTrashState.next[0].includes('coin'):
+        case !isNaN(discardTrashState.next[0]):
         default:
       }
+    } else {
+      newLog = newLog.concat(cleanup(newHand));
     }
 
+    setLogs(newLog);
+  },
+  cleanup = newHand => {
+    let newLog = [];
     setDiscardTrashQueue([]);
     setDiscardTrashState(null);
-    setHand(newHand);
-
     if (!actions || !hasAction(newHand)) {
       setPhase('Buy');
       setActions(0);
       newLog = newLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
-    }
-    setLogs(newLog);
+    };
+    setHand(newHand);
+    return newLog;
   },
   nextPhase = (card, count, supplyOn) => {
     let newHand = [],
@@ -350,7 +366,7 @@ function App() {
       <div className="supply-market">
         <CardDisplay
           coin={treasure - bought}
-          phase={phase}
+          phase={actionSupply? 'supply' : phase}
           onClick={nextPhase}
           sort={true}
           supply={true}

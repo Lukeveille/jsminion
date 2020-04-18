@@ -23,7 +23,7 @@ export default props => {
       let correctAction = (
         (props.phase === 'Action' && card.type === 'Action' && !props.supply) ||
         (props.phase === 'Buy' && card.type === 'Treasure' && !props.supply) ||
-        (props.phase === 'Buy' && props.coin >= card.cost && props.supply) ||
+        ((props.phase === 'Buy' || props.phase === 'supply') && props.coin >= card.cost && props.supply) ||
         props.discardTrashState
       );
       
