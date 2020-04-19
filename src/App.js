@@ -16,7 +16,7 @@ function App() {
   const player = 1,
   [phase, setPhase] = useState(),
   [showModal, setShowModal] = useState(false),
-  [discardTrashState, setDiscardTrashState] = useState(null),
+  [discardTrashState, setDiscardTrashState] = useState(false),
   [discardTrashQueue, setDiscardTrashQueue] = useState([]),
   [modalContent, setModalContent] = useState([[]]),
   [altKey, setAltKey] = useState(false),
@@ -235,7 +235,7 @@ function App() {
   cleanup = newHand => {
     let newLog = [];
     setDiscardTrashQueue([]);
-    setDiscardTrashState(null);
+    setDiscardTrashState(false);
     if (!actions || !hasAction(newHand)) {
       setPhase('Buy');
       setActions(0);
@@ -425,14 +425,15 @@ function App() {
           {actionSupply? '' : <div>
 
             <div
-              className={(treasureInHand() > 0)? `game-button live ${(phase === 'Buy'? '' : ' hidden')}` : 'button-space'}
+              className={discardTrashState || !phase? 'hidden' : treasureInHand() > 0 && phase === 'Buy'? `game-button live` : 'button-space'}
               onClick={playTreasure}
             >
-              {treasureInHand() > 0? `Play All Treasure (${treasureInHand()})` : ' '}
+              {treasureInHand() > 0 && phase === 'Buy'? `Play All Treasure (${treasureInHand()})` : ' '}
             </div>
 
             <div
-              className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${(phase === 'Buy'? ' top-spaced' : '')}`}
+              // className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${(phase === 'Buy'? ' top-spaced' : '')}`}
+              className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${discardTrashState? '' : ' top-spaced'}`}
               onClick={discardTrashState? noLimit || rightAmount? discardTrashCards : () => {} : nextPhase}
             >
               {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
