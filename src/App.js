@@ -221,12 +221,9 @@ function App() {
   },
   gainCard = card => {
     let newSupply = [...supply],
-    newLog = [...logs].concat(generateLog(gameState, [card], 'gains', discardTrashQueue.length, true));
+    newLog = [...logs].concat(generateLog(gameState, [card], 'gains', 1, true));
     const removal = newSupply.findIndex(i => (i === card)),
     cardGained = newSupply.splice(removal, 1);
-
-    console.log(newSupply)
-    console.log(cardGained)
 
     setSupply(newSupply);
     setDiscard([...discard].concat(cardGained));

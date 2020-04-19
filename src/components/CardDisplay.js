@@ -48,7 +48,6 @@ export default props => {
           correctAction = correctAction && props.restriction === card.type;
         };
         if (props.actionSupply) {
-          console.log(props.supply)
           correctAction = correctAction && props.supply;
         }
 
