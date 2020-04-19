@@ -44,6 +44,9 @@ export default props => {
           count = count - reduce;
           correctAction = count > 0 && cardQueue.length < limit;
         };
+        if (props.discardTrashState && props.discardTrashState.restriction) {
+          correctAction = correctAction && props.discardTrashState.restriction === card.type;
+        };
         
         cardElements[i].push(
           <div key={`card${i}${j}`} className="inline">

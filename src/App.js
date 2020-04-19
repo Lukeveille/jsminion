@@ -388,6 +388,7 @@ function App() {
           supply={true}
           altKey={altKey}
           cards={supply}
+          discardTrashState={discardTrashState && actionSupply? discardTrashState : undefined}
         />
       </div>
       <div className="logs">
@@ -432,8 +433,7 @@ function App() {
             </div>
 
             <div
-              // className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${(phase === 'Buy'? ' top-spaced' : '')}`}
-              className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${discardTrashState? '' : ' top-spaced'}`}
+              className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${discardTrashState || !phase? '' : ' top-spaced'}`}
               onClick={discardTrashState? noLimit || rightAmount? discardTrashCards : () => {} : nextPhase}
             >
               {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
