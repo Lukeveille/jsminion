@@ -47,7 +47,11 @@ export default props => {
         if (props.restriction) {
           correctAction = correctAction && props.restriction === card.type;
         };
-        
+        if (props.actionSupply) {
+          console.log(props.supply)
+          correctAction = correctAction && props.supply;
+        }
+
         cardElements[i].push(
           <div key={`card${i}${j}`} className="inline">
             <Card

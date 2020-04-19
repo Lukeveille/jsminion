@@ -98,7 +98,7 @@
       "cost": 5,
       "instructions": "You may trash a Treasure from your hand. Gain a Treasure to your hand costing up to coin-3 more than it.",
       "discardTrash": "trash 1 supply Treasure",
-      "supply": "discardTrash 3 Treasure",
+      "supply": "discardTrash 3",
       "type": "Action"
     },
     {

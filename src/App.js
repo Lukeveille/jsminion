@@ -133,7 +133,6 @@ function App() {
     if (card.type === 'Action') {
       if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
       if (card.buys) { setBuys(buys + card.buys) };
-      
       if (card.discardTrash) {
 
         let actionInfo = card.discardTrash.split(' '),
@@ -155,6 +154,7 @@ function App() {
           next: actionInfo[2]? [actionInfo[2], card[actionInfo[2]]] : [],
           restriction: actionInfo[3]
         };
+
         setDiscardTrashState(actionObject);
       };
     }
@@ -163,22 +163,7 @@ function App() {
     setTreasure(treasureCount);
     return newHand;
   },
-  gainCard = card => {
-    let newSupply = [...supply],
-    newLog = [...logs].concat(generateLog(gameState, [card], 'gains', discardTrashQueue.length, true));
-    const removal = newSupply.findIndex(i => (i === card)),
-    cardGained = newSupply.splice(removal, 1);
-
-    console.log(newSupply)
-    console.log(cardGained)
-
-    setSupply(newSupply);
-    setDiscard([...discard].concat(cardGained));
-    setTreasure(actionSupply.treasure);
-    setActionSupply(false);
-    setLogs(newLog.concat(cleanup(hand)));
-  },
-  discardTrash = (card, size = 1) => {
+  discardTrashCard = (card, size = 1) => {
     let newQueue = [...discardTrashQueue],
     newHand = [...hand];
     
@@ -205,10 +190,11 @@ function App() {
       setTrash(newTrash);
     };
     newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], actionName, discardTrashQueue.length, true));
-
-    console.log(discardTrashState)
-
-    if (discardTrashState.next.length > 0) {
+    newLog = next(discardTrashState, newHand, newLog);
+    setLogs(newLog);
+  },
+  next = (state, newHand, newLog) => {
+    if (state.next.length > 0) {
       const nextAction = discardTrashState.next[0];
       switch (nextAction) {
         case 'draw':
@@ -224,13 +210,29 @@ function App() {
           setActionSupply({treasure, count: discardTrashState.amount, restriction: supplyMsg[2]});
           setTreasure(newCoin);
           setHand(newHand);
+          setDiscardTrashQueue([]);
           break;
         default:
       }
     } else {
       newLog = newLog.concat(cleanup(newHand));
     }
-    setLogs(newLog);
+    return newLog;
+  },
+  gainCard = card => {
+    let newSupply = [...supply],
+    newLog = [...logs].concat(generateLog(gameState, [card], 'gains', discardTrashQueue.length, true));
+    const removal = newSupply.findIndex(i => (i === card)),
+    cardGained = newSupply.splice(removal, 1);
+
+    console.log(newSupply)
+    console.log(cardGained)
+
+    setSupply(newSupply);
+    setDiscard([...discard].concat(cardGained));
+    setTreasure(actionSupply.treasure);
+    setActionSupply(false);
+    setLogs(newLog.concat(cleanup(hand)));
   },
   cleanup = newHand => {
     let newLog = [];
@@ -384,6 +386,7 @@ function App() {
           coin={treasure - bought}
           phase={actionSupply? 'supply' : phase}
           onClick={actionSupply? gainCard : nextPhase}
+          actionSupply={actionSupply}
           sort={true}
           supply={true}
           altKey={altKey}
@@ -472,8 +475,9 @@ function App() {
           sort={true}
           cards={hand}
           phase={phase}
-          onClick={discardTrashState? discardTrash : nextPhase}
+          onClick={discardTrashState? discardTrashCard : nextPhase}
           discardTrashState={discardTrashState}
+          actionSupply={actionSupply}
           restriction={discardTrashState? discardTrashState.restriction : undefined}
           cardQueue={discardTrashQueue}
         />
