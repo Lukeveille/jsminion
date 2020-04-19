@@ -40,7 +40,7 @@ function App() {
     if (discardTrashState) {
       const modifier = discardTrashState.modifier? `${discardTrashState.modifier.split('-').join(' ')} ` : '',
       plural = discardTrashState.amount && isNaN(discardTrashState.amount)? '(s)' : discardTrashState.amount > 1? 's' : '';
-      message = `Select ${modifier}${discardTrashState.amount} card${plural} to ${discardTrashState.type}`;
+      message = `Select ${modifier}${discardTrashState.amount} card${plural}${actionSupply? '' : ` to ${discardTrashState.type}`}`;
     } else if (actionSupply) {
       message = `Choose a Card`;
     } else if (phase === 'Buy') {
@@ -134,10 +134,10 @@ function App() {
       if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
       if (card.buys) { setBuys(buys + card.buys) };
       
-      if (card.discard || card.trash) {
+      if (card.discardTrash) {
 
-        let actionInfo = card.discard? card.discard.split(' ') : card.trash.split(' '),
-        amount = actionInfo[0],
+        let actionInfo = card.discardTrash.split(' '),
+        amount = actionInfo[1],
         modifier = '';
         
         if (amount.includes('|')){
@@ -149,11 +149,11 @@ function App() {
         amount = isNaN(amount)? amount : parseInt(amount);
         
         const actionObject = {
-          type: card.discard? 'discard' : 'trash',
+          type: actionInfo[0],
           amount,
           modifier,
-          next: actionInfo[1]? [actionInfo[1], card[actionInfo[1]]] : [],
-          restriction: actionInfo[2]
+          next: actionInfo[2]? [actionInfo[2], card[actionInfo[2]]] : [],
+          restriction: actionInfo[3]
         };
         setDiscardTrashState(actionObject);
       };
@@ -162,6 +162,21 @@ function App() {
     setInPlay([...inPlay].concat(cards));
     setTreasure(treasureCount);
     return newHand;
+  },
+  gainCard = card => {
+    let newSupply = [...supply],
+    newLog = [...logs].concat(generateLog(gameState, [card], 'gains', discardTrashQueue.length, true));
+    const removal = newSupply.findIndex(i => (i === card)),
+    cardGained = newSupply.splice(removal, 1);
+
+    console.log(newSupply)
+    console.log(cardGained)
+
+    setSupply(newSupply);
+    setDiscard([...discard].concat(cardGained));
+    setTreasure(actionSupply.treasure);
+    setActionSupply(false);
+    setLogs(newLog.concat(cleanup(hand)));
   },
   discardTrash = (card, size = 1) => {
     let newQueue = [...discardTrashQueue],
@@ -191,8 +206,11 @@ function App() {
     };
     newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], actionName, discardTrashQueue.length, true));
 
-    if (discardTrashState.next) {
-      switch (discardTrashState.next[0]) {
+    console.log(discardTrashState)
+
+    if (discardTrashState.next.length > 0) {
+      const nextAction = discardTrashState.next[0];
+      switch (nextAction) {
         case 'draw':
           const newSize = !isNaN(discardTrashState.next[1])? discardTrashState.next[1] : discardTrashQueue.length;
           newHand = newHand.concat(rollover(newSize));
@@ -201,13 +219,11 @@ function App() {
           break;
         case 'play':
         case 'supply':
-          // const supplyMsg = inPlay[0]['supply'].split(' ');
-          // let newCoin = supplyMsg[0] === 'discard' || 'trash'? discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];
-          // setActionSupply({treasure, count: discardTrashState.amount, restriction: supplyMsg[2]});
-          // setTreasure(newCoin);
+          const supplyMsg = inPlay[0]['supply'].split(' ');
+          let newCoin = supplyMsg[0] === 'discardTrash'? discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];
+          setActionSupply({treasure, count: discardTrashState.amount, restriction: supplyMsg[2]});
+          setTreasure(newCoin);
           break;
-        case discardTrashState.next[0].includes('coin'):
-        case !isNaN(discardTrashState.next[0]):
         default:
       }
     } else {
@@ -243,7 +259,7 @@ function App() {
 
         setActions(hasAction(newHand)? actionTotal : 0);
 
-        if ((!actionTotal || !hasAction(newHand)) && !card.trash && !card.discard) {
+        if ((!actionTotal || !hasAction(newHand)) && !card.discardTrash) {
           cardLog = cardLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
           setPhase('Buy');
         }
@@ -340,7 +356,7 @@ function App() {
     };
     setLogs([...logs].concat(cardLog));
   },
-  noLimit = discardTrashState && (discardTrashState.modifier === 'up-to' || discardTrashState.amount === 'any'),
+  noLimit = discardTrashState && discardTrashQueue.length > 0 && (discardTrashState.modifier === 'up-to' || discardTrashState.amount === 'any'),
   rightAmount = discardTrashState && discardTrashState.amount === discardTrashQueue.length,
   logSticker = document.getElementById('log-sticker');
 
@@ -367,7 +383,7 @@ function App() {
         <CardDisplay
           coin={treasure - bought}
           phase={actionSupply? 'supply' : phase}
-          onClick={nextPhase}
+          onClick={actionSupply? gainCard : nextPhase}
           sort={true}
           supply={true}
           altKey={altKey}
@@ -405,27 +421,30 @@ function App() {
         <div>
           <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
           <p className="instructions red">{instructions()}&nbsp;</p>
-          <div
-            className={(treasureInHand() > 0)? `game-button live ${(phase === 'Buy'? '' : ' hidden')}` : 'button-space'}
-            onClick={playTreasure}
-          >
-            {treasureInHand() > 0? `Play All Treasure (${treasureInHand()})` : ' '}
-          </div>
+          
+          {actionSupply? '' : <div>
 
-          <div
-            className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${(phase === 'Buy'? ' top-spaced' : '')}`}
-            onClick={discardTrashState? noLimit || rightAmount? discardTrashCards : () => {} : nextPhase}
-          >
-            {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
-          </div>
+            <div
+              className={(treasureInHand() > 0)? `game-button live ${(phase === 'Buy'? '' : ' hidden')}` : 'button-space'}
+              onClick={playTreasure}
+            >
+              {treasureInHand() > 0? `Play All Treasure (${treasureInHand()})` : ' '}
+            </div>
 
-          <div
-            className={`game-button live top-spaced ${(discardTrashState && discardTrashQueue.length > 0)? '' : ' hidden'}`}
-            onClick={setDiscardTrashQueue}
-          >
-            {`Choose different cards`}
-          </div>
+            <div
+              className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${(phase === 'Buy'? ' top-spaced' : '')}`}
+              onClick={discardTrashState? noLimit || rightAmount? discardTrashCards : () => {} : nextPhase}
+            >
+              {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
+            </div>
 
+            <div
+              className={`game-button live top-spaced ${(discardTrashState && discardTrashQueue.length > 0)? '' : ' hidden'}`}
+              onClick={() => {setDiscardTrashQueue([])}}
+            >
+              {`Choose different cards`}
+            </div>
+          </div>}
         </div>
         <div>
           <div className="breakline"/>

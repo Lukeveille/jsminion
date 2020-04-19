@@ -2,11 +2,11 @@ import cardList from './cards.json';
 
 export const standardGame = [
   'Village',
-  // 'Smithy',
-  // 'Market',
-  // 'Chapel', // trash
-  // 'Cellar', // discard
-  // 'Remodel', // trash
+  'Smithy',
+  'Market',
+  'Chapel', // trash
+  'Cellar', // discard
+  'Remodel', // trash
   // 'Mine', // trash
   // 'Moneylender', // trash
   // 'Vassal', // discard *modal option
