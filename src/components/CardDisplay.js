@@ -21,7 +21,7 @@ export default props => {
   stacks.forEach((cards, i) => {
     cards.forEach((card, j) => {
       let correctAction = (
-        (props.phase === 'Action' && card.type === 'Action' && !props.supply) ||
+        (props.phase === card.type && !props.supply) ||
         (props.phase === 'Buy' && card.type === 'Treasure' && !props.supply) ||
         ((props.phase === 'Buy' || props.phase === 'supply') && props.coin >= card.cost && props.supply) ||
         props.discardTrashState
@@ -44,8 +44,8 @@ export default props => {
           count = count - reduce;
           correctAction = count > 0 && cardQueue.length < limit;
         };
-        if (props.discardTrashState && props.discardTrashState.restriction) {
-          correctAction = correctAction && props.discardTrashState.restriction === card.type;
+        if (props.restriction) {
+          correctAction = correctAction && props.restriction === card.type;
         };
         
         cardElements[i].push(

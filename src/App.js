@@ -219,17 +219,17 @@ function App() {
           break;
         case 'play':
         case 'supply':
-          const supplyMsg = inPlay[0]['supply'].split(' ');
+          const supplyMsg = inPlay[0]? inPlay[0]['supply'].split(' ') : [];
           let newCoin = supplyMsg[0] === 'discardTrash'? discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];
           setActionSupply({treasure, count: discardTrashState.amount, restriction: supplyMsg[2]});
           setTreasure(newCoin);
+          setHand(newHand);
           break;
         default:
       }
     } else {
       newLog = newLog.concat(cleanup(newHand));
     }
-
     setLogs(newLog);
   },
   cleanup = newHand => {
@@ -388,7 +388,7 @@ function App() {
           supply={true}
           altKey={altKey}
           cards={supply}
-          discardTrashState={discardTrashState && actionSupply? discardTrashState : undefined}
+          restriction={discardTrashState? discardTrashState.restriction : undefined}
         />
       </div>
       <div className="logs">
@@ -474,6 +474,7 @@ function App() {
           phase={phase}
           onClick={discardTrashState? discardTrash : nextPhase}
           discardTrashState={discardTrashState}
+          restriction={discardTrashState? discardTrashState.restriction : undefined}
           cardQueue={discardTrashQueue}
         />
       </div>
