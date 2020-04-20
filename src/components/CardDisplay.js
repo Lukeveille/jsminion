@@ -49,7 +49,11 @@ export default props => {
         };
         if (props.actionSupply) {
           correctAction = correctAction && props.supply;
-        }
+        };
+        if (!props.supply && card.discardTrash && card.discardTrash.split(' ')[2] === 'auto') {
+          const cardNames = props.cards.map(card => (card.name));
+          correctAction = correctAction && cardNames.includes(card.discardTrash.split(' ')[3]);
+        };
 
         cardElements[i].push(
           <div key={`card${i}${j}`} className="inline">

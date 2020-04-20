@@ -8,7 +8,7 @@ export const standardGame = [
   'Cellar', // discard
   'Remodel', // trash
   'Mine', // trash
-  // 'Moneylender', // trash
+  'Moneylender', // trash
   // 'Vassal', // discard *modal option
   // 'Workshop',
   // 'Harbinger',

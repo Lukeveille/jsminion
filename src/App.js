@@ -121,12 +121,13 @@ function App() {
     setHand(newHand);
     setLogs(newLogs);
   },
-  playCard = (card, count) => {
+  playCard = (card, count, log) => {
     let newHand = [...hand],
-    treasureCount = countValue(inPlay, 'treasure');
+    treasureCount = countValue(inPlay, 'treasure'),
+    removal = newHand.findIndex(i => (i === card)),
+    cardLog = log;
 
-    const removal = newHand.findIndex(i => (i === card)),
-    size = phase === card.type? 1 : count,
+    const size = phase === card.type? 1 : count,
     cards = newHand.splice(removal, size);
     
     treasureCount += countTreasure(cards);
@@ -148,20 +149,32 @@ function App() {
         amount = isNaN(amount)? amount : parseInt(amount);
         
         const actionObject = {
+          card,
           type: actionInfo[0],
           amount,
           modifier,
           next: actionInfo[2]? [actionInfo[2], card[actionInfo[2]]] : [],
           restriction: actionInfo[3]
         };
-
-        setDiscardTrashState(actionObject);
+        if (actionObject.next && actionObject.next[0] === 'auto') {          
+          let actionName = 'discards';
+          removal = newHand.findIndex(i => (i.name === actionObject.restriction));
+          if (actionObject.type === 'discard') {
+            setDiscard([...discard].concat(newHand.splice(removal, actionObject.amount)));
+          } else {
+            setTrash([...trash].concat(newHand.splice(removal, actionObject.amount)));
+            actionName = 'trashes'
+          };
+          cardLog = cardLog.concat(generateLog(gameState, [{name: 'card'}], actionName, actionObject.amount, true))
+        } else {
+          setDiscardTrashState(actionObject);
+        };
       };
-    }
+    };
     setHand(newHand);
     setInPlay([...inPlay].concat(cards));
     setTreasure(treasureCount);
-    return newHand;
+    return [newHand, cardLog];
   },
   discardTrashCard = (card, size = 1) => {
     let newQueue = [...discardTrashQueue],
@@ -205,7 +218,7 @@ function App() {
           break;
         case 'play':
         case 'supply':
-          const supplyMsg = inPlay[0]? inPlay[0]['supply'].split(' ') : [];
+          const supplyMsg = discardTrashState.card.supply.split(' ');
           let newCoin = supplyMsg[0] === 'discardTrash'? discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];
           setActionSupply({treasure, count: discardTrashState.amount, restriction: supplyMsg[2]});
           setTreasure(newCoin);
@@ -252,13 +265,15 @@ function App() {
         let actionTotal = actions-1;
         if (card.actions) { actionTotal += card.actions };
         if (card.type === 'Action') {
-          newHand = playCard(card, count);
-          cardLog = printLog(gameState, [card]);
+          cardLog = cardLog.concat(printLog(gameState, [card]));
+          [newHand, cardLog] = playCard(card, count, cardLog);
         }
 
         setActions(hasAction(newHand)? actionTotal : 0);
 
-        if ((!actionTotal || !hasAction(newHand)) && !card.discardTrash) {
+        const auto = card.discardTrash? card.discardTrash.split(' ').includes('auto')? true : false : true;
+
+        if ((!actionTotal || !hasAction(newHand)) && auto) {
           cardLog = cardLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
           setPhase('Buy');
         }

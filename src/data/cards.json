@@ -51,20 +51,20 @@
       "name": "Village",
       "cost": 3,
       "actions": 2,
-      "cards": "1",
+      "cards": 1,
       "type": "Action"
     },
     {
       "name": "Smithy",
       "cost": 4,
-      "cards": "3",
+      "cards": 3,
       "type": "Action"
     },
     {
       "name": "Market",
       "cost": 5,
       "actions": 1,
-      "cards": "1",
+      "cards": 1,
       "buys": 1,
       "treasure": 1,
       "type": "Action"
@@ -106,7 +106,7 @@
       "cost": 4,
       "treasure": 3,
       "instructions": "You may trash a Copper from your hand for +coin-3",
-      "discardTrash": "trash 1 +coin-3 Copper",
+      "discardTrash": "trash 1 auto Copper",
       "type": "Action",
       "hidden": "treasure"
     },
@@ -129,8 +129,8 @@
     {
       "name": "Harbinger",
       "cost": 3,
-      "cards": "1",
-      "actions": "1",
+      "cards": 1,
+      "actions": 1,
       "instructions": "Look through your discard pile. You may put a card from it onto your deck.",
       "discardPile": "1 deck",
       "type": "Action"
@@ -139,8 +139,8 @@
       "name": "Merchant",
       "cost": 3,
       "treasure": "Silver 1",
-      "cards": "1",
-      "actions": "1",
+      "cards": 1,
+      "actions": 1,
       "instructions": "The first time you play a Silver this turn, +coin-1",
       "buyPhase": "1 first Silver",
       "type": "Action"
@@ -148,16 +148,16 @@
     {
       "name": "Festival",
       "cost": 5,
-      "actions": "2",
-      "buys": "1",
-      "treasures": "2",
+      "actions": 2,
+      "buys": 1,
+      "treasures": 2,
       "type": "Action"
     },
     {
       "name": "Laboratory",
       "cost": 5,
-      "cards": "2",
-      "actions": "1",
+      "cards": 2,
+      "actions": 1,
       "type": "Action"
     }
   ]
