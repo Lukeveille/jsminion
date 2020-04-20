@@ -156,16 +156,24 @@ function App() {
           next: actionInfo[2]? [actionInfo[2], card[actionInfo[2]]] : [],
           restriction: actionInfo[3]
         };
-        if (actionObject.next && actionObject.next[0] === 'auto') {          
-          let actionName = 'discards';
-          removal = newHand.findIndex(i => (i.name === actionObject.restriction));
-          if (actionObject.type === 'discard') {
-            setDiscard([...discard].concat(newHand.splice(removal, actionObject.amount)));
+        if (actionObject.next && actionObject.next[0] === 'auto') {
+          if (actionObject.modifier && actionObject.modifier !== 'up-to') {
+            console.log(actionObject.modifier)
           } else {
-            setTrash([...trash].concat(newHand.splice(removal, actionObject.amount)));
-            actionName = 'trashes'
-          };
-          cardLog = cardLog.concat(generateLog(gameState, [{name: 'card'}], actionName, actionObject.amount, true))
+            let actionName = 'discards';
+            
+            removal = newHand.findIndex(i => (i.name === actionObject.restriction));
+
+            if (removal === -1) treasureCount = 0;
+
+            if (actionObject.type === 'discard') {
+              setDiscard([...discard].concat(newHand.splice(removal, actionObject.amount)));
+            } else {
+              setTrash([...trash].concat(newHand.splice(removal, actionObject.amount)));
+              actionName = 'trashes'
+            };
+            cardLog = cardLog.concat(generateLog(gameState, [{name: 'card'}], actionName, actionObject.amount, true))
+          }
         } else {
           setDiscardTrashState(actionObject);
         };
@@ -216,7 +224,6 @@ function App() {
           newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], 'draws', discardTrashQueue.length, true));
           newLog = newLog.concat(cleanup(newHand));
           break;
-        case 'play':
         case 'supply':
           const supplyMsg = discardTrashState.card.supply.split(' ');
           let newCoin = supplyMsg[0] === 'discardTrash'? discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];

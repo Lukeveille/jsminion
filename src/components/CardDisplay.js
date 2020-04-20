@@ -45,14 +45,11 @@ export default props => {
           correctAction = count > 0 && cardQueue.length < limit;
         };
         if (props.restriction) {
-          correctAction = correctAction && props.restriction === card.type;
+          console.log(card.subType)
+          correctAction = correctAction && (props.restriction === card.type || props.restriction === card.subType);
         };
         if (props.actionSupply) {
           correctAction = correctAction && props.supply;
-        };
-        if (!props.supply && card.discardTrash && card.discardTrash.split(' ')[2] === 'auto') {
-          const cardNames = props.cards.map(card => (card.name));
-          correctAction = correctAction && cardNames.includes(card.discardTrash.split(' ')[3]);
         };
 
         cardElements[i].push(

@@ -9,12 +9,12 @@ export const standardGame = [
   'Remodel', // trash
   'Mine', // trash
   'Moneylender', // trash
-  // 'Vassal', // discard *modal option
+  'Vassal', // discard *modal option
   // 'Workshop',
   // 'Harbinger',
   // 'Merchant',
-  'Festival',
-  'Laboratory'
+  // 'Festival',
+  // 'Laboratory'
 ];
 
 const importAll = files => {
@@ -38,7 +38,7 @@ export const startingCards = () => {
   const startingDeck = [];
   cardTypes.forEach(type => {
     for (let j = 0; j < (type === 'treasure'? 7 : 3); j++) {
-      startingDeck.push(allCards()[type][0]);
+      startingDeck.push(allCards()[type][1]);
     };
   });
   return startingDeck;
