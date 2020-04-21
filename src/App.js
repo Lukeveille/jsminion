@@ -11,6 +11,7 @@ import countTreasure from './utils/countTreasure';
 import CardDisplay from './components/CardDisplay';
 import Modal from './components/Modal';
 import './styles/App.css';
+import capital from './utils/capital';
 
 function App() {
   const player = 1,
@@ -77,6 +78,23 @@ function App() {
       Start Game
     </div>
   </div>,
+  actionModal = (cards, accept, decline, buttonText, live) => {
+    return <div>
+      <CardDisplay
+        altKey={altKey}
+        onClick={accept}
+        cards={cards}
+        live={live}
+        title={live? 'You may play' : `To ${buttonText}`}
+      />
+      <div
+        className="game-button start-button live"
+        onClick={decline}
+      >
+        {capital(buttonText)}
+      </div>
+    </div>
+  },
   [menuScreen, setMenuScreen] = useState(startScreen),
   currentModal = cards => {
     return <Modal
@@ -96,7 +114,7 @@ function App() {
 
     if (deck.length > size) {
       setDeck(deckSplit);
-    } else if (deck.length > 0) {
+    } else {
       const shuffled = shuffle(discard);
       setDiscard([]);
       newHand = newHand.concat(shuffled.splice(0, (size-newHand.length)));
@@ -135,19 +153,15 @@ function App() {
       if (card.cards) { newHand = newHand.concat(rollover(card.cards)) };
       if (card.buys) { setBuys(buys + card.buys) };
       if (card.discardTrash) {
-
         let actionInfo = card.discardTrash.split(' '),
         amount = actionInfo[1],
         modifier = '';
-        
         if (amount.includes('|')){
           amount = amount.split('|');
           modifier = amount[1];
           amount = amount[0];
         };
-        
         amount = isNaN(amount)? amount : parseInt(amount);
-        
         const actionObject = {
           card,
           type: actionInfo[0],
@@ -158,7 +172,36 @@ function App() {
         };
         if (actionObject.next && actionObject.next[0] === 'auto') {
           if (actionObject.modifier && actionObject.modifier !== 'up-to') {
-            console.log(actionObject.modifier)
+            switch (actionObject.modifier) {
+              case 'deck':
+                let discardTrash = card.deck.split(' '),
+                newDeck = [...deck];
+                discardTrash = {
+                  index: discardTrash[0],
+                  next: discardTrash[1],
+                  type: discardTrash[2]
+                };
+                removal = newDeck.splice(discardTrash.index, actionObject.amount);
+                const decline = () => {
+                  setMenuScreen(null);
+                  setDeck(newDeck);
+                  setDiscard([...discard].concat(removal));
+                };
+                if (discardTrash.next === 'modal') {
+                  const cardLive = discardTrash.type === removal[0].type,
+                  accept = card => {
+                    setMenuScreen(null);
+                    // setActions(actions + 1)
+                    // playCard(card);
+                    // setPhase('Action');
+                  };
+                  setMenuScreen(actionModal(removal, accept, decline, actionObject.type, cardLive));
+                } else {
+                  decline();
+                }
+                break;
+              default: break;
+            }
           } else {
             let actionName = 'discards';
             
@@ -263,7 +306,7 @@ function App() {
     setHand(newHand);
     return newLog;
   },
-  nextPhase = (card, count, supplyOn) => {
+  nextPhase = (card, count, supplyOn, oldPlay) => {
     let newHand = [],
     cardLog = [];
 
@@ -275,7 +318,6 @@ function App() {
           cardLog = cardLog.concat(printLog(gameState, [card]));
           [newHand, cardLog] = playCard(card, count, cardLog);
         }
-
         setActions(hasAction(newHand)? actionTotal : 0);
 
         const auto = card.discardTrash? card.discardTrash.split(' ').includes('auto')? true : false : true;
@@ -343,7 +385,7 @@ function App() {
 
           if (deck.length > 5) {
             setDeck(deckSplit);
-          } else if (deck.length > 0) {
+          } else {
             const shuffled = shuffle(discarded);
             discarded = [];
             newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)));
@@ -377,7 +419,7 @@ function App() {
     };
     setLogs([...logs].concat(cardLog));
   },
-  noLimit = discardTrashState && discardTrashQueue.length > 0 && (discardTrashState.modifier === 'up-to' || discardTrashState.amount === 'any'),
+  noLimit = discardTrashState && (discardTrashState.modifier === 'up-to' || discardTrashState.amount === 'any'),
   rightAmount = discardTrashState && discardTrashState.amount === discardTrashQueue.length,
   logSticker = document.getElementById('log-sticker');
 

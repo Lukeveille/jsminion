@@ -82,7 +82,6 @@
       "actions": 1,
       "instructions": "Discard any number of cards, then draw that many.",
       "discardTrash": "discard any draw",
-      "draw": "discard",
       "type": "Action"
     },
     {

@@ -57,7 +57,7 @@ export default props => {
             <Card
               altKey={props.altKey}
               card={card}
-              live={correctAction}
+              live={props.live? true : correctAction}
               count={count}
               stacked={props.stacked}
               onClick={props.onClick}
