@@ -2,7 +2,7 @@ import cardList from './cards.json';
 
 export const standardGame = [
   'Village',
-  'Smithy',
+  // 'Smithy',
   'Market',
   'Chapel', // trash
   'Cellar', // discard
@@ -37,8 +37,8 @@ allCards = (set = []) => ({
 export const startingCards = () => {
   const startingDeck = [];
   cardTypes.forEach(type => {
-    for (let j = 0; j < (type === 'treasure'? 5 : 1); j++) {
-      startingDeck.push(allCards()[type][1]);
+    for (let j = 0; j < (type === 'treasure'? 7 : 3); j++) {
+      startingDeck.push(allCards()[type][0]);
     };
   });
   return startingDeck;
