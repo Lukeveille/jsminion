@@ -3,7 +3,8 @@ import Card from './Card';
 import sorting from '../utils/sorting';
 
 export default props => {
-  let stacks = [props.cards];
+  let stacks = [props.cards],
+  count = 1;
   const cardElements = [[], [], []];
   if (props.sort) {
     stacks[0].sort(sorting('name'));
@@ -14,9 +15,7 @@ export default props => {
     victory = stacks[0].filter(card => (card.type === 'Victory')).sort(sorting('cost'));
 
     stacks = props.supply? [treasures, victory, actions] : [actions, treasures, victory];
-  }
-  
-  let count = 1;
+  };
 
   stacks.forEach((cards, i) => {
     cards.forEach((card, j) => {
