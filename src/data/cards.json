@@ -70,6 +70,21 @@
       "type": "Action"
     },
     {
+      "name": "Festival",
+      "cost": 5,
+      "actions": 2,
+      "buys": 1,
+      "treasures": 2,
+      "type": "Action"
+    },
+    {
+      "name": "Laboratory",
+      "cost": 5,
+      "cards": 2,
+      "actions": 1,
+      "type": "Action"
+    },
+    {
       "name": "Chapel",
       "cost": 2,
       "instructions": "Trash up to 4 cards from your hand.",
@@ -142,21 +157,6 @@
       "actions": 1,
       "instructions": "The first time you play a Silver this turn, +coin-1",
       "buyPhase": "1 first Silver",
-      "type": "Action"
-    },
-    {
-      "name": "Festival",
-      "cost": 5,
-      "actions": 2,
-      "buys": 1,
-      "treasures": 2,
-      "type": "Action"
-    },
-    {
-      "name": "Laboratory",
-      "cost": 5,
-      "cards": 2,
-      "actions": 1,
       "type": "Action"
     }
   ]

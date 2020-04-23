@@ -16,6 +16,7 @@ import moveCard from './utils/moveCard';
 import CardDisplay from './components/CardDisplay';
 import Modal from './components/Modal';
 import CurrentModal from './components/CurrentModal';
+import ActionModal from './components/ActionModal';
 import StartScreen from './components/StartScreen';
 import './styles/App.css';
 
@@ -59,23 +60,6 @@ function App() {
     setTreasure(0);
     setBuys(0);
   },
-  // actionModal = (cards, accept, decline, buttonText, live) => {
-  //   return <div>
-  //     <CardDisplay
-  //       altKey={altKey}
-  //       onClick={accept}
-  //       cards={cards}
-  //       live={live}
-  //       title={live? 'You may play' : `To ${buttonText}`}
-  //     />
-  //     <div
-  //       className="game-button start-button live"
-  //       onClick={decline}
-  //     >
-  //       {capital(buttonText)}
-  //     </div>
-  //   </div>
-  // },
   [menuScreen, setMenuScreen] = useState(<StartScreen onClick={startGame} phaseTitle={"Let's Play"} start={true} button={'Start Game'} />),
   playAllTreasure = () => {
     const treasures = hand.filter(card => (card.type === 'Treasure')),
@@ -138,7 +122,7 @@ function App() {
       newTrash = newTrash.concat(discardTrashQueue);
       setTrash(newTrash);
     };
-    newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], actionName, discardTrashQueue.length, true));
+    newLog = newLog.concat(generateLog(gameState, [{name: 'Card'}], actionName, discardTrashQueue.length, true));
     
     if (newDiscardTrashState.next.length > 0) {
       const nextAction = newDiscardTrashState.next[0];
@@ -147,7 +131,7 @@ function App() {
           const newSize = !isNaN(newDiscardTrashState.next[1])? newDiscardTrashState.next[1] : discardTrashQueue.length;
           [rolloverCards, newDeck, newDiscard] = rollover(newSize, deck, discard);
           newHand = newHand.concat(rolloverCards);
-          newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], 'draws', discardTrashQueue.length, true));
+          newLog = newLog.concat(generateLog(gameState, [{name: 'Card'}], 'draws', discardTrashQueue.length, true));
           [newLog, newActions, newPhase, newDiscardTrashQueue, newDiscardTrashState] = cleanup(newHand, newActions, phase, gameState, newLog);
           break;
         case 'supply':
@@ -161,7 +145,6 @@ function App() {
     } else {
       [newLog, newActions, newPhase, newDiscardTrashQueue, newDiscardTrashState] = cleanup(newHand, newActions, phase, gameState, newLog);
     };
-
     setHand(newHand)
     setPhase(newPhase)
     setTreasure(newCoin)
@@ -177,6 +160,7 @@ function App() {
     newInPlay = [...inPlay],
     newLog = [...logs],
     newBuys = buys,
+    newPhase = phase,
     newTreasure = countValue(inPlay, 'treasure'),
     newDiscard = [...discard];
     const size = phase === card.type? 1 : count;
@@ -225,20 +209,20 @@ function App() {
                     };
                     let removal = newDeck.splice(discardTrash.index, actionObject.amount);
                     const decline = () => {
-                      // setMenuScreen(null);
-                      // setDeck(newDeck);
-                      // setDiscard([...discard].concat(removal));
+                      setMenuScreen(null);
+                      setDeck(newDeck);
+                      setDiscard(newDiscard.concat(removal));
                     };
-                    console.log(removal)
                     if (discardTrash.next === 'modal') {
-                      // const cardLive = discardTrash.type === removal[0].type,
-                      // accept = card => {
-                        // setMenuScreen(null);
-                        // setActions(actions + 1)
-                        // playCard(card);
-                        // setPhase('Action');
-                      // };
-                      // setMenuScreen(actionModal(removal, accept, decline, actionObject.type, cardLive));
+                      const cardLive = discardTrash.type === removal[0].type,
+                      accept = card => {
+                        setMenuScreen(null);
+                        setActions(actions + 1);
+                        newPhase = 'Action';
+                        // nextPhase(card);
+                        setDiscardTrashState(false);
+                      };
+                      setMenuScreen(<ActionModal cards={removal} accept={accept} decline={decline} buttonText={actionObject.type} live={cardLive} />)
                     } else {
                       decline();
                     }
@@ -255,7 +239,7 @@ function App() {
                   setTrash([...trash].concat(newHand.splice(removal, actionObject.amount)));
                   actionName = 'trashes'
                 };
-                newLog = newLog.concat(generateLog(gameState, [{name: 'card'}], actionName, actionObject.amount, true))
+                newLog = newLog.concat(generateLog(gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
               }
             } else {
               setDiscardTrashState(actionObject);
@@ -268,22 +252,20 @@ function App() {
 
         if ((!actionTotal || !hasAction(newHand)) && auto) {
           newLog = newLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
-          setPhase('Buy');
+          newPhase = 'Buy';
         }
         break;
 
       case 'Buy':
         let buysLeft = buys,
-        victory = victoryPoints;
+        newVictoryPoints = victoryPoints;
 
         if (supplyOn) {
-          let newSupply = [...supply],
-          cardBought = supply.findIndex(i => (i === card));
-          cardBought = newSupply.splice(cardBought, 1);
+          let newSupply, cardBought;
+          [newSupply, newDiscard, cardBought] = moveCard(card, 1, supply, newDiscard)
 
           const cardsLeft = newSupply.filter(newCard => newCard.name === card.name).length;
-          victory = card.victory? victory + card.victory : victory;
-          newDiscard = newDiscard.concat(cardBought);
+          newVictoryPoints = card.victory? newVictoryPoints + card.victory : newVictoryPoints;
 
           if (!cardsLeft) {
             setEmptySupply(emptySupply + 1);
@@ -292,7 +274,7 @@ function App() {
 
             if (card.name === 'Province' || emptySupply === 2) {
               setSupply(newSupply);
-              setMenuScreen(<StartScreen onClick={startGame} phaseTitle={"Game Over"} victory={victory} button={'Play Again'} />)
+              setMenuScreen(<StartScreen onClick={startGame} phaseTitle={"Game Over"} victory={newVictoryPoints} button={'Play Again'} />)
               break;
             };
           };
@@ -327,12 +309,12 @@ function App() {
           setActions(0);
           setBought(0);
           newTreasure = 0;
-          setPhase(null);
+          newPhase = null;
           setGameState({...gameState, turn: gameState.turn + 1});
           newLog = newLog.concat(printLog(gameState, [{name: 'turn', end: 'ends'}]));
         }
         newBuys = buysLeft;
-        setVictoryPoints(victory);
+        setVictoryPoints(newVictoryPoints);
         break;
 
       default:
@@ -341,13 +323,14 @@ function App() {
         newBuys =  1;
         if (hasAction(hand)) {
           setActions(1);
-          setPhase('Action');
+          newPhase = 'Action';
         } else {
-          setPhase('Buy');
+          newPhase = 'Buy';
           newLog = newLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
         }
         break;
     };
+    setPhase(newPhase)
     setHand(newHand);
     setInPlay(newInPlay);
     setDeck(newDeck);
@@ -372,7 +355,6 @@ function App() {
   window.onkeyup = e => {
     if (e.keyCode === 18) setAltKey(false);
   };
-
   useEffect(() => {
     if (logSticker) logSticker.scrollIntoView();
   }, [logs, logSticker]);
@@ -407,7 +389,7 @@ function App() {
         <span>Coin <span className='coin'>{treasure - bought}</span> </span>
       </div>
       <div
-        className={`trash game-button ${trash.length > 0? 'active' : ''}`}
+        className={`trash game-button${trash.length > 0? ' active' : ''}`}
         onClick={() => {
           if (trash.length > 0) {
             setModalContent([trash, 'Trash']);
@@ -485,7 +467,12 @@ function App() {
         setShow={() => {}}
         children={menuScreen}
       />
-      <CurrentModal showModal={showModal} setShowModal={setShowModal} altKey={altKey} modalContent={modalContent} />
+      <CurrentModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        altKey={altKey}
+        modalContent={modalContent}
+      />
     </div>
   );
 };

@@ -67,12 +67,9 @@ export default props => {
             />
             {props.card.type === 'Action'? <div className="card-instructions">
               <div className="perks">
-                {/* eslint-disable-next-line */}
                 {types.map(type => {
                   const name = type === 'treasure'? <span className='coin'>{props.card[type]}</span> : props.card[type] > 1? capital(type) : capital(type).slice(0, -1);
-                  if (props.card[type] && !isNaN(props.card[type]) && props.card.hidden !== type) {
-                    return <p key={type}>+<span>{type !== 'treasure'? props.card[type] : ''} {name}</span></p>
-                  };
+                  return props.card[type] && !isNaN(props.card[type]) && props.card.hidden !== type? <p key={type}>+<span>{type !== 'treasure'? props.card[type] : ''} {name}</span></p> : ''
                 })}
               </div>
               <div className="instructions">
