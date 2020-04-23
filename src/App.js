@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { startingCards, supplies, standardGame } from './data/cardSets';
 import { spacer } from './utils/printLog';
 import { generateLog } from './utils/printLog';
@@ -8,15 +8,19 @@ import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
 import hasAction from './utils/hasAction';
 import countTreasure from './utils/countTreasure';
-import instructions from './utils/instructions';
-import treasureInHand from './utils/treasureInHand';
 import cleanup from './utils/cleanup';
 import rollover from './utils/rollover';
 import moveCard from './utils/moveCard';
+import next from './utils/next';
+import parseActionObject from './utils/parseActionObject';
+import autoAction from './utils/autoAction';
 import CardDisplay from './components/CardDisplay';
+import LogDisplay from './components/LogDisplay';
+import TurnInfo from './components/TurnInfo';
+import TrashButton from './components/TrashButton';
+import ButtonDisplay from './components/ButtonDisplay';
 import Modal from './components/Modal';
 import CurrentModal from './components/CurrentModal';
-import ActionModal from './components/ActionModal';
 import StartScreen from './components/StartScreen';
 import './styles/App.css';
 
@@ -46,10 +50,9 @@ function App() {
   startGame = () => {
     const startingDeck = shuffle(startingCards());
     setVictoryPoints(countValue(startingDeck, 'victory'));
-    const startingHand = startingDeck.splice(0, 5);
-    setSupply(supplies(standardGame));
-    setHand(startingHand);
+    setHand(startingDeck.splice(0, 5));
     setDeck(startingDeck);
+    setSupply(supplies(standardGame));
     setDiscard([]);
     setInPlay([]);
     setLogs([]);
@@ -60,7 +63,14 @@ function App() {
     setTreasure(0);
     setBuys(0);
   },
-  [menuScreen, setMenuScreen] = useState(<StartScreen onClick={startGame} phaseTitle={"Let's Play"} start={true} button={'Start Game'} />),
+  [menuScreen, setMenuScreen] = useState(
+    <StartScreen
+      onClick={startGame}
+      phaseTitle={"Let's Play"}
+      start={true}
+      button={'Start Game'}
+    />
+  ),
   playAllTreasure = () => {
     const treasures = hand.filter(card => (card.type === 'Treasure')),
     newPlay = [...inPlay].concat(treasures),
@@ -71,7 +81,9 @@ function App() {
     newHand = hand.filter(card => (card.type !== 'Treasure'));
 
     treasureNames.forEach(treasureCard => {
-      newLogs = newLogs.concat(printLog(gameState, treasures.filter(card => (treasureCard.name === card.name))))
+      newLogs = newLogs.concat(printLog(gameState, treasures.filter(
+        card => (treasureCard.name === card.name)
+      )));
     });
     setTreasure(countTreasure(newPlay));
     setInPlay(newPlay);
@@ -79,10 +91,16 @@ function App() {
     setLogs(newLogs);
   },
   gainCard = card => {
+    let newLog = [...logs].concat(generateLog(gameState, [card], 'gains', 1, true));
     const [newSupply, newDiscard] = moveCard(card, 1, supply, discard),
-    newLog = [...logs].concat(generateLog(gameState, [card], 'gains', 1, true)),
-    [cleanupLog, newActions, newPhase, newDiscardTrashQueue, newDiscardTrashState] = (cleanup(hand, actions, phase, gameState, newLog));
-    setLogs(newLog.concat(cleanupLog));
+    [ cleanupLog,
+      newActions,
+      newPhase,
+      newDiscardTrashQueue,
+      newDiscardTrashState
+    ] = cleanup(hand, actions, phase, gameState, newLog);
+    
+    setLogs(cleanupLog);
     setPhase(newPhase)
     setDiscardTrashQueue(newDiscardTrashQueue);
     setDiscardTrashState(newDiscardTrashState);
@@ -98,7 +116,6 @@ function App() {
   },
   discardTrashCards = () => {
     let newHand = [...hand],
-    rolloverCards,
     newPhase = phase,
     newLog = [...logs],
     newDiscard = [...discard],
@@ -113,7 +130,6 @@ function App() {
     discardTrashQueue.forEach(card => {
       newHand.splice(newHand.findIndex(i => (i === card)), 1);
     });
-    
     if (newDiscardTrashState.type === 'discard') {
       newDiscard = newDiscard.concat(newDiscardTrashQueue);
       setDiscard(newDiscard);
@@ -122,28 +138,41 @@ function App() {
       newTrash = newTrash.concat(discardTrashQueue);
       setTrash(newTrash);
     };
-    newLog = newLog.concat(generateLog(gameState, [{name: 'Card'}], actionName, discardTrashQueue.length, true));
-    
+    newLog = newLog.concat(generateLog(
+      gameState,
+      [{name: 'Card'}],
+      actionName,
+      discardTrashQueue.length,
+      true
+    ));
     if (newDiscardTrashState.next.length > 0) {
-      const nextAction = newDiscardTrashState.next[0];
-      switch (nextAction) {
-        case 'draw':
-          const newSize = !isNaN(newDiscardTrashState.next[1])? newDiscardTrashState.next[1] : discardTrashQueue.length;
-          [rolloverCards, newDeck, newDiscard] = rollover(newSize, deck, discard);
-          newHand = newHand.concat(rolloverCards);
-          newLog = newLog.concat(generateLog(gameState, [{name: 'Card'}], 'draws', discardTrashQueue.length, true));
-          [newLog, newActions, newPhase, newDiscardTrashQueue, newDiscardTrashState] = cleanup(newHand, newActions, phase, gameState, newLog);
-          break;
-        case 'supply':
-          const supplyMsg = newDiscardTrashState.card.supply.split(' ');
-          newCoin = supplyMsg[0] === 'discardTrash'? discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];
-          setActionSupply({treasure, count: newDiscardTrashState.amount, restriction: supplyMsg[2]});
-          newDiscardTrashQueue = [];
-          break;
-        default:
-      }
+      [ newHand,
+        newLog,
+        newCoin,
+        newPhase,
+        newActions,
+        newDiscardTrashQueue,
+        newDiscardTrashState
+      ] = next(
+        gameState,
+        newDiscardTrashState,
+        newDiscardTrashQueue,
+        newDeck,
+        newDiscard,
+        newHand,
+        newPhase,
+        newCoin,
+        newLog,
+        newActions,
+        setActionSupply
+      );
     } else {
-      [newLog, newActions, newPhase, newDiscardTrashQueue, newDiscardTrashState] = cleanup(newHand, newActions, phase, gameState, newLog);
+      [ newLog,
+        newActions,
+        newPhase,
+        newDiscardTrashQueue,
+        newDiscardTrashState
+      ] = cleanup(newHand, newActions, phase, gameState, newLog);
     };
     setHand(newHand)
     setPhase(newPhase)
@@ -162,100 +191,57 @@ function App() {
     newBuys = buys,
     newPhase = phase,
     newTreasure = countValue(inPlay, 'treasure'),
-    newDiscard = [...discard];
+    newDiscard = [...discard],
+    newTrash = [...trash];
     const size = phase === card.type? 1 : count;
 
     switch (phase) {
       case 'Action':
         let actionTotal = actions-1,
+        rolloverCards = [],
         newCards;
+        
         [newHand, newInPlay, newCards] = moveCard(card, size, hand, inPlay);
-        newTreasure += countTreasure(newCards)
-        if (card.actions) { actionTotal += card.actions };
-        if (card.type === 'Action') {
-          let rolloverCards = [];
-          if (card.cards) [rolloverCards, newDeck, newDiscard] = rollover(card.cards, newDeck, newDiscard);
-          newHand = newHand.concat(rolloverCards)
-          newLog = newLog.concat(printLog(gameState, [card]));
-          if (card.buys) newBuys += card.buys;
-          if (card.discardTrash) {
-            let actionInfo = card.discardTrash.split(' '),
-            amount = actionInfo[1],
-            modifier = '';
-            if (amount.includes('|')){
-              amount = amount.split('|');
-              modifier = amount[1];
-              amount = amount[0];
-            };
-            amount = isNaN(amount)? amount : parseInt(amount);
-            const actionObject = {
+        newTreasure += countTreasure(newCards);
+        if (card.actions) actionTotal += card.actions;
+        if (card.cards) [rolloverCards, newDeck, newDiscard] = rollover(card.cards, newDeck, newDiscard);
+        newHand = newHand.concat(rolloverCards);
+        newLog = newLog.concat(printLog(gameState, [card]));
+        if (card.buys) newBuys += card.buys;
+        if (card.discardTrash) {
+          const actionObject = parseActionObject(card);
+          if (actionObject.next && actionObject.next[0] === 'auto') {
+            [ newHand, 
+              newDeck, 
+              newDiscard, 
+              newTrash,
+              newTreasure,
+              newLog
+            ] = autoAction(
               card,
-              type: actionInfo[0],
-              amount,
-              modifier,
-              next: actionInfo[2]? [actionInfo[2], card[actionInfo[2]]] : [],
-              restriction: actionInfo[3]
-            };
-            if (actionObject.next && actionObject.next[0] === 'auto') {
-              if (actionObject.modifier && actionObject.modifier !== 'up-to') {
-                switch (actionObject.modifier) {
-                  case 'deck':
-                    let discardTrash = card.deck.split(' '),
-                    newDeck = [...deck];
-                    discardTrash = {
-                      index: discardTrash[0],
-                      next: discardTrash[1],
-                      type: discardTrash[2]
-                    };
-                    let removal = newDeck.splice(discardTrash.index, actionObject.amount);
-                    const decline = () => {
-                      setMenuScreen(null);
-                      setDeck(newDeck);
-                      setDiscard(newDiscard.concat(removal));
-                    };
-                    if (discardTrash.next === 'modal') {
-                      const cardLive = discardTrash.type === removal[0].type,
-                      accept = card => {
-                        setMenuScreen(null);
-                        setActions(actions + 1);
-                        newPhase = 'Action';
-                        // nextPhase(card);
-                        setDiscardTrashState(false);
-                      };
-                      setMenuScreen(<ActionModal cards={removal} accept={accept} decline={decline} buttonText={actionObject.type} live={cardLive} />)
-                    } else {
-                      decline();
-                    }
-                    break;
-                  default: break;
-                }
-              } else {
-                let actionName = 'discards';
-                let removal = newHand.findIndex(i => (i.name === actionObject.restriction));
-                if (removal === -1) newTreasure = 0;
-                if (actionObject.type === 'discard') {
-                  newDiscard = newDiscard.concat(newHand.splice(removal, actionObject.amount));
-                } else {
-                  setTrash([...trash].concat(newHand.splice(removal, actionObject.amount)));
-                  actionName = 'trashes'
-                };
-                newLog = newLog.concat(generateLog(gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
-              }
-            } else {
-              setDiscardTrashState(actionObject);
-            };
+              gameState,
+              actionObject,
+              newDeck,
+              newDiscard,
+              newTrash,
+              newHand,
+              newTreasure,
+              newLog,
+              setMenuScreen,
+              setDiscardTrashState
+            );
+          } else {
+            setDiscardTrashState(actionObject);
           };
-        }
+        };
         setActions(hasAction(newHand)? actionTotal : 0);
-
+        // incorrect
         const auto = card.discardTrash? card.discardTrash.split(' ').includes('auto')? true : false : true;
-
         if ((!actionTotal || !hasAction(newHand)) && auto) {
           newLog = newLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
           newPhase = 'Buy';
-        }
+        };
         break;
-
       case 'Buy':
         let buysLeft = buys,
         newVictoryPoints = victoryPoints;
@@ -274,7 +260,14 @@ function App() {
 
             if (card.name === 'Province' || emptySupply === 2) {
               setSupply(newSupply);
-              setMenuScreen(<StartScreen onClick={startGame} phaseTitle={"Game Over"} victory={newVictoryPoints} button={'Play Again'} />)
+              setMenuScreen(
+                <StartScreen
+                  onClick={startGame}
+                  phaseTitle={"Game Over"}
+                  victory={newVictoryPoints}
+                  button={'Play Again'}
+                />
+              );
               break;
             };
           };
@@ -336,12 +329,10 @@ function App() {
     setDeck(newDeck);
     setBuys(newBuys);
     setDiscard(newDiscard);
+    setTrash(newTrash);
     setTreasure(newTreasure);
     setLogs(newLog);
-  },
-  noLimit = discardTrashState && (discardTrashState.modifier === 'up-to' || discardTrashState.amount === 'any'),
-  rightAmount = discardTrashState && discardTrashState.amount === discardTrashQueue.length,
-  logSticker = document.getElementById('log-sticker');
+  };
 
   window.onkeydown = e => {
     if (e.keyCode === 18) {
@@ -355,9 +346,6 @@ function App() {
   window.onkeyup = e => {
     if (e.keyCode === 18) setAltKey(false);
   };
-  useEffect(() => {
-    if (logSticker) logSticker.scrollIntoView();
-  }, [logs, logSticker]);
 
   return (
     <div className="App">
@@ -374,80 +362,40 @@ function App() {
           restriction={discardTrashState? discardTrashState.restriction : undefined}
         />
       </div>
-      <div className="logs">
-        <p className="log-title">Log</p>
-        <div className="breakline"/>
-        <div className="log-readout">
-          {logs.length >1? logs : <div className="spacer"/>}
-          <div id="log-sticker" />
-        </div>
-      </div>
-      <div className="info">
-        <span className="hidden">VP <span className='red'>{victoryPoints}</span> |&nbsp;</span>
-        <span>Action <span className='red'>{actions}</span> |&nbsp;</span>
-        <span>Buys <span className='red'>{buys}</span> |&nbsp;</span>
-        <span>Coin <span className='coin'>{treasure - bought}</span> </span>
-      </div>
-      <div
-        className={`trash game-button${trash.length > 0? ' active' : ''}`}
-        onClick={() => {
-          if (trash.length > 0) {
-            setModalContent([trash, 'Trash']);
-            setShowModal(true);
-          };
-        }}
-      >Trash ({trash.length})</div>
+      <LogDisplay logs={logs} />
+      <TurnInfo
+        victoryPoints={victoryPoints}
+        actions={actions}
+        buys={buys}
+        treasure={treasure}
+        bought={bought}
+      />
+      <TrashButton
+        trash={trash}
+        setModalContent={setModalContent}
+        setShowModal={setShowModal}
+      />
       <div className="in-play">
         <CardDisplay sort={true} altKey={altKey} cards={inPlay}/>
       </div>
       <div className="combo-mat"></div>
-      <div className="button-display">
-        <div>
-          <div className="game-button red">{phase? `Your Turn - ${phase} Phase` : `P2's Turn`}</div>
-          <p className="instructions red">{instructions(phase, buys, discardTrashState, actionSupply)}&nbsp;</p>
-          
-          {actionSupply? '' : <div>
-
-            <div
-              className={discardTrashState || !phase? 'hidden' : treasureInHand(hand) > 0 && phase === 'Buy'? `game-button live` : 'button-space'}
-              onClick={playAllTreasure}
-            >
-              {treasureInHand(hand) > 0 && phase === 'Buy'? `Play All Treasure (${treasureInHand(hand)})` : ' '}
-            </div>
-
-            <div
-              className={`game-button ${discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${discardTrashState || !phase? '' : ' top-spaced'}`}
-              onClick={discardTrashState? noLimit || rightAmount? discardTrashCards : () => {} : nextPhase}
-            >
-              {discardTrashState? `Confirm Card${isNaN(discardTrashState.amount) || discardTrashState.amount > 1? 's' : ''} to ${discardTrashState.type} (${discardTrashQueue.length})` : phase? `End ${phase} Phase` : 'Start Turn'}
-            </div>
-
-            <div
-              className={`game-button live top-spaced ${(discardTrashState && discardTrashQueue.length > 0)? '' : ' hidden'}`}
-              onClick={() => {setDiscardTrashQueue([])}}
-            >
-              {`Choose different cards`}
-            </div>
-          </div>}
-        </div>
-        <div>
-          <div className="breakline"/>
-          <div className="deck">
-            <p>Deck ({deck.length})</p>
-          </div>
-          <div
-            className={`deck ${discard.length > 0? 'active' : ''}`}
-            onClick={() => {
-              if (discard.length > 0) {
-                setModalContent([discard, 'Discard']);
-                setShowModal(true);
-              };
-            }}
-          >
-            <p>Discard ({discard.length})</p>
-          </div>
-        </div>
-      </div>
+      <ButtonDisplay
+        buys={buys}
+        actionSupply={actionSupply}
+        hand={hand}
+        phase={phase}
+        discardTrashState={discardTrashState}
+        discardTrashQueue={discardTrashQueue}
+        setDiscardTrashQueue={setDiscardTrashQueue}
+        deck={deck}
+        setModalContent={setModalContent}
+        setShowModal={setShowModal}
+        discard={discard}
+        playAllTreasure={playAllTreasure}
+        discardTrashCards={discardTrashCards}
+        startGame={startGame}
+        nextPhase={nextPhase}
+      />
       <div className="hand">
         <CardDisplay
           altKey={altKey}

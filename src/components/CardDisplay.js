@@ -44,9 +44,9 @@ export default props => {
           correctAction = count > 0 && cardQueue.length < limit;
         };
         if (props.restriction) {
-          console.log(card.subType)
           correctAction = correctAction && (props.restriction === card.type || props.restriction === card.subType);
         };
+        
         if (props.actionSupply) {
           correctAction = correctAction && props.supply;
         };

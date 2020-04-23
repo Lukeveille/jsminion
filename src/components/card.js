@@ -17,13 +17,13 @@ export default props => {
 
       remainder = remainder.length > 0? remainder.join(' ') : '';
       newText = <div>{beginning}<span className='coin'>{coinValue}</span> {remainder}</div>
-    }
+    };
     return newText;
-  }
+  };
 
   useEffect(() => {
     setAltKey(props.altKey)
-  }, [props.altKey])
+  }, [props.altKey]);
 
   return <div className={`card-info ${props.card.empty || props.queued.includes(props.card)? 'transparent' : ''}`}>
     {props.count > 1 || props.supply || props.queued.includes(props.card)? <p

@@ -79,7 +79,6 @@
 .log-readout {
   height: 88%;
   width: 100%;
-  display: inline-block;
   overflow: auto;
   text-align: left;
 }
