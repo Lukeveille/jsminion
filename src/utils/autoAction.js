@@ -41,14 +41,18 @@ export default (card, gameState, actionObject, deck, discard, trash, hand, coin,
   } else {
     let actionName = 'discards';
     let removal = hand.findIndex(i => (i.name === actionObject.restriction));
-    if (removal === -1) coin = 0;
     if (actionObject.type === 'discard') {
       discard = discard.concat(hand.splice(removal, actionObject.amount));
     } else {
       trash = ([...trash].concat(hand.splice(removal, actionObject.amount)));
       actionName = 'trashes'
     };
-    log = log.concat(generateLog(gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
+    if (removal === -1) {
+      coin = 0;
+      log.pop();
+    } else {
+      log = log.concat(generateLog(gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
+    }
   };
   return [hand, deck, discard, trash, coin, log]
 };
