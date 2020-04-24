@@ -220,14 +220,15 @@ function App() {
           
           let checkHandForActions = !hasAction(newHand);
           if (actionObject) {
-            checkHandForActions = false;
             if (actionObject.next && actionObject.next[0] === 'auto') {
               [ newHand, 
                 newDeck, 
                 newDiscard, 
                 newTrash,
                 newTreasure,
-                newLog
+                newLog,
+                checkHandForActions,
+                actionTotal
               ] = autoAction(
                 card,
                 gameState,
@@ -239,14 +240,18 @@ function App() {
                 newTreasure,
                 newLog,
                 setMenuScreen,
-                setDiscardTrashState
+                setDiscardTrashState,
+                actionTotal
               );
             } else {
+              checkHandForActions = false;
               setDiscardTrashState(actionObject);
             };
           };
           const auto = actionObject? actionObject.next && actionObject.next[0] === 'auto'? true : false : true;
-
+          
+          console.log(checkHandForActions);
+          
           if ((!actionTotal || checkHandForActions) && auto) {
             [newLog, newPhase, actionTotal] = enterBuyPhase(gameState, newLog);
           };

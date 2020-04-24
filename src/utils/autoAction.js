@@ -1,8 +1,9 @@
 import React from 'react';
 import ActionModal from '../components/ActionModal';
 import { generateLog } from './printLog';
+import hasAction from './hasAction';
 
-export default (card, gameState, actionObject, deck, discard, trash, hand, coin, log, setMenuScreen, setDiscardTrashState) => {
+export default (card, gameState, actionObject, deck, discard, trash, hand, coin, log, setMenuScreen, setDiscardTrashState, actions) => {
   if (actionObject.modifier && actionObject.modifier !== 'up-to') {
     switch (actionObject.modifier) {
       case 'deck':
@@ -54,5 +55,8 @@ export default (card, gameState, actionObject, deck, discard, trash, hand, coin,
       log = log.concat(generateLog(gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
     }
   };
-  return [hand, deck, discard, trash, coin, log]
+  
+  const checkHand = !hasAction(hand);
+
+  return [hand, deck, discard, trash, coin, log, checkHand, actions]
 };
