@@ -6,6 +6,7 @@
   max-height: 1vh;
   max-width: 1300px;
   margin: auto;
+  scrollbar-color: #777 #121c21;
 }
 .supply-market,
 .info,
@@ -81,6 +82,22 @@
   width: 100%;
   overflow: auto;
   text-align: left;
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  cursor: pointer;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #777;
+  border-radius: 2px;
+}
+.log-readout::-webkit-scrollbar {
+  background-color: #121c21;
+}
+.in-play::-webkit-scrollbar,
+.hand::-webkit-scrollbar {
+  background-color: #1c272d;
 }
 .log {
   font-size: 12px;

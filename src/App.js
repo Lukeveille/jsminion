@@ -1,8 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { startingCards, supplies, standardGame } from './data/cardSets';
-import { spacer } from './utils/printLog';
-import { generateLog } from './utils/printLog';
+import { generateLog, spacer } from './utils/printLog';
 import printLog from './utils/printLog';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
@@ -14,6 +13,7 @@ import moveCard from './utils/moveCard';
 import next from './utils/next';
 import parseActionObject from './utils/parseActionObject';
 import autoAction from './utils/autoAction';
+import enterBuyPhase from './utils/enterBuyPhase';
 import CardDisplay from './components/CardDisplay';
 import LogDisplay from './components/LogDisplay';
 import TurnInfo from './components/TurnInfo';
@@ -174,6 +174,7 @@ function App() {
         newDiscardTrashState
       ] = cleanup(newHand, newActions, phase, gameState, newLog);
     };
+
     setHand(newHand)
     setPhase(newPhase)
     setTreasure(newCoin)
@@ -190,6 +191,7 @@ function App() {
     newLog = [...logs],
     newBuys = buys,
     newPhase = phase,
+    actionTotal = actions,
     newTreasure = countValue(inPlay, 'treasure'),
     newDiscard = [...discard],
     newTrash = [...trash];
@@ -197,49 +199,59 @@ function App() {
 
     switch (phase) {
       case 'Action':
-        let actionTotal = actions-1,
-        rolloverCards = [],
-        newCards;
-        
-        [newHand, newInPlay, newCards] = moveCard(card, size, hand, inPlay);
-        newTreasure += countTreasure(newCards);
-        if (card.actions) actionTotal += card.actions;
-        if (card.cards) [rolloverCards, newDeck, newDiscard] = rollover(card.cards, newDeck, newDiscard);
-        newHand = newHand.concat(rolloverCards);
-        newLog = newLog.concat(printLog(gameState, [card]));
-        if (card.buys) newBuys += card.buys;
-        if (card.discardTrash) {
-          const actionObject = parseActionObject(card);
-          if (actionObject.next && actionObject.next[0] === 'auto') {
-            [ newHand, 
-              newDeck, 
-              newDiscard, 
-              newTrash,
-              newTreasure,
-              newLog
-            ] = autoAction(
-              card,
-              gameState,
-              actionObject,
-              newDeck,
-              newDiscard,
-              newTrash,
-              newHand,
-              newTreasure,
-              newLog,
-              setMenuScreen,
-              setDiscardTrashState
-            );
-          } else {
-            setDiscardTrashState(actionObject);
+        if (card.type === phase) {
+          let rolloverCards = [],
+          newCards;
+
+          newLog = newLog.concat(printLog(gameState, [card]));
+          actionTotal = actionTotal-1;
+          
+          [newHand, newInPlay, newCards] = moveCard(card, size, hand, inPlay);
+          newTreasure += countTreasure(newCards);
+
+          if (card.actions) actionTotal += card.actions;
+          if (card.buys) newBuys += card.buys;
+          if (card.cards) {
+            [rolloverCards, newDeck, newDiscard] = rollover(card.cards, newDeck, newDiscard);
+            newHand = newHand.concat(rolloverCards);
           };
-        };
-        setActions(hasAction(newHand)? actionTotal : 0);
-        // incorrect
-        const auto = card.discardTrash? card.discardTrash.split(' ').includes('auto')? true : false : true;
-        if ((!actionTotal || !hasAction(newHand)) && auto) {
-          newLog = newLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
-          newPhase = 'Buy';
+          
+          const actionObject = card.discardTrash? parseActionObject(card) : false;
+          
+          let checkHandForActions = !hasAction(newHand);
+          if (actionObject) {
+            checkHandForActions = false;
+            if (actionObject.next && actionObject.next[0] === 'auto') {
+              [ newHand, 
+                newDeck, 
+                newDiscard, 
+                newTrash,
+                newTreasure,
+                newLog
+              ] = autoAction(
+                card,
+                gameState,
+                actionObject,
+                newDeck,
+                newDiscard,
+                newTrash,
+                newHand,
+                newTreasure,
+                newLog,
+                setMenuScreen,
+                setDiscardTrashState
+              );
+            } else {
+              setDiscardTrashState(actionObject);
+            };
+          };
+          const auto = actionObject? actionObject.next && actionObject.next[0] === 'auto'? true : false : true;
+
+          if ((!actionTotal || checkHandForActions) && auto) {
+            [newLog, newPhase, actionTotal] = enterBuyPhase(gameState, newLog);
+          };
+        } else {
+          [newLog, newPhase, actionTotal] = enterBuyPhase(gameState, newLog);
         };
         break;
       case 'Buy':
@@ -299,13 +311,13 @@ function App() {
             newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)));
             newDeck = shuffled;
           };
-          setActions(0);
+          actionTotal = 0;
           setBought(0);
           newTreasure = 0;
           newPhase = null;
           setGameState({...gameState, turn: gameState.turn + 1});
           newLog = newLog.concat(printLog(gameState, [{name: 'turn', end: 'ends'}]));
-        }
+        };
         newBuys = buysLeft;
         setVictoryPoints(newVictoryPoints);
         break;
@@ -315,14 +327,14 @@ function App() {
         newLog = newLog.concat(setSpacer.concat(printLog(gameState)));
         newBuys =  1;
         if (hasAction(hand)) {
-          setActions(1);
+          actionTotal = 1;
           newPhase = 'Action';
         } else {
-          newPhase = 'Buy';
-          newLog = newLog.concat(printLog(gameState, [{name: 'Buy Phase', end: 'enters'}]));
+          [newLog, newPhase] = enterBuyPhase(gameState, newLog);
         }
         break;
     };
+    setActions(actionTotal);
     setPhase(newPhase)
     setHand(newHand);
     setInPlay(newInPlay);

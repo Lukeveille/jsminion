@@ -13,7 +13,7 @@ export default props => {
       <p className="log-title">Log</p>
       <div className="breakline"/>
       <div className="log-readout">
-        {props.logs.length >1? props.logs : <div className="spacer"/>}
+        {props.logs.length > 1? props.logs : <div className="spacer"/>}
         <div id="log-sticker" />
       </div>
     </div>
