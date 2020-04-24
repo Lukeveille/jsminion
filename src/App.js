@@ -147,6 +147,7 @@ function App() {
     ));
     if (newDiscardTrashState.next.length > 0) {
       [ newHand,
+        newDeck,
         newLog,
         newCoin,
         newPhase,
@@ -217,7 +218,6 @@ function App() {
           };
           
           const actionObject = card.discardTrash? parseActionObject(card) : false;
-          
           let checkHandForActions = !hasAction(newHand);
           if (actionObject) {
             if (actionObject.next && actionObject.next[0] === 'auto') {
@@ -249,9 +249,7 @@ function App() {
             };
           };
           const auto = actionObject? actionObject.next && actionObject.next[0] === 'auto'? true : false : true;
-          
-          console.log(checkHandForActions);
-          
+
           if ((!actionTotal || checkHandForActions) && auto) {
             [newLog, newPhase, actionTotal] = enterBuyPhase(gameState, newLog);
           };

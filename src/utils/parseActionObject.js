@@ -8,7 +8,7 @@ export default card => {
     amount = amount[0];
   };
   amount = isNaN(amount)? amount : parseInt(amount);
-  const actionObject = {
+  return {
     card,
     type: actionInfo[0],
     amount,
@@ -16,5 +16,4 @@ export default card => {
     next: actionInfo[2]? [actionInfo[2], card[actionInfo[2]]] : [],
     restriction: actionInfo[3]
   };
-  return actionObject
 };

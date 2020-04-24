@@ -22,5 +22,5 @@ export default (gameState, discardTrashState, discardTrashQueue, deck, discard, 
       break;
     default:
   };
-  return [hand, log, newCoin, phase, actions, discardTrashQueue, discardTrashState];
+  return [hand, deck, log, newCoin, phase, actions, discardTrashQueue, discardTrashState];
 };
