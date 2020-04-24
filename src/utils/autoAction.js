@@ -3,7 +3,7 @@ import ActionModal from '../components/ActionModal';
 import { generateLog } from './printLog';
 import hasAction from './hasAction';
 
-export default (card, gameState, actionObject, deck, discard, trash, hand, coin, log, setMenuScreen, setDiscardTrashState, actions) => {
+export default (card, turnObject, actionObject, setMenuScreen, setDiscardTrashState) => {
   if (actionObject.modifier && actionObject.modifier !== 'up-to') {
     switch (actionObject.modifier) {
       case 'deck':
@@ -13,10 +13,10 @@ export default (card, gameState, actionObject, deck, discard, trash, hand, coin,
           next: discardTrash[1],
           type: discardTrash[2]
         };
-        let removal = deck.splice(discardTrash.index, actionObject.amount);
+        let removal = turnObject.deck.splice(discardTrash.index, actionObject.amount);
         const decline = () => {
           setMenuScreen(null);
-          discard = discard.concat(removal);
+          turnObject.discard = turnObject.discard.concat(removal);
         };
         if (discardTrash.next === 'modal') {
           const cardLive = discardTrash.type === removal[0].type,
@@ -41,22 +41,22 @@ export default (card, gameState, actionObject, deck, discard, trash, hand, coin,
     };
   } else {
     let actionName = 'discards';
-    let removal = hand.findIndex(i => (i.name === actionObject.restriction));
+    let removal = turnObject.hand.findIndex(i => (i.name === actionObject.restriction));
     if (actionObject.type === 'discard') {
-      discard = discard.concat(hand.splice(removal, actionObject.amount));
+      turnObject.discard = turnObject.discard.concat(turnObject.hand.splice(removal, actionObject.amount));
     } else {
-      trash = ([...trash].concat(hand.splice(removal, actionObject.amount)));
+      turnObject.trash = (turnObject.trash.concat(turnObject.hand.splice(removal, actionObject.amount)));
       actionName = 'trashes'
     };
     if (removal === -1) {
-      coin = 0;
-      log.pop();
+      turnObject.treasure = 0;
+      turnObject.logs.pop();
     } else {
-      log = log.concat(generateLog(gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
+      turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
     }
   };
   
-  const checkHand = !hasAction(hand);
+  const checkHand = !hasAction(turnObject.hand);
 
-  return [hand, deck, discard, trash, coin, log, checkHand, actions]
+  return [turnObject, checkHand]
 };

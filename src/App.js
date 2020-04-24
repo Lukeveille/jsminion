@@ -70,8 +70,24 @@ function App() {
       start={true}
       button={'Start Game'}
     />
-  ),
-  playAllTreasure = () => {
+  );
+  let turnObject = {
+    gameState,
+    hand: [...hand],
+    deck: [...deck],
+    discard: [...discard],
+    trash: [...trash],
+    inPlay: [...inPlay],
+    logs: [...logs],
+    supply: [...supply],
+    discardTrashQueue: [...discardTrashQueue],
+    discardTrashState: {...discardTrashState},
+    actions,
+    buys,
+    treasure,
+    phase
+  };
+  const playAllTreasure = () => {
     const treasures = hand.filter(card => (card.type === 'Treasure')),
     newPlay = [...inPlay].concat(treasures),
     unique = (val, i, self) => ( self.indexOf(val) === i );
@@ -91,23 +107,14 @@ function App() {
     setLogs(newLogs);
   },
   gainCard = card => {
-    let newLog = [...logs].concat(generateLog(gameState, [card], 'gains', 1, true));
-    const [newSupply, newDiscard] = moveCard(card, 1, supply, discard),
-    [ cleanupLog,
-      newActions,
-      newPhase,
-      newDiscardTrashQueue,
-      newDiscardTrashState
-    ] = cleanup(hand, actions, phase, gameState, newLog);
+    turnObject.logs = turnObject.logs.concat(generateLog(gameState, [card], 'gains', 1, true));
+    [turnObject.supply, turnObject.discard] = moveCard(card, 1, supply, discard);
+    turnObject.treasure = actionSupply.treasure;
+    turnObject = cleanup(turnObject);
     
-    setLogs(cleanupLog);
-    setPhase(newPhase)
-    setDiscardTrashQueue(newDiscardTrashQueue);
-    setDiscardTrashState(newDiscardTrashState);
-    setActions(newActions);
-    setSupply(newSupply);
-    setDiscard(newDiscard);
-    setTreasure(actionSupply.treasure);
+    setTurnState(turnObject);
+    setDiscardTrashQueue(turnObject.discardTrashQueue);
+    setDiscardTrashState(turnObject.discardTrashState);
     setActionSupply(false);
   },
   discardTrashCard = (card, size = 1) => {
@@ -115,87 +122,37 @@ function App() {
     setDiscardTrashQueue(newQueue[1]);
   },
   discardTrashCards = () => {
-    let newHand = [...hand],
-    newPhase = phase,
-    newLog = [...logs],
-    newDiscard = [...discard],
-    newTrash = [...trash],
-    newDeck = [...deck],
-    newDiscardTrashQueue = [...discardTrashQueue],
-    newDiscardTrashState = {...discardTrashState},
-    newActions = actions,
-    newCoin = treasure,
-    actionName = 'discards';
-
+    let actionName = 'discards';
     discardTrashQueue.forEach(card => {
-      newHand.splice(newHand.findIndex(i => (i === card)), 1);
+      turnObject.hand.splice(turnObject.hand.findIndex(i => (i === card)), 1);
     });
-    if (newDiscardTrashState.type === 'discard') {
-      newDiscard = newDiscard.concat(newDiscardTrashQueue);
-      setDiscard(newDiscard);
+    if (turnObject.discardTrashState.type === 'discard') {
+      turnObject.discard = turnObject.discard.concat(discardTrashQueue);
+      setDiscard(turnObject.discard);
     } else {
       actionName = 'trashes';
-      newTrash = newTrash.concat(discardTrashQueue);
-      setTrash(newTrash);
+      turnObject.trash = turnObject.trash.concat(discardTrashQueue);
+      setTrash(turnObject.trash);
     };
-    newLog = newLog.concat(generateLog(
+    turnObject.logs = turnObject.logs.concat(generateLog(
       gameState,
       [{name: 'Card'}],
       actionName,
       discardTrashQueue.length,
       true
     ));
-    if (newDiscardTrashState.next.length > 0) {
-      [ newHand,
-        newDeck,
-        newLog,
-        newCoin,
-        newPhase,
-        newActions,
-        newDiscardTrashQueue,
-        newDiscardTrashState
-      ] = next(
-        gameState,
-        newDiscardTrashState,
-        newDiscardTrashQueue,
-        newDeck,
-        newDiscard,
-        newHand,
-        newPhase,
-        newCoin,
-        newLog,
-        newActions,
-        setActionSupply
-      );
+    if (turnObject.discardTrashState.next.length > 0) {
+      turnObject = next(turnObject, setActionSupply);
     } else {
-      [ newLog,
-        newActions,
-        newPhase,
-        newDiscardTrashQueue,
-        newDiscardTrashState
-      ] = cleanup(newHand, newActions, phase, gameState, newLog);
+      turnObject = cleanup(turnObject);
     };
 
-    setHand(newHand)
-    setPhase(newPhase)
-    setTreasure(newCoin)
-    setDiscardTrashQueue(newDiscardTrashQueue);
-    setDiscardTrashState(newDiscardTrashState);
-    setActions(newActions);
-    setDeck(newDeck);
-    setLogs(newLog);
+    setTurnState(turnObject);
+    setDiscardTrashQueue(turnObject.discardTrashQueue);
+    setDiscardTrashState(turnObject.discardTrashState);
   },
   nextPhase = (card, count, supplyOn) => {
-    let newHand = [...hand],
-    newDeck = [...deck],
-    newInPlay = [...inPlay],
-    newLog = [...logs],
-    newBuys = buys,
-    newPhase = phase,
-    actionTotal = actions,
-    newTreasure = countValue(inPlay, 'treasure'),
-    newDiscard = [...discard],
-    newTrash = [...trash];
+    turnObject.treasure = countValue(inPlay, 'treasure');
     const size = phase === card.type? 1 : count;
 
     switch (phase) {
@@ -204,45 +161,23 @@ function App() {
           let rolloverCards = [],
           newCards;
 
-          newLog = newLog.concat(printLog(gameState, [card]));
-          actionTotal = actionTotal-1;
-          
-          [newHand, newInPlay, newCards] = moveCard(card, size, hand, inPlay);
-          newTreasure += countTreasure(newCards);
+          turnObject.logs = turnObject.logs.concat(printLog(gameState, [card]));
+          turnObject.actions = turnObject.actions - 1;
+          [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, hand, inPlay);
+          turnObject.treasure += countTreasure(newCards);
 
-          if (card.actions) actionTotal += card.actions;
-          if (card.buys) newBuys += card.buys;
+          if (card.actions) turnObject.actions += card.actions;
+          if (card.buys) turnObject.buys += card.buys;
           if (card.cards) {
-            [rolloverCards, newDeck, newDiscard] = rollover(card.cards, newDeck, newDiscard);
-            newHand = newHand.concat(rolloverCards);
+            [rolloverCards, turnObject.deck, turnObject.discard] = rollover(card.cards, turnObject.deck, turnObject.discard);
+            turnObject.hand = turnObject.hand.concat(rolloverCards);
           };
           
           const actionObject = card.discardTrash? parseActionObject(card) : false;
-          let checkHandForActions = !hasAction(newHand);
+          let checkHandForActions = !hasAction(turnObject.hand);
           if (actionObject) {
             if (actionObject.next && actionObject.next[0] === 'auto') {
-              [ newHand, 
-                newDeck, 
-                newDiscard, 
-                newTrash,
-                newTreasure,
-                newLog,
-                checkHandForActions,
-                actionTotal
-              ] = autoAction(
-                card,
-                gameState,
-                actionObject,
-                newDeck,
-                newDiscard,
-                newTrash,
-                newHand,
-                newTreasure,
-                newLog,
-                setMenuScreen,
-                setDiscardTrashState,
-                actionTotal
-              );
+              [turnObject, checkHandForActions] = autoAction(card, turnObject, actionObject, setMenuScreen, setDiscardTrashState);
             } else {
               checkHandForActions = false;
               setDiscardTrashState(actionObject);
@@ -250,11 +185,11 @@ function App() {
           };
           const auto = actionObject? actionObject.next && actionObject.next[0] === 'auto'? true : false : true;
 
-          if ((!actionTotal || checkHandForActions) && auto) {
-            [newLog, newPhase, actionTotal] = enterBuyPhase(gameState, newLog);
+          if ((!turnObject.actions || checkHandForActions) && auto) {
+            [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(gameState, turnObject.logs);
           };
         } else {
-          [newLog, newPhase, actionTotal] = enterBuyPhase(gameState, newLog);
+          [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(gameState, turnObject.logs);
         };
         break;
       case 'Buy':
@@ -262,19 +197,19 @@ function App() {
         newVictoryPoints = victoryPoints;
 
         if (supplyOn) {
-          let newSupply, cardBought;
-          [newSupply, newDiscard, cardBought] = moveCard(card, 1, supply, newDiscard)
+          let cardBought;
+          [turnObject.supply, turnObject.discard, cardBought] = moveCard(card, 1, supply, turnObject.discard)
 
-          const cardsLeft = newSupply.filter(newCard => newCard.name === card.name).length;
+          const cardsLeft = turnObject.supply.filter(newCard => newCard.name === card.name).length;
           newVictoryPoints = card.victory? newVictoryPoints + card.victory : newVictoryPoints;
 
           if (!cardsLeft) {
             setEmptySupply(emptySupply + 1);
             cardBought = {...cardBought[0], empty: true};
-            newSupply = newSupply.concat(cardBought);
+            turnObject.supply = turnObject.supply.concat(cardBought);
 
             if (card.name === 'Province' || emptySupply === 2) {
-              setSupply(newSupply);
+              setSupply(turnObject.supply);
               setMenuScreen(
                 <StartScreen
                   onClick={startGame}
@@ -286,67 +221,67 @@ function App() {
               break;
             };
           };
-          setSupply(newSupply);
+          setSupply(turnObject.supply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
-          newLog = newLog.concat(printLog(gameState, cardBought, 'buys'));
+          turnObject.logs = turnObject.logs.concat(printLog(gameState, cardBought, 'buys'));
         } else if (card.type === 'Treasure') {
           let newCards;
-          [newHand, newInPlay, newCards] = moveCard(card, size, hand, inPlay);
-          newTreasure += countTreasure(newCards)
-          newLog = newLog.concat(printLog(gameState, [card], null, count));
+          [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, hand, inPlay);
+          turnObject.treasure += countTreasure(newCards)
+          turnObject.logs = turnObject.logs.concat(printLog(gameState, [card], null, count));
         } else {
           buysLeft = 0;
         };
         
         if (buysLeft < 1 || ((treasure - bought - card.cost) < 1 && supplyOn)) {
           const deckSplit = [...deck];
-          buysLeft = 0;
-          newInPlay = [];
-          newDiscard = newDiscard.concat(inPlay).concat(hand);
-          newHand = deckSplit.splice(0,5);
-
-          if (deck.length > 5) {
-            newDeck = deckSplit;
-          } else {
-            const shuffled = shuffle(newDiscard);
-            newDiscard = [];
-            newHand = newHand.concat(shuffled.splice(0, (5-newHand.length)));
-            newDeck = shuffled;
+          turnObject = {...turnObject,
+            inPlay: [],
+            discard: turnObject.discard.concat(inPlay).concat(hand),
+            hand: deckSplit.splice(0,5)
           };
-          actionTotal = 0;
+          buysLeft = 0;
+          [turnObject.hand, turnObject.deck, turnObject.discard] = rollover(5, turnObject.deck, turnObject.discard);
+          turnObject = {...turnObject, 
+            actions: 0,
+            treasure: 0,
+            phase: null,
+            logs: turnObject.logs.concat(printLog(gameState, [{name: 'turn', end: 'ends'}]))
+          };
           setBought(0);
-          newTreasure = 0;
-          newPhase = null;
           setGameState({...gameState, turn: gameState.turn + 1});
-          newLog = newLog.concat(printLog(gameState, [{name: 'turn', end: 'ends'}]));
         };
-        newBuys = buysLeft;
+        turnObject.buys = buysLeft;
         setVictoryPoints(newVictoryPoints);
         break;
 
       default:
         const setSpacer = gameState.turn === 1 && gameState.turnPlayer === 1? [] : spacer();
-        newLog = newLog.concat(setSpacer.concat(printLog(gameState)));
-        newBuys =  1;
+        turnObject.logs = turnObject.logs.concat(setSpacer.concat(printLog(gameState)));
+        turnObject.buys =  1;
         if (hasAction(hand)) {
-          actionTotal = 1;
-          newPhase = 'Action';
+          turnObject.actions = 1;
+          turnObject.phase = 'Action';
         } else {
-          [newLog, newPhase] = enterBuyPhase(gameState, newLog);
+          [turnObject.logs, turnObject.phase] = enterBuyPhase(gameState, turnObject.logs);
         }
         break;
     };
-    setActions(actionTotal);
-    setPhase(newPhase)
-    setHand(newHand);
-    setInPlay(newInPlay);
-    setDeck(newDeck);
-    setBuys(newBuys);
-    setDiscard(newDiscard);
-    setTrash(newTrash);
-    setTreasure(newTreasure);
-    setLogs(newLog);
+    setTurnState(turnObject);
+  },
+  setTurnState = turnObject => {
+    setHand(turnObject.hand);
+    setDeck(turnObject.deck);
+    setDiscard(turnObject.discard);
+    setTrash(turnObject.trash);
+    setInPlay(turnObject.inPlay);
+    setLogs(turnObject.logs);
+    setSupply(turnObject.supply);
+    setActions(turnObject.actions);
+    setBuys(turnObject.buys);
+    setTreasure(turnObject.treasure);
+    setPhase(turnObject.phase);
   };
 
   window.onkeydown = e => {

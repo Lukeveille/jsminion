@@ -22,10 +22,10 @@ export const generateLog = (gameState, cards, cardAction, num, actionLog) => {
         {cards?
         <span>
           &nbsp;{action} {cards && (cards[0].name === 'Action' || cards[0].name === 'Buy' || cards[0].name === 'Coin')? '+' : ''}
-          {cards && cards[0].end? 'their' : size === 1 && !actionLog? 'a' : size}
+          <span className={cards[0].name === 'Coin'? 'coin' : ''}>{cards && cards[0].end? 'their' : size === 1 && !actionLog? 'a' : size}</span>
           <span className={`${cards[0].type}-text`}>
-            &nbsp;{cards[0].name}
-            {size !== 1 && cards[0].type !== 'Treasure'? 's' : ''}
+            &nbsp;{cards[0].name === 'Coin'? '' : <span>{cards[0].name}</span>}
+            {size !== 1 && cards[0].type !== 'Treasure' && cards[0].name !== 'Coin'? 's' : ''}
           </span>
         </span>
         :
