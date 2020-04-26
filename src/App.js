@@ -44,6 +44,7 @@ function App() {
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
+  [coinMod, setCoinMod] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
   [victoryPoints, setVictoryPoints] = useState(),
   startGame = () => {
@@ -84,16 +85,18 @@ function App() {
     actions,
     buys,
     treasure,
-    phase
+    phase,
+    menuScreen,
+    coinMod
   };
   const playAllTreasure = () => {
     const treasures = hand.filter(card => (card.type === 'Treasure')),
     newPlay = [...inPlay].concat(treasures),
-    unique = (val, i, self) => ( self.indexOf(val) === i );
-
-    let newLogs = [...logs],
+    unique = (val, i, self) => (self.indexOf(val) === i),
     treasureNames = treasures.filter(unique),
     newHand = hand.filter(card => (card.type !== 'Treasure'));
+
+    let newLogs = [...logs];
 
     treasureNames.forEach(treasureCard => {
       newLogs = newLogs.concat(printLog(gameState, treasures.filter(
@@ -172,17 +175,26 @@ function App() {
             turnObject.hand = turnObject.hand.concat(rolloverCards);
           };
           
-          const actionObject = card.discardTrash? parseActionObject(card) : false;
+          const actionObject = card.discardTrash? parseActionObject(card) : false,
+          setters = {
+            setMenuScreen,
+            setDiscardTrashState,
+            setDiscard,
+            setLogs,
+            setActions,
+            nextPhase
+          };
           let checkHandForActions = !hasType(turnObject.hand, 'Action');
           if (actionObject) {
             if (actionObject.next && actionObject.next[0] === 'auto') {
-              [turnObject, checkHandForActions] = autoAction(card, turnObject, actionObject, setMenuScreen, setDiscardTrashState);
+              [turnObject, checkHandForActions] = autoAction(card, turnObject, actionObject, setters);
             } else {
               checkHandForActions = false;
               setDiscardTrashState(actionObject);
             };
           };
-          const auto = actionObject? actionObject.next && actionObject.next[0] === 'auto'? true : false : true;
+          let auto = actionObject? actionObject.next && actionObject.next[0] === 'auto'? true : false : true;
+          auto = turnObject.menuScreen? false : auto;
 
           if ((!turnObject.actions || checkHandForActions) && auto) {
             [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(gameState, turnObject.logs);
@@ -248,6 +260,7 @@ function App() {
             phase: null,
             logs: turnObject.logs.concat(printLog(gameState, [{name: 'turn', end: 'ends'}]))
           };
+          setCoinMod(0);
           setBought(0);
           setGameState({...gameState, turn: gameState.turn + 1});
         };
@@ -279,8 +292,12 @@ function App() {
     setSupply(turnObject.supply);
     setActions(turnObject.actions);
     setBuys(turnObject.buys);
-    setTreasure(turnObject.treasure);
+    setTreasure(turnObject.treasure - coinMod);
+    setCoinMod(turnObject.coinMod)
     setPhase(turnObject.phase);
+    setMenuScreen(turnObject.menuScreen);
+
+    // console.log(turnObject)
   };
 
   window.onkeydown = e => {
@@ -288,8 +305,8 @@ function App() {
       setAltKey(true);
     } else if (e.keyCode === 27) {
       setShowModal(false);
-    } else if (e.keyCode === 13) {
-      if (menuScreen) startGame();
+    // } else if (e.keyCode === 13) {
+    //   if (menuScreen) startGame();
     };
   };
   window.onkeyup = e => {
