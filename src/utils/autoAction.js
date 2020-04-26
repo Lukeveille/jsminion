@@ -1,7 +1,7 @@
 import React from 'react';
 import ActionModal from '../components/ActionModal';
 import { generateLog } from './printLog';
-import hasAction from './hasAction';
+import hasType from './hasType';
 
 export default (card, turnObject, actionObject, setMenuScreen, setDiscardTrashState) => {
   if (actionObject.modifier && actionObject.modifier !== 'up-to') {
@@ -56,7 +56,7 @@ export default (card, turnObject, actionObject, setMenuScreen, setDiscardTrashSt
     }
   };
   
-  const checkHand = !hasAction(turnObject.hand);
+  const checkHand = !hasType(turnObject.hand, 'Action');
 
   return [turnObject, checkHand]
 };

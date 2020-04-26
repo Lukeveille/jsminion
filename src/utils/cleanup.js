@@ -1,13 +1,9 @@
-import hasAction from './hasAction';
-import printLog from './printLog';
+import hasType from './hasType';
+import enterBuyPhase from './enterBuyPhase';
 
 export default turnObject => {
-  if (!turnObject.actions || !hasAction(turnObject.hand)) {
-    turnObject = {...turnObject,
-      phase: 'Buy',
-      actions: 0,
-      logs: turnObject.logs.concat(printLog(turnObject.gameState, [{name: 'Buy Phase', end: 'enters'}]))
-    };
+  if (!turnObject.actions || !hasType(turnObject.hand, 'Action')) {
+    [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(turnObject.gameState, turnObject.logs);
   };
   return {...turnObject, discardTrashQueue: [], discardTrashState: false};
 };

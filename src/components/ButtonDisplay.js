@@ -1,6 +1,6 @@
 import React from 'react';
 import instructions from '../utils/instructions';
-import treasureInHand from '../utils/treasureInHand';
+import countCards from '../utils/countCards';
 
 export default props => {
   const noLimit = props.discardTrashState && (props.discardTrashState.modifier === 'up-to' || props.discardTrashState.amount === 'any'),
@@ -14,10 +14,10 @@ export default props => {
   
         {props.actionSupply? '' : <div>
           <div
-            className={props.discardTrashState || !props.phase? 'hidden' : treasureInHand(props.hand) > 0 && props.phase === 'Buy'? `game-button live` : 'button-space'}
+            className={props.discardTrashState || !props.phase? 'hidden' : countCards(props.hand, 'type', 'Treasure') > 0 && props.phase === 'Buy'? `game-button live` : 'button-space'}
             onClick={props.playAllTreasure}
           >
-            {treasureInHand(props.hand) > 0 && props.phase === 'Buy'? `Play All Treasure (${treasureInHand(props.hand)})` : ' '}
+            {countCards(props.hand, 'type', 'Treasure') > 0 && props.phase === 'Buy'? `Play All Treasure (${countCards(props.hand, 'type', 'Treasure')})` : ' '}
           </div>
           <div
             className={`game-button ${props.discardTrashState? noLimit || rightAmount? '' : 'not-' : ''}live${props.discardTrashState || !props.phase? '' : ' top-spaced'}`}

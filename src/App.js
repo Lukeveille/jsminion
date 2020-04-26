@@ -5,8 +5,7 @@ import { generateLog, spacer } from './utils/printLog';
 import printLog from './utils/printLog';
 import shuffle from './utils/shuffle';
 import countValue from './utils/countValue';
-import hasAction from './utils/hasAction';
-import countTreasure from './utils/countTreasure';
+import hasType from './utils/hasType';
 import cleanup from './utils/cleanup';
 import rollover from './utils/rollover';
 import moveCard from './utils/moveCard';
@@ -101,7 +100,7 @@ function App() {
         card => (treasureCard.name === card.name)
       )));
     });
-    setTreasure(countTreasure(newPlay));
+    setTreasure(countValue(newPlay, 'treasure'));
     setInPlay(newPlay);
     setHand(newHand);
     setLogs(newLogs);
@@ -162,9 +161,9 @@ function App() {
           newCards;
 
           turnObject.logs = turnObject.logs.concat(printLog(gameState, [card]));
-          turnObject.actions = turnObject.actions - 1;
+          turnObject.actions--;
           [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, hand, inPlay);
-          turnObject.treasure += countTreasure(newCards);
+          turnObject.treasure += countValue(newCards, 'treasure');
 
           if (card.actions) turnObject.actions += card.actions;
           if (card.buys) turnObject.buys += card.buys;
@@ -174,7 +173,7 @@ function App() {
           };
           
           const actionObject = card.discardTrash? parseActionObject(card) : false;
-          let checkHandForActions = !hasAction(turnObject.hand);
+          let checkHandForActions = !hasType(turnObject.hand, 'Action');
           if (actionObject) {
             if (actionObject.next && actionObject.next[0] === 'auto') {
               [turnObject, checkHandForActions] = autoAction(card, turnObject, actionObject, setMenuScreen, setDiscardTrashState);
@@ -228,7 +227,7 @@ function App() {
         } else if (card.type === 'Treasure') {
           let newCards;
           [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, hand, inPlay);
-          turnObject.treasure += countTreasure(newCards)
+          turnObject.treasure += countValue(newCards, 'treasure')
           turnObject.logs = turnObject.logs.concat(printLog(gameState, [card], null, count));
         } else {
           buysLeft = 0;
@@ -260,7 +259,7 @@ function App() {
         const setSpacer = gameState.turn === 1 && gameState.turnPlayer === 1? [] : spacer();
         turnObject.logs = turnObject.logs.concat(setSpacer.concat(printLog(gameState)));
         turnObject.buys =  1;
-        if (hasAction(hand)) {
+        if (hasType(hand, 'Action')) {
           turnObject.actions = 1;
           turnObject.phase = 'Action';
         } else {
