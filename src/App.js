@@ -182,6 +182,7 @@ function App() {
             setDiscard,
             setLogs,
             setActions,
+            setPhase,
             nextPhase
           };
           let checkHandForActions = !hasType(turnObject.hand, 'Action');
