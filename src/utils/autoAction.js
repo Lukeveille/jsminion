@@ -37,9 +37,10 @@ export default (card, turnObject, actionObject, setters) => {
             setters.setDiscardTrashState(false);
           },
           accept = () => {
+            console.log(turnObject)
             turnObject.menuScreen = null;
             turnObject.hand = turnObject.hand.concat(removal[0]);
-            turnObject = playAction(removal[0], turnObject, setters, 1);
+            turnObject = playAction(removal[0], 1, turnObject, setters);
             setters.setTurnState(turnObject);
             setters.setDiscardTrashState(false);
           };
