@@ -33,18 +33,18 @@ function App() {
   [altKey, setAltKey] = useState(false),
   [actionSupply, setActionSupply] = useState(false),
   [logs, setLogs] = useState([]),
-  [gameState, setGameState] = useState({turn: 1, player, turnPlayer: 1}),
+  [gameState, setGameState] = useState({turn: 0, player, turnPlayer: 1}),
   [deck, setDeck] = useState([]),
   [hand, setHand] = useState([]),
   [inPlay, setInPlay] = useState([]),
   [discard, setDiscard] = useState([]),
+  [coinMod, setCoinMod] = useState(0),
   [trash, setTrash] = useState([]),
   [supply, setSupply] = useState([]),
   [bought, setBought] = useState(0),
   [treasure, setTreasure] = useState(0),
   [actions, setActions] = useState(0),
   [buys, setBuys] = useState(0),
-  [coinMod, setCoinMod] = useState(0),
   [emptySupply, setEmptySupply] = useState(),
   [victoryPoints, setVictoryPoints] = useState(),
   startGame = () => {
@@ -62,6 +62,7 @@ function App() {
     setEmptySupply(0);
     setTreasure(0);
     setBuys(0);
+    setGameState({...gameState, turn: 1})
   },
   [menuScreen, setMenuScreen] = useState(
     <StartScreen
@@ -222,6 +223,7 @@ function App() {
 
             if (card.name === 'Province' || emptySupply === 2) {
               setSupply(turnObject.supply);
+              setGameState({...gameState, turn: 0})
               setMenuScreen(
                 <StartScreen
                   onClick={startGame}
@@ -258,10 +260,10 @@ function App() {
           turnObject = {...turnObject, 
             actions: 0,
             treasure: 0,
+            coinMod: 0,
             phase: null,
             logs: turnObject.logs.concat(printLog(gameState, [{name: 'turn', end: 'ends'}]))
           };
-          setCoinMod(0);
           setBought(0);
           setGameState({...gameState, turn: gameState.turn + 1});
         };
@@ -293,12 +295,10 @@ function App() {
     setSupply(turnObject.supply);
     setActions(turnObject.actions);
     setBuys(turnObject.buys);
-    setTreasure(turnObject.treasure - coinMod);
-    setCoinMod(turnObject.coinMod)
+    setTreasure(turnObject.treasure);
     setPhase(turnObject.phase);
     setMenuScreen(turnObject.menuScreen);
-
-    // console.log(turnObject)
+    setCoinMod(turnObject.coinMod);
   };
 
   window.onkeydown = e => {
@@ -306,8 +306,8 @@ function App() {
       setAltKey(true);
     } else if (e.keyCode === 27) {
       setShowModal(false);
-    // } else if (e.keyCode === 13) {
-    //   if (menuScreen) startGame();
+    } else if (e.keyCode === 13) {
+      if (menuScreen && gameState.turn === 0) startGame();
     };
   };
   window.onkeyup = e => {
@@ -326,6 +326,7 @@ function App() {
           supply={true}
           altKey={altKey}
           cards={supply}
+          coinMod={coinMod}
           restriction={discardTrashState? discardTrashState.restriction : undefined}
         />
       </div>
@@ -335,6 +336,7 @@ function App() {
         actions={actions}
         buys={buys}
         treasure={treasure}
+        coinMod={coinMod}
         bought={bought}
       />
       <TrashButton

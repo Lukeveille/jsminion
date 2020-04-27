@@ -32,8 +32,8 @@ export default (card, turnObject, actionObject, setters) => {
             console.log(turnObject)
 
             setters.setDiscard(turnObject.discard.concat(removal));
-            const temp = turnObject.logs.pop();
-            setters.setLogs(turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true)).concat(temp));
+            // const temp = turnObject.logs.pop();
+            // setters.setLogs(turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true)).concat(temp));
             setters.setDiscardTrashState(false);
           },
           accept = () => {
@@ -71,7 +71,7 @@ export default (card, turnObject, actionObject, setters) => {
       actionName = 'trashes'
     };
     if (removal === -1) {
-      turnObject.treasure = 0;
+      // turnObject.treasure = 0;
       console.log(turnObject.inPlay.filter(playCard => (playCard === card)));
       turnObject.coinMod += 3;
       turnObject.logs.pop();
