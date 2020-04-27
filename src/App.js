@@ -10,9 +10,8 @@ import cleanup from './utils/cleanup';
 import rollover from './utils/rollover';
 import moveCard from './utils/moveCard';
 import next from './utils/next';
-import parseActionObject from './utils/parseActionObject';
-import autoAction from './utils/autoAction';
 import enterBuyPhase from './utils/enterBuyPhase';
+import playAction from './utils/playAction';
 import CardDisplay from './components/CardDisplay';
 import LogDisplay from './components/LogDisplay';
 import TurnInfo from './components/TurnInfo';
@@ -160,47 +159,13 @@ function App() {
 
     switch (phase) {
       case 'Action':
+        const setters = {
+          setDiscardTrashState,
+          setPhase,
+          setTurnState
+        };
         if (card.type === phase) {
-          let rolloverCards = [],
-          newCards;
-
-          turnObject.logs = turnObject.logs.concat(printLog(gameState, [card]));
-          turnObject.actions--;
-          [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, hand, inPlay);
-          turnObject.treasure += countValue(newCards, 'treasure');
-
-          if (card.actions) turnObject.actions += card.actions;
-          if (card.buys) turnObject.buys += card.buys;
-          if (card.cards) {
-            [rolloverCards, turnObject.deck, turnObject.discard] = rollover(card.cards, turnObject.deck, turnObject.discard);
-            turnObject.hand = turnObject.hand.concat(rolloverCards);
-          };
-          
-          const actionObject = card.discardTrash? parseActionObject(card) : false,
-          setters = {
-            setMenuScreen,
-            setDiscardTrashState,
-            setDiscard,
-            setLogs,
-            setActions,
-            setPhase,
-            nextPhase
-          };
-          let checkHandForActions = !hasType(turnObject.hand, 'Action');
-          if (actionObject) {
-            if (actionObject.next && actionObject.next[0] === 'auto') {
-              [turnObject, checkHandForActions] = autoAction(card, turnObject, actionObject, setters);
-            } else {
-              checkHandForActions = false;
-              setDiscardTrashState(actionObject);
-            };
-          };
-          let auto = actionObject? actionObject.next && actionObject.next[0] === 'auto'? true : false : true;
-          auto = turnObject.menuScreen? false : auto;
-
-          if ((!turnObject.actions || checkHandForActions) && auto) {
-            [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(gameState, turnObject.logs);
-          };
+          turnObject = playAction(card, size, turnObject, setters);
         } else {
           [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(gameState, turnObject.logs);
         };

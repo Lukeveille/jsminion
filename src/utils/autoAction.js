@@ -3,6 +3,7 @@ import ActionModal from '../components/ActionModal';
 import { generateLog } from './printLog';
 import hasType from './hasType';
 import cleanup from './cleanup';
+import playAction from './playAction';
 
 export default (card, turnObject, actionObject, setters) => {
   if (actionObject.modifier && actionObject.modifier !== 'up-to') {
@@ -18,28 +19,29 @@ export default (card, turnObject, actionObject, setters) => {
         let removal = turnObject.deck.splice(discardTrash.index, actionObject.amount);
         const discard = () => {
           turnObject.discard = turnObject.discard.concat(removal);
-          turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true))
+          turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true));
         };
         if (discardTrash.next === 'modal') {
           const cardLive = discardTrash.type === removal[0].type,
           decline = () => {
             turnObject.actions--;
-            setters.setMenuScreen(null);
             turnObject = cleanup(turnObject);
             if (turnObject.actions === 0) setters.setPhase('Buy');
-            setters.setActions(turnObject.actions);
-            
-            console.log(turnObject)
-
-            setters.setDiscard(turnObject.discard.concat(removal));
-            // const temp = turnObject.logs.pop();
-            // setters.setLogs(turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true)).concat(temp));
+            turnObject.hand.splice(turnObject.hand.findIndex(card => (card === removal[0])), 1);
+            turnObject = {...turnObject,
+              discard: turnObject.discard.concat(removal),
+              logs: turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true)),
+              menuScreen: null
+            };
+            setters.setTurnState(turnObject)
             setters.setDiscardTrashState(false);
           },
           accept = () => {
-            setters.setMenuScreen(null);
+            turnObject.menuScreen = null;
+            turnObject.hand = turnObject.hand.concat(removal[0]);
+            turnObject = playAction(removal[0], turnObject, setters, 1);
+            setters.setTurnState(turnObject);
             setters.setDiscardTrashState(false);
-            setters.nextPhase(removal[0], 1);
           };
           if (cardLive) {
             turnObject.actions++;
@@ -71,16 +73,12 @@ export default (card, turnObject, actionObject, setters) => {
       actionName = 'trashes'
     };
     if (removal === -1) {
-      // turnObject.treasure = 0;
-      console.log(turnObject.inPlay.filter(playCard => (playCard === card)));
       turnObject.coinMod += 3;
       turnObject.logs.pop();
     } else {
       turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
     };
   };
-  
   const checkHand = !hasType(turnObject.hand, 'Action');
-
   return [turnObject, checkHand]
 };

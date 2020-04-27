@@ -28,14 +28,14 @@ export default props => {
   return <div className={`card-info ${props.card.empty || props.queued.includes(props.card)? 'transparent' : ''}`}>
     {props.count > 1 || props.supply || props.queued.includes(props.card)? <p
       onClick={e => {
-        if (props.live && !props.card.empty) {
+        if (props.live && !props.card.empty && !props.supply && props.card.type === 'Treasure') {
           const trueLimit = props.limit - props.queued.length,
           count = trueLimit > props.count? props.count : trueLimit;
           props.onClick(props.card, count);
           e.stopPropagation();
         }
       }}
-      className={`card-stack${props.live && props.card.type !== 'Action' && props.stacked? '-live' : ''}`}
+      className={`card-stack${props.live && props.card.type === 'Treasure' && props.stacked? '-live' : ''}`}
     >
       {props.card.empty? 0 : props.count}
     </p> : ''}
