@@ -19,7 +19,12 @@ export default (turnObject, setActionSupply) => {
     case 'supply':
       const supplyMsg = turnObject.discardTrashState.card.supply.split(' ');
       newCoin = supplyMsg[0] === 'discardTrash'? turnObject.discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];
-      setActionSupply({treasure: turnObject.treasure, count: turnObject.discardTrashState.amount, restriction: supplyMsg[2]});
+      setActionSupply({
+        treasure: turnObject.treasure,
+        count: turnObject.discardTrashState.amount,
+        restriction: supplyMsg[2],
+        destination: supplyMsg[2]? supplyMsg[2] : 'discard'
+      });
       turnObject.discardTrashQueue = [];
       break;
     default:

@@ -108,9 +108,17 @@ function App() {
     setHand(newHand);
     setLogs(newLogs);
   },
-  gainCard = card => {
-    turnObject.logs = turnObject.logs.concat(generateLog(gameState, [card], 'gains', 1, true));
-    [turnObject.supply, turnObject.discard] = moveCard(card, 1, supply, discard);
+  gainCard = (card, count, destination) => {
+    turnObject.logs = turnObject.logs.concat(generateLog(
+      gameState,
+      [{...card,
+        name: destination === 'discard'? card.name : <span>{card.name}<span className="default-text"> to their {destination}</span></span>
+      }],
+      'gains',
+      1,
+      true
+    ));
+    [turnObject.supply, turnObject[destination]] = moveCard(card, count, supply, turnObject[destination]);
     turnObject.treasure = actionSupply.treasure;
     turnObject = cleanup(turnObject);
     
@@ -149,11 +157,13 @@ function App() {
           setDiscardTrashQueue(turnObject.discardTrashQueue);
         } else {
           turnObject = cleanup(turnObject);
+          // setDiscardTrashState(false);
         };
       } else {
         turnObject = cleanup(turnObject);
-        setDiscardTrashState(false);
+        // setDiscardTrashState(false);
       };
+      setDiscardTrashState(turnObject.discardTrashState);
       setTurnState(turnObject);
     },
     nextPhase = (card, count, supplyOn) => {

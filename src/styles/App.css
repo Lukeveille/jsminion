@@ -302,6 +302,9 @@
 .Action {
   background-color: #aaafb2;
 }
+.default-text {
+  color: #aaafb2;
+}
 .Treasure-text {
   color: #f2cda2;
 }
