@@ -124,37 +124,40 @@ function App() {
     setDiscardTrashQueue(newQueue[1]);
   },
   discardTrashCards = () => {
-    let actionName = 'discards';
-    discardTrashQueue.forEach(card => {
-      turnObject.hand.splice(turnObject.hand.findIndex(i => (i === card)), 1);
-    });
-    if (turnObject.discardTrashState.type === 'discard') {
-      turnObject.discard = turnObject.discard.concat(discardTrashQueue);
-      setDiscard(turnObject.discard);
-    } else {
-      actionName = 'trashes';
-      turnObject.trash = turnObject.trash.concat(discardTrashQueue);
-      setTrash(turnObject.trash);
-    };
-    turnObject.logs = turnObject.logs.concat(generateLog(
-      gameState,
-      [{name: 'Card'}],
-      actionName,
-      discardTrashQueue.length,
-      true
-    ));
-    if (turnObject.discardTrashState.next.length > 0) {
-      turnObject = next(turnObject, setActionSupply);
-    } else {
-      turnObject = cleanup(turnObject);
-    };
-
-    setTurnState(turnObject);
-    setDiscardTrashQueue(turnObject.discardTrashQueue);
-    setDiscardTrashState(turnObject.discardTrashState);
-  },
-  nextPhase = (card, count, supplyOn) => {
-    turnObject.treasure = countValue(inPlay, 'treasure');
+    if (discardTrashQueue.length > 0) {
+      let actionName = 'discards';
+      discardTrashQueue.forEach(card => {
+        turnObject.hand.splice(turnObject.hand.findIndex(i => (i === card)), 1);
+      });
+      if (turnObject.discardTrashState.type === 'discard') {
+        turnObject.discard = turnObject.discard.concat(discardTrashQueue);
+        setDiscard(turnObject.discard);
+      } else {
+        actionName = 'trashes';
+        turnObject.trash = turnObject.trash.concat(discardTrashQueue);
+        setTrash(turnObject.trash);
+      };
+      turnObject.logs = turnObject.logs.concat(generateLog(
+        gameState,
+        [{name: 'Card'}],
+        actionName,
+        discardTrashQueue.length,
+        true
+        ));
+        if (turnObject.discardTrashState.next.length > 0) {
+          turnObject = next(turnObject, setActionSupply);
+          setDiscardTrashQueue(turnObject.discardTrashQueue);
+        } else {
+          turnObject = cleanup(turnObject);
+        };
+      } else {
+        turnObject = cleanup(turnObject);
+        setDiscardTrashState(false);
+      };
+      setTurnState(turnObject);
+    },
+    nextPhase = (card, count, supplyOn) => {
+      turnObject.treasure = countValue(inPlay, 'treasure');
     const size = phase === card.type? 1 : count;
 
     switch (phase) {

@@ -6,6 +6,7 @@ import cleanup from './cleanup';
 import playAction from './playAction';
 
 export default (card, turnObject, actionObject, setters) => {
+  const actionLogName = [{name: 'Card from deck'}]
   if (actionObject.modifier && actionObject.modifier !== 'up-to') {
     let discardTrash = card[actionObject.modifier].split(' ');
     discardTrash = {
@@ -19,7 +20,7 @@ export default (card, turnObject, actionObject, setters) => {
         let removal = turnObject.deck.splice(discardTrash.index, actionObject.amount);
         const discard = () => {
           turnObject.discard = turnObject.discard.concat(removal);
-          turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true));
+          turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, actionLogName, 'discards', 1, true));
         };
         if (discardTrash.next === 'modal') {
           const cardLive = discardTrash.type === removal[0].type,
@@ -31,7 +32,7 @@ export default (card, turnObject, actionObject, setters) => {
             const endLog = turnObject.logs.pop();
             turnObject = {...turnObject,
               discard: turnObject.discard.concat(removal),
-              logs: turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true)).concat(endLog),
+              logs: turnObject.logs.concat(generateLog(turnObject.gameState, actionLogName, 'discards', 1, true)).concat(endLog),
               menuScreen: null
             };
             setters.setTurnState(turnObject);
@@ -76,7 +77,7 @@ export default (card, turnObject, actionObject, setters) => {
       turnObject.coinMod += 3;
       turnObject.logs.pop();
     } else {
-      turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], actionName, actionObject.amount, true))
+      turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, actionLogName, actionName, actionObject.amount, true))
     };
   };
   const checkHand = !hasType(turnObject.hand, 'Action');
