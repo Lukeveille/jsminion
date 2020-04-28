@@ -81,7 +81,7 @@ function App() {
     logs: [...logs],
     supply: [...supply],
     discardTrashQueue: [...discardTrashQueue],
-    discardTrashState: {...discardTrashState},
+    discardTrashState: discardTrashState? {...discardTrashState} : false,
     actions,
     buys,
     treasure,

@@ -28,21 +28,20 @@ export default (card, turnObject, actionObject, setters) => {
             turnObject = cleanup(turnObject);
             if (turnObject.actions === 0) setters.setPhase('Buy');
             turnObject.hand.splice(turnObject.hand.findIndex(card => (card === removal[0])), 1);
+            const endLog = turnObject.logs.pop();
             turnObject = {...turnObject,
               discard: turnObject.discard.concat(removal),
-              logs: turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true)),
+              logs: turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'discards', 1, true)).concat(endLog),
               menuScreen: null
             };
-            setters.setTurnState(turnObject)
+            setters.setTurnState(turnObject);
             setters.setDiscardTrashState(false);
           },
           accept = () => {
-            console.log(turnObject)
             turnObject.menuScreen = null;
             turnObject.hand = turnObject.hand.concat(removal[0]);
             turnObject = playAction(removal[0], 1, turnObject, setters);
             setters.setTurnState(turnObject);
-            setters.setDiscardTrashState(false);
           };
           if (cardLive) {
             turnObject.actions++;
