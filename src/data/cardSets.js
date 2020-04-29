@@ -2,7 +2,7 @@ import cardList from './cards.json';
 
 export const standardGame = [
   'Village',
-  // 'Smithy',
+  'Smithy',
   'Market',
   'Chapel', // trash
   'Cellar', // discard
@@ -14,7 +14,7 @@ export const standardGame = [
   // 'Harbinger',
   // 'Merchant',
   // 'Festival',
-  // 'Laboratory'
+  'Laboratory'
 ];
 
 const importAll = files => {

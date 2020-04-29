@@ -67,16 +67,16 @@ export default (card, turnObject, actionObject, setters) => {
   } else {
     let actionName = 'discards';
     let removal = turnObject.hand.findIndex(i => (i.name === actionObject.restriction));
-    if (actionObject.type === 'discard') {
-      turnObject.discard = turnObject.discard.concat(turnObject.hand.splice(removal, actionObject.amount));
-    } else {
-      turnObject.trash = (turnObject.trash.concat(turnObject.hand.splice(removal, actionObject.amount)));
-      actionName = 'trashes'
-    };
     if (removal === -1) {
       turnObject.coinMod += 3;
       turnObject.logs.pop();
     } else {
+      if (actionObject.type === 'discard') {
+        turnObject.discard = turnObject.discard.concat(turnObject.hand.splice(removal, actionObject.amount));
+      } else {
+        turnObject.trash = (turnObject.trash.concat(turnObject.hand.splice(removal, actionObject.amount)));
+        actionName = 'trashes'
+      };
       turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, actionLogName, actionName, actionObject.amount, true))
     };
   };
