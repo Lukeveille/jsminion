@@ -194,7 +194,7 @@ function App() {
 
           if (!cardsLeft) {
             setEmptySupply(emptySupply + 1);
-            cardBought = {...cardBought[0], empty: true};
+            cardBought = [{...cardBought[0], empty: true}];
             turnObject.supply = turnObject.supply.concat(cardBought);
             if (card.name === 'Province' || emptySupply === 2) {
               setSupply(turnObject.supply);
@@ -213,7 +213,7 @@ function App() {
           setSupply(turnObject.supply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
-          turnObject.logs = turnObject.logs.concat(printLog(gameState, [cardBought], 'buys'));
+          turnObject.logs = turnObject.logs.concat(printLog(gameState, cardBought, 'buys'));
         } else if (card.type === 'Treasure') {
           let newCards;
           [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, hand, inPlay);
