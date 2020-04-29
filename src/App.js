@@ -154,7 +154,6 @@ function App() {
         ));
         if (turnObject.discardTrashState.next.length > 0) {
           turnObject = next(turnObject, setActionSupply);
-          setDiscardTrashQueue(turnObject.discardTrashQueue);
         } else {
           turnObject = cleanup(turnObject);
           // setDiscardTrashState(false);
@@ -164,6 +163,7 @@ function App() {
         // setDiscardTrashState(false);
       };
       setDiscardTrashState(turnObject.discardTrashState);
+      setDiscardTrashQueue(turnObject.discardTrashQueue);
       setTurnState(turnObject);
     },
     nextPhase = (card, count, supplyOn) => {
