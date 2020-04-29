@@ -6,7 +6,7 @@ import cleanup from './cleanup';
 import playAction from './playAction';
 
 export default (card, turnObject, actionObject, setters) => {
-  const actionLogName = [{name: 'Card from deck'}]
+  const actionLogName = [{name: `Card${actionObject.modifier? ` from ${actionObject.modifier}` : ''}`}]
   if (actionObject.modifier && actionObject.modifier !== 'up-to') {
     let discardTrash = card[actionObject.modifier].split(' ');
     discardTrash = {
