@@ -156,11 +156,9 @@ function App() {
           turnObject = next(turnObject, setActionSupply);
         } else {
           turnObject = cleanup(turnObject);
-          // setDiscardTrashState(false);
         };
       } else {
         turnObject = cleanup(turnObject);
-        // setDiscardTrashState(false);
       };
       setDiscardTrashState(turnObject.discardTrashState);
       setDiscardTrashQueue(turnObject.discardTrashQueue);
@@ -198,11 +196,10 @@ function App() {
             setEmptySupply(emptySupply + 1);
             cardBought = {...cardBought[0], empty: true};
             turnObject.supply = turnObject.supply.concat(cardBought);
-
             if (card.name === 'Province' || emptySupply === 2) {
               setSupply(turnObject.supply);
               setGameState({...gameState, turn: 0})
-              setMenuScreen(
+              turnObject.menuScreen = (
                 <StartScreen
                   onClick={startGame}
                   phaseTitle={"Game Over"}
@@ -216,7 +213,7 @@ function App() {
           setSupply(turnObject.supply);
           setBought(bought + card.cost);
           buysLeft = buysLeft - 1;
-          turnObject.logs = turnObject.logs.concat(printLog(gameState, cardBought, 'buys'));
+          turnObject.logs = turnObject.logs.concat(printLog(gameState, [cardBought], 'buys'));
         } else if (card.type === 'Treasure') {
           let newCards;
           [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, hand, inPlay);
