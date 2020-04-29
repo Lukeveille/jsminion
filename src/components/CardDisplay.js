@@ -63,6 +63,7 @@ export default props => {
               supply={props.supply}
               queued={cardQueue}
               limit={limit}
+              discardTrash={props.discardTrashState}
               destination={props.actionSupply? props.actionSupply.destination : false}
             />
           </div>
@@ -86,6 +87,8 @@ export default props => {
   :
   <div>
     {title}
-    {allCards}
+    <div className={props.title === 'Discard'? 'discard-stack' : ''}>
+      {allCards}
+    </div>
   </div>
 };

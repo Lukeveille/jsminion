@@ -128,6 +128,13 @@
 .game-button {
   cursor: default;
 }
+.discard-stack {
+  display: flex;
+  flex-direction: column-reverse;
+  max-height: 85vh;
+  overflow: auto;
+  padding: 1rem;
+}
 .breakline {
   display: block;
   height: 1px;
