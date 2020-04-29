@@ -133,7 +133,8 @@
   flex-direction: column-reverse;
   max-height: 85vh;
   overflow: auto;
-  padding: 1rem;
+  padding: 0 .5rem;
+  margin: .5rem 0;
 }
 .breakline {
   display: block;

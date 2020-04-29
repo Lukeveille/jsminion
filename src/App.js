@@ -147,7 +147,7 @@ function App() {
       };
       turnObject.logs = turnObject.logs.concat(generateLog(
         gameState,
-        [{name: 'Card'}],
+        [{name: 'card'}],
         actionName,
         discardTrashQueue.length,
         true

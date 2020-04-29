@@ -12,7 +12,7 @@ export default (turnObject, setActionSupply) => {
       [rolloverCards, turnObject.deck, turnObject.discard] = rollover(newSize, turnObject.deck, turnObject.discard);
       turnObject = {...turnObject,
         hand: turnObject.hand.concat(rolloverCards),
-        logs: turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'Card'}], 'draws', turnObject.discardTrashQueue.length, true))
+        logs: turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'card'}], 'draws', turnObject.discardTrashQueue.length, true))
       };
       turnObject = cleanup(turnObject);
       break;
