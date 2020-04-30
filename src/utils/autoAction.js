@@ -58,9 +58,6 @@ export default (card, turnObject, actionObject, setters) => {
           } else if (removal.length > 0) {
             discard();
           };
-        // } else {
-          // turnObject.logs.pop();
-          // turnObject.coinMod = card.treasure;
         };
         break;
       default: break;

@@ -4,7 +4,7 @@
   grid-template-rows: 5fr 1fr 2fr 4fr;
   grid-template-columns: 1fr 4fr 1fr;
   max-height: 1vh;
-  max-width: 1268px;
+  max-width: 1275px;
   margin: auto;
   scrollbar-color: #777 #121c21;
 }
@@ -389,7 +389,7 @@
   padding: .3rem .5rem;
 }
 
-@media screen and (max-width: 1268px) {
+@media screen and (max-width: 1275px) {
   .card {
     width: 10.5rem;
   }
@@ -404,7 +404,7 @@
     width: 8rem;
   }
 }
-@media screen and (max-width: 988px) {
+@media screen and (max-width: 990px) {
   .card {
     width: 8rem;
   }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { testingCards, supplies, standardGame } from './data/cardSets';
+import { startingCards, supplies, standardGame } from './data/cardSets';
 import { generateLog, spacer } from './utils/printLog';
 import printLog from './utils/printLog';
 import shuffle from './utils/shuffle';
@@ -47,7 +47,7 @@ function App() {
   [emptySupply, setEmptySupply] = useState(),
   [victoryPoints, setVictoryPoints] = useState(),
   startGame = () => {
-    const startingDeck = shuffle(testingCards());
+    const startingDeck = shuffle(startingCards());
     setVictoryPoints(countValue(startingDeck, 'victory'));
     setHand(startingDeck.splice(0, 5));
     setDeck(startingDeck);
