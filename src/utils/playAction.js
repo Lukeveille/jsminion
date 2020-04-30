@@ -19,7 +19,11 @@ export default (card, size, turnObject, setters) => {
   if (card.buys) turnObject.buys += card.buys;
   if (card.cards) {
     [rolloverCards, turnObject.deck, turnObject.discard] = rollover(card.cards, turnObject.deck, turnObject.discard);
-    turnObject.hand = turnObject.hand.concat(rolloverCards);
+    if (rolloverCards.length > 0) {
+      turnObject.hand = turnObject.hand.concat(rolloverCards);
+    } else {
+      turnObject.logs.pop();
+    };
   };
   const actionObject = card.discardTrash? parseActionObject(card) : false;
   let checkHandForActions = !hasType(turnObject.hand, 'Action');

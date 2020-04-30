@@ -5,7 +5,7 @@ import capital from './capital';
 export const spacer = () => ([<div key={`log${uuidv4().slice(0,8)}`} className="spacer"/>]);
 
 const colors = ['red', 'blue', 'orange', 'green'],
-logActions = ['actions', 'cards', 'buys', 'treasure'];
+logActions = ['actions', 'buys', 'treasure', 'cards'];
 
 export const generateLog = (gameState, cards, cardAction, num, actionLog) => {
   const size = num || num === 0? num : cards? cards.length : 1;

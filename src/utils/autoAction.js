@@ -22,7 +22,7 @@ export default (card, turnObject, actionObject, setters) => {
           turnObject.discard = turnObject.discard.concat(removal);
           turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, actionLogName, 'discards', 1, true));
         };
-        if (discardTrash.next === 'modal') {
+        if (discardTrash.next === 'modal' && removal.length > 0) {
           const cardLive = discardTrash.type === removal[0].type,
           decline = () => {
             turnObject.actions--;
@@ -55,12 +55,13 @@ export default (card, turnObject, actionObject, setters) => {
                 live={cardLive}
               />
             );
-          } else {
+          } else if (removal.length > 0) {
             discard();
           };
-        } else {
-          discard();
-        }
+        // } else {
+          // turnObject.logs.pop();
+          // turnObject.coinMod = card.treasure;
+        };
         break;
       default: break;
     };
