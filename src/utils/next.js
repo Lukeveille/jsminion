@@ -22,7 +22,6 @@ export default (turnObject, setActionSupply) => {
       setActionSupply({
         treasure: turnObject.treasure,
         count: turnObject.discardTrashState.amount,
-        restriction: supplyMsg[2],
         destination: supplyMsg[2]? supplyMsg[2] : 'discard'
       });
       turnObject.discardTrashQueue = [];

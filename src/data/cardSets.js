@@ -10,11 +10,11 @@ export const standardGame = [
   'Mine', // trash
   'Moneylender', // trash
   'Vassal', // discard *modal option
-  // 'Workshop',
+  'Workshop',
   // 'Harbinger',
   // 'Merchant',
   // 'Festival',
-  'Laboratory'
+  // 'Laboratory'
 ];
 
 const importAll = files => {

@@ -9,6 +9,7 @@ import enterBuyPhase from './enterBuyPhase';
 
 export default (card, size, turnObject, setters) => {
   let rolloverCards = [],
+  actionSupply = false,
   newCards;
   turnObject.logs = turnObject.logs.concat(printLog(turnObject.gameState, [card]));
   turnObject.actions--;
@@ -29,12 +30,20 @@ export default (card, size, turnObject, setters) => {
       checkHandForActions = false;
       setters.setDiscardTrashState(actionObject);
     };
+  } else if (card.supply) {
+    const supplyMsg = card.supply.split(' ');
+    actionSupply = {
+      treasure: turnObject.treasure,
+      count: 1,
+      destination: supplyMsg[1]? supplyMsg[1] : 'discard'
+    };
+    turnObject.treasure = supplyMsg[0];
   };
-  let auto = actionObject? actionObject.next && actionObject.next[0] === 'auto'? true : false : true;
+  let auto = actionObject? (actionObject.next && actionObject.next[0] === 'auto')? true : false : true;
   auto = turnObject.menuScreen? false : auto;
-  if ((!turnObject.actions || checkHandForActions) && auto) {
+  if ((!turnObject.actions || checkHandForActions) && auto && !actionSupply) {
     [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(turnObject.gameState, turnObject.logs);
   };
-
+  setters.setActionSupply(actionSupply);
   return turnObject;
 };

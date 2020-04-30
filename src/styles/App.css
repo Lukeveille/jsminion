@@ -4,7 +4,7 @@
   grid-template-rows: 5fr 1fr 2fr 4fr;
   grid-template-columns: 1fr 4fr 1fr;
   max-height: 1vh;
-  max-width: 1300px;
+  max-width: 1268px;
   margin: auto;
   scrollbar-color: #777 #121c21;
 }
@@ -32,12 +32,15 @@
   margin: .5rem;
 }
 .hand {
-  height: 32vh;
+  height: calc(90vh - 29.35rem);
   flex-direction: row;
 }
 .hand {
   display: flex;
   justify-content: center;
+}
+.logs {
+  min-height: 18.25rem;
 }
 .supply-market {
   min-height: 19rem;
@@ -52,7 +55,7 @@
   flex-direction: column;
 }
 .in-play {
-  height: 19vh;
+  height: 9.8rem;
 }
 .logs,
 .trash,
@@ -251,6 +254,9 @@
   align-items: center;
   justify-content: space-around;
 }
+.trash {
+  height: 3.8vh;
+}
 .start-button {
   max-width: 8rem;
   margin: 2rem auto;
@@ -383,8 +389,28 @@
   padding: .3rem .5rem;
 }
 
-@media screen and (max-width: 1260px) {
+@media screen and (max-width: 1268px) {
   .card {
     width: 10.5rem;
+  }
+}
+@media screen and (max-width: 1108px) {
+  .card {
+    width: 9rem;
+  }
+}
+@media screen and (max-width: 988px) {
+  .card {
+    width: 8rem;
+  }
+}
+@media screen and (max-width: 988px) {
+  .card {
+    width: 8rem;
+  }
+}
+@media screen and (max-width: 908px) {
+  .card {
+    width: 7rem;
   }
 }

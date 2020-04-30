@@ -173,6 +173,7 @@ function App() {
         const setters = {
           setDiscardTrashState,
           setPhase,
+          setActionSupply,
           setTurnState
         };
         if (card.type === phase) {
