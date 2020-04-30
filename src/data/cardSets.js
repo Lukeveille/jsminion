@@ -44,6 +44,10 @@ export const startingCards = () => {
   return startingDeck;
 };
 
+export const testingCards = () => {
+  return [cardList.action[0], cardList.action[10], cardList.action[11], cardList.treasure[0], cardList.treasure[1]]
+};
+
 export const supplies = (set = []) => {
   const allCardTypes = cardTypes.concat('action'),
   allSupplies = [],
