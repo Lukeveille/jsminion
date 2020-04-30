@@ -1,6 +1,7 @@
 import { generateLog } from './printLog';
 import rollover from './rollover';
 import cleanup from './cleanup';
+import parseActionObject from './parseActionObject';
 
 export default (turnObject, setActionSupply) => {
   const nextAction = turnObject.discardTrashState.next[0];
@@ -17,12 +18,12 @@ export default (turnObject, setActionSupply) => {
       turnObject = cleanup(turnObject);
       break;
     case 'supply':
-      const supplyMsg = turnObject.discardTrashState.card.supply.split(' ');
-      newCoin = supplyMsg[0] === 'discardTrash'? turnObject.discardTrashQueue[0].cost + parseInt(supplyMsg[1]): supplyMsg[0];
+      const supplyMsg = parseActionObject(turnObject.discardTrashState.card, 'supply');
+      newCoin = supplyMsg.type === 'discardTrash'? turnObject.discardTrashQueue[0].cost + parseInt(supplyMsg.amount): supplyMsg.amount;
       setActionSupply({
         treasure: turnObject.treasure,
         count: turnObject.discardTrashState.amount,
-        destination: supplyMsg[2]? supplyMsg[2] : 'discard'
+        destination: supplyMsg.next && supplyMsg.next[0]? supplyMsg.next[0] : 'discard'
       });
       turnObject.discardTrashQueue = [];
       break;

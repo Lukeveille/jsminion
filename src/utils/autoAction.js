@@ -4,16 +4,12 @@ import { generateLog } from './printLog';
 import hasType from './hasType';
 import cleanup from './cleanup';
 import playAction from './playAction';
+import parseActionObject from './parseActionObject';
 
 export default (card, turnObject, actionObject, setters) => {
-  const actionLogName = [{name: `Card${actionObject.modifier? ` from ${actionObject.modifier}` : ''}`}]
+  const actionLogName = [{name: `card${actionObject.modifier? ` from ${actionObject.modifier}` : ''}`}]
   if (actionObject.modifier && actionObject.modifier !== 'up-to') {
-    let discardTrash = card[actionObject.modifier].split(' ');
-    discardTrash = {
-      index: discardTrash[0],
-      next: discardTrash[1],
-      type: discardTrash[2]
-    };
+    let discardTrash = parseActionObject(card, actionObject.modifier)
     switch (actionObject.modifier) {
       case 'deck':
         if (turnObject.deck.length < 1) turnObject = {...turnObject, deck: turnObject.discard, discard: []};
@@ -22,7 +18,7 @@ export default (card, turnObject, actionObject, setters) => {
           turnObject.discard = turnObject.discard.concat(removal);
           turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, actionLogName, 'discards', 1, true));
         };
-        if (discardTrash.next === 'modal' && removal.length > 0) {
+        if (discardTrash.next[0] === 'modal' && removal.length > 0) {
           const cardLive = discardTrash.type === removal[0].type,
           decline = () => {
             turnObject.actions--;

@@ -130,14 +130,14 @@
       "treasure": 2,
       "instructions": "Discard the top card of your deck. If it's an Action card, you may play it.",
       "discardTrash": "discard 1|deck auto",
-      "deck": "0 modal Action",
+      "deck": "Action [0 modal",
       "type": "Action"
     },
     {
       "name": "Workshop",
       "cost": 3,
       "instructions": "Gain a card costing up to coin-4",
-      "supply": "4",
+      "supply": "gain 4",
       "type": "Action"
     },
     {
@@ -146,17 +146,16 @@
       "cards": 1,
       "actions": 1,
       "instructions": "Look through your discard pile. You may put a card from it onto your deck.",
-      "discardPile": "1 deck",
+      "discard": "modal 1|deck",
       "type": "Action"
     },
     {
       "name": "Merchant",
       "cost": 3,
-      "treasure": "Silver 1",
       "cards": 1,
       "actions": 1,
       "instructions": "The first time you play a Silver this turn, +coin-1",
-      "buyPhase": "1 first Silver",
+      "buyPhase": "Silver 1 null first",
       "type": "Action"
     }
   ]

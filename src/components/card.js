@@ -42,7 +42,11 @@ export default props => {
     </p> : ''}
     <div
       className={`card ${props.card.type} ${props.card.name === 'Curse'? 'curse' : ''} ${props.live && !props.card.empty? 'live' : ''}`}
-      onClick={() => { if (props.live && !props.card.empty) props.onClick(props.card, 1, props.destination? props.destination : props.supply? true : false) }}
+      onClick={() => {
+        if (props.live && !props.card.empty) {
+          props.onClick(props.card, 1, props.destination? props.destination : props.supply? true : false);
+        };
+      }}
       onMouseOver={() => {
         setShowFullCard(true);
       }}

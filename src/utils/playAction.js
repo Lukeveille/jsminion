@@ -25,8 +25,12 @@ export default (card, size, turnObject, setters) => {
       turnObject.logs.pop();
     };
   };
-  const actionObject = card.discardTrash? parseActionObject(card) : false;
+  const actionObject = card.discardTrash? parseActionObject(card, 'discardTrash') : false;
   let checkHandForActions = !hasType(turnObject.hand, 'Action');
+  if (card.buyPhase) {
+    const buyPhaseModifier = parseActionObject(card, 'buyPhase');
+    console.log(buyPhaseModifier);
+  }
   if (actionObject) {
     if (actionObject.next && actionObject.next[0] === 'auto') {
       [turnObject, checkHandForActions] = autoAction(card, turnObject, actionObject, setters);
@@ -35,13 +39,16 @@ export default (card, size, turnObject, setters) => {
       setters.setDiscardTrashState(actionObject);
     };
   } else if (card.supply) {
-    const supplyMsg = card.supply.split(' ');
+    const supplyMsg = parseActionObject(card, 'supply');
     actionSupply = {
       treasure: turnObject.treasure,
       count: 1,
-      destination: supplyMsg[1]? supplyMsg[1] : 'discard'
+      destination: supplyMsg.next && supplyMsg.next[0]? supplyMsg.next[0] : 'discard'
     };
-    turnObject.treasure = supplyMsg[0];
+    turnObject.treasure = supplyMsg.amount;
+  } else if (card.discard) {
+    const discardInfo = parseActionObject(card, 'discard');
+    console.log(discardInfo);
   };
   let auto = actionObject? (actionObject.next && actionObject.next[0] === 'auto')? true : false : true;
   auto = turnObject.menuScreen? false : auto;
