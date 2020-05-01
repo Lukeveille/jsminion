@@ -10,6 +10,7 @@ export default props => {
       cards={props.cards}
       live={props.live}
       title={props.title}
+      modal={true}
     />
     <div
       className="game-button start-button live"

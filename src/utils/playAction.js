@@ -6,6 +6,7 @@ import autoAction from './autoAction';
 import moveCard from './moveCard';
 import countValue from './countValue';
 import rollover from './rollover';
+import cleanup from './cleanup';
 import hasType from './hasType';
 import enterBuyPhase from './enterBuyPhase';
 import ActionModal from '../components/ActionModal';
@@ -28,7 +29,7 @@ export default (card, size, turnObject, setters) => {
       turnObject.logs.pop();
     };
   };
-  const actionObject = card.discardTrash? parseActionObject(card, 'discardTrash') : false;
+  const discardTrashObject = card.discardTrash? parseActionObject(card, 'discardTrash') : false;
   let checkHandForActions = !hasType(turnObject.hand, 'Action');
   if (card.buyPhase) {
     // Merchant
@@ -38,12 +39,12 @@ export default (card, size, turnObject, setters) => {
     console.log(buyPhaseModifier)
 
   }
-  if (actionObject) {
-    if (actionObject.next && actionObject.next[0] === 'auto') {
-      [turnObject, checkHandForActions] = autoAction(card, turnObject, actionObject, setters);
+  if (discardTrashObject) {
+    if (discardTrashObject.next && discardTrashObject.next[0] === 'auto') {
+      [turnObject, checkHandForActions] = autoAction(card, turnObject, discardTrashObject, setters);
     } else {
       checkHandForActions = false;
-      setters.setDiscardTrashState(actionObject);
+      setters.setDiscardTrashState(discardTrashObject);
     };
   } else if (card.supply) {
     const supplyMsg = parseActionObject(card, 'supply');
@@ -53,9 +54,7 @@ export default (card, size, turnObject, setters) => {
       destination: supplyMsg.next && supplyMsg.next[0]? supplyMsg.next[0] : 'discard'
     };
     turnObject.treasure = supplyMsg.amount;
-  } else if (card.discard) {  
-    // Harbinger
-
+  } else if (card.discard) {
     const discardInfo = parseActionObject(card, 'discard');
 
     switch (discardInfo.type) {
@@ -65,19 +64,15 @@ export default (card, size, turnObject, setters) => {
             <ActionModal
               cards={turnObject.discard}
               accept={card => {
-                
-                console.log(turnObject)
-                console.log(card);
-
                 [turnObject.discard, turnObject.deck] = moveCard(card, discardInfo.amount, turnObject.discard, turnObject.deck);
                 turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'discard to deck'}], 'moves', discardInfo.amount, true));
                 turnObject.menuScreen = false;
-                
-                console.log(turnObject)
-
+                turnObject = cleanup(turnObject);
                 setters.setTurnState(turnObject);
               }}
-              decline={() => { setters.setTurnState({...turnObject, menuScreen: false }) }}
+              decline={() => {
+                setters.setTurnState({...turnObject, menuScreen: false });
+              }}
               buttonText={'Decline'}
               live={true}
               title={`Choose ${discardInfo.amount} to move from discard to deck`}
@@ -87,9 +82,8 @@ export default (card, size, turnObject, setters) => {
         break;
       default: break;
     };
-
   };
-  let auto = actionObject? (actionObject.next && actionObject.next[0] === 'auto')? true : false : true;
+  let auto = discardTrashObject? (discardTrashObject.next && discardTrashObject.next[0] === 'auto')? true : false : true;
   auto = turnObject.menuScreen? false : auto;
   if ((!turnObject.actions || checkHandForActions) && auto && !actionSupply) {
     [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(turnObject.gameState, turnObject.logs);

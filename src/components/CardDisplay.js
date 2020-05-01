@@ -57,6 +57,7 @@ export default props => {
               altKey={props.altKey}
               card={card}
               live={props.live? true : correctAction}
+              modal={props.modal}
               count={count}
               stacked={props.stacked}
               onClick={props.onClick}

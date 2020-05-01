@@ -20,7 +20,7 @@ export default props => {
     };
     return newText;
   },
-  multiPlay = (props.live && !props.card.empty && !props.supply) && (props.card.type === 'Treasure' || props.discardTrash);
+  multiPlay = (props.live && !props.card.empty && !props.supply && !props.modal) && (props.card.type === 'Treasure' || props.discardTrash);
 
   useEffect(() => {
     setAltKey(props.altKey)
