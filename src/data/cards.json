@@ -130,7 +130,7 @@
       "treasure": 2,
       "instructions": "Discard the top card of your deck. If it's an Action card, you may play it.",
       "discardTrash": "discard 1|deck auto",
-      "deck": "Action [0 modal",
+      "deck": "Action [0] modal",
       "type": "Action"
     },
     {
@@ -155,7 +155,7 @@
       "cards": 1,
       "actions": 1,
       "instructions": "The first time you play a Silver this turn, +coin-1",
-      "buyPhase": "Silver 1 null first",
+      "buyPhase": "Silver 1 0 first",
       "type": "Action"
     }
   ]

@@ -42,7 +42,7 @@ export default (gameState, cards, cardAction, num) => {
   if (cards && cards[0].type === 'Action' && cardAction !== 'buys') {
     logActions.forEach(action => {
       const descriptor = action === 'cards'? 'draws' : 'gets',
-      name =  action === 'treasure'? 'Coin': capital(action).slice(0, -1),
+      name =  action === 'treasure'? 'Coin': action === 'cards'? action.slice(0, -1) : capital(action).slice(0, -1),
       invalid = action === 'cards' && cards && isNaN(cards[0].cards);
       if (cards[0][action] && !invalid) newLogs = newLogs.concat(generateLog(gameState, [{...cards[0], name}], descriptor, cards[0][action], true));
     })

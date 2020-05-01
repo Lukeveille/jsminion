@@ -1,11 +1,14 @@
+import React from 'react';
+import { generateLog } from './printLog';
+import printLog from './printLog';
 import parseActionObject from './parseActionObject';
 import autoAction from './autoAction';
-import printLog from './printLog';
 import moveCard from './moveCard';
 import countValue from './countValue';
 import rollover from './rollover';
 import hasType from './hasType';
 import enterBuyPhase from './enterBuyPhase';
+import ActionModal from '../components/ActionModal';
 
 export default (card, size, turnObject, setters) => {
   let rolloverCards = [],
@@ -28,8 +31,12 @@ export default (card, size, turnObject, setters) => {
   const actionObject = card.discardTrash? parseActionObject(card, 'discardTrash') : false;
   let checkHandForActions = !hasType(turnObject.hand, 'Action');
   if (card.buyPhase) {
+    // Merchant
+
     const buyPhaseModifier = parseActionObject(card, 'buyPhase');
-    console.log(buyPhaseModifier);
+    
+    console.log(buyPhaseModifier)
+
   }
   if (actionObject) {
     if (actionObject.next && actionObject.next[0] === 'auto') {
@@ -46,9 +53,41 @@ export default (card, size, turnObject, setters) => {
       destination: supplyMsg.next && supplyMsg.next[0]? supplyMsg.next[0] : 'discard'
     };
     turnObject.treasure = supplyMsg.amount;
-  } else if (card.discard) {
+  } else if (card.discard) {  
+    // Harbinger
+
     const discardInfo = parseActionObject(card, 'discard');
-    console.log(discardInfo);
+
+    switch (discardInfo.type) {
+      case 'modal':
+        if (turnObject.discard.length > 0) {
+          turnObject.menuScreen = (
+            <ActionModal
+              cards={turnObject.discard}
+              accept={card => {
+                
+                console.log(turnObject)
+                console.log(card);
+
+                [turnObject.discard, turnObject.deck] = moveCard(card, discardInfo.amount, turnObject.discard, turnObject.deck);
+                turnObject.logs = turnObject.logs.concat(generateLog(turnObject.gameState, [{name: 'discard to deck'}], 'moves', discardInfo.amount, true));
+                turnObject.menuScreen = false;
+                
+                console.log(turnObject)
+
+                setters.setTurnState(turnObject);
+              }}
+              decline={() => { setters.setTurnState({...turnObject, menuScreen: false }) }}
+              buttonText={'Decline'}
+              live={true}
+              title={`Choose ${discardInfo.amount} to move from discard to deck`}
+            />
+          );
+        };
+        break;
+      default: break;
+    };
+
   };
   let auto = actionObject? (actionObject.next && actionObject.next[0] === 'auto')? true : false : true;
   auto = turnObject.menuScreen? false : auto;

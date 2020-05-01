@@ -9,7 +9,7 @@ export default props => {
       onClick={props.accept}
       cards={props.cards}
       live={props.live}
-      title={props.live? 'You may play' : `To ${props.buttonText}`}
+      title={props.title}
     />
     <div
       className="game-button start-button live"

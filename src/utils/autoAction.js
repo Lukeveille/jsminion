@@ -49,6 +49,7 @@ export default (card, turnObject, actionObject, setters) => {
                 decline={decline}
                 buttonText={actionObject.type}
                 live={cardLive}
+                title="You may play"
               />
             );
           } else if (removal.length > 0) {
