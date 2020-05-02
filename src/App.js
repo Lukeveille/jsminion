@@ -12,6 +12,7 @@ import moveCard from './utils/moveCard';
 import next from './utils/next';
 import enterBuyPhase from './utils/enterBuyPhase';
 import playAction from './utils/playAction';
+import playCardModifier from './utils/playCardModifier';
 import CardDisplay from './components/CardDisplay';
 import LogDisplay from './components/LogDisplay';
 import TurnInfo from './components/TurnInfo';
@@ -30,6 +31,7 @@ function App() {
   [discardTrashQueue, setDiscardTrashQueue] = useState([]),
   [modalContent, setModalContent] = useState([[]]),
   [altKey, setAltKey] = useState(false),
+  [playMod, setPlayMod] = useState(false),
   [actionSupply, setActionSupply] = useState(false),
   [logs, setLogs] = useState([]),
   [gameState, setGameState] = useState({turn: 0, player, turnPlayer: 1}),
@@ -87,7 +89,8 @@ function App() {
     treasure,
     phase,
     menuScreen,
-    coinMod
+    coinMod,
+    playMod
   };
   const playAllTreasure = () => {
     const treasures = hand.filter(card => (card.type === 'Treasure')),
@@ -107,6 +110,7 @@ function App() {
     setInPlay(newPlay);
     setHand(newHand);
     setLogs(newLogs);
+    if (playMod) turnObject = playCardModifier(treasures, turnObject);
   },
   gainCard = (card, count, destination) => {
     turnObject.logs = turnObject.logs.concat(
@@ -151,21 +155,21 @@ function App() {
         actionName,
         discardTrashQueue.length,
         true
-        ));
-        if (turnObject.discardTrashState.next.length > 0) {
-          turnObject = next(turnObject, setActionSupply);
-        } else {
-          turnObject = cleanup(turnObject);
-        };
+      ));
+      if (turnObject.discardTrashState.next.length > 0) {
+        turnObject = next(turnObject, setActionSupply);
       } else {
         turnObject = cleanup(turnObject);
       };
-      setDiscardTrashState(turnObject.discardTrashState);
-      setDiscardTrashQueue(turnObject.discardTrashQueue);
-      setTurnState(turnObject);
-    },
-    nextPhase = (card, count, supplyOn) => {
-      turnObject.treasure = countValue(inPlay, 'treasure');
+    } else {
+      turnObject = cleanup(turnObject);
+    };
+    setDiscardTrashState(turnObject.discardTrashState);
+    setDiscardTrashQueue(turnObject.discardTrashQueue);
+    setTurnState(turnObject);
+  },
+  nextPhase = (card, count, supplyOn) => {
+    turnObject.treasure = countValue(inPlay, 'treasure');
     const size = phase === card.type? 1 : count;
 
     switch (phase) {
@@ -181,7 +185,8 @@ function App() {
         } else {
           [turnObject.logs, turnObject.phase, turnObject.actions] = enterBuyPhase(gameState, turnObject.logs);
         };
-        break;
+      break;
+
       case 'Buy':
         let buysLeft = buys,
         newVictoryPoints = victoryPoints;
@@ -237,6 +242,7 @@ function App() {
             actions: 0,
             treasure: 0,
             coinMod: 0,
+            playMod: false,
             phase: null,
             logs: turnObject.logs.concat(printLog(gameState, [{name: 'turn', end: 'ends'}]))
           };
@@ -245,7 +251,7 @@ function App() {
         };
         turnObject.buys = buysLeft;
         setVictoryPoints(newVictoryPoints);
-        break;
+      break;
 
       default:
         const setSpacer = gameState.turn === 1 && gameState.turnPlayer === 1? [] : spacer();
@@ -257,8 +263,9 @@ function App() {
         } else {
           [turnObject.logs, turnObject.phase] = enterBuyPhase(gameState, turnObject.logs);
         }
-        break;
+      break;
     };
+    if (playMod) turnObject = playCardModifier(card, turnObject);
     setTurnState(turnObject);
   },
   setTurnState = turnObject => {
@@ -275,6 +282,7 @@ function App() {
     setPhase(turnObject.phase);
     setMenuScreen(turnObject.menuScreen);
     setCoinMod(turnObject.coinMod);
+    setPlayMod(turnObject.playMod);
   };
 
   window.onkeydown = e => {

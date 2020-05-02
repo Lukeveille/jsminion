@@ -63,7 +63,7 @@ export default (card, turnObject, actionObject, setters) => {
     let actionName = 'discards';
     let removal = turnObject.hand.findIndex(i => (i.name === actionObject.restriction));
     if (removal === -1) {
-      turnObject.coinMod += 3;
+      turnObject.coinMod -= 3;
       turnObject.logs.pop();
     } else {
       if (actionObject.type === 'discard') {

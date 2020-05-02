@@ -54,7 +54,7 @@ export default props => {
         setShowFullCard(false);
       }}
     >
-      <p className="card-top">{props.card.name}</p>
+      <p className="card-top">{props.card.name.split('_').join(' ')}</p>
       <div className="card-btm">
         <p className="card-side">{props.card.cost}</p>
         <p>{props.card.type}</p>
@@ -63,7 +63,7 @@ export default props => {
       <div className={`full-card-wrapper ${props.stacked? 'lower-card' : ''}`}>
         <div className={`full-card ${props.card.type} ${showFullCard && altKey? '' : 'hidden'} ${props.live? 'full-card-live' : ''} ${props.card.name === 'Curse'? 'curse' : ''}`}>
           <div className="card-top">
-            <p>{props.card.name}</p>
+            <p>{props.card.name.split('_').join(' ')}</p>
             <div
               className={`${props.card.type === 'Action'? 'action' : 'card'}-image`}
               style={{

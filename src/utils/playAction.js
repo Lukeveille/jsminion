@@ -19,6 +19,7 @@ export default (card, size, turnObject, setters) => {
   turnObject.actions--;
   [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, turnObject.hand, turnObject.inPlay);
   turnObject.treasure += countValue(newCards, 'treasure');
+  if (card.playMod) turnObject.playMod = parseActionObject(card, 'playMod');
   if (card.actions) turnObject.actions += card.actions;
   if (card.buys) turnObject.buys += card.buys;
   if (card.cards) {
@@ -31,14 +32,6 @@ export default (card, size, turnObject, setters) => {
   };
   const discardTrashObject = card.discardTrash? parseActionObject(card, 'discardTrash') : false;
   let checkHandForActions = !hasType(turnObject.hand, 'Action');
-  if (card.buyPhase) {
-    // Merchant
-
-    const buyPhaseModifier = parseActionObject(card, 'buyPhase');
-    
-    console.log(buyPhaseModifier)
-
-  }
   if (discardTrashObject) {
     if (discardTrashObject.next && discardTrashObject.next[0] === 'auto') {
       [turnObject, checkHandForActions] = autoAction(card, turnObject, discardTrashObject, setters);

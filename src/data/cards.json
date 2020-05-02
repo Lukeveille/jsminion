@@ -155,7 +155,7 @@
       "cards": 1,
       "actions": 1,
       "instructions": "The first time you play a Silver this turn, +coin-1",
-      "buyPhase": "Silver 1 0 first",
+      "playMod": "coinMod 1|1 0 Silver",
       "type": "Action"
     }
   ]

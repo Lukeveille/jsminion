@@ -14,6 +14,7 @@ export default (card, attribute) => {
     amount = '';
   };
   amount = isNaN(amount)? amount : parseInt(amount);
+  modifier = isNaN(modifier)? modifier : parseInt(modifier);
   return {
     card,
     type: actionInfo[0],
