@@ -19,7 +19,6 @@ export default (card, size, turnObject, setters) => {
   turnObject.actions--;
   [turnObject.hand, turnObject.inPlay, newCards] = moveCard(card, size, turnObject.hand, turnObject.inPlay);
   turnObject.treasure += countValue(newCards, 'treasure');
-  if (card.playMod) turnObject.playMod = parseActionObject(card, 'playMod');
   if (card.actions) turnObject.actions += card.actions;
   if (card.buys) turnObject.buys += card.buys;
   if (card.cards) {
@@ -28,6 +27,14 @@ export default (card, size, turnObject, setters) => {
       turnObject.hand = turnObject.hand.concat(rolloverCards);
     } else {
       turnObject.logs.pop();
+    };
+  };
+  if (card.playMod) {
+    if (turnObject.playMod) {
+      const newMod = parseActionObject(card, 'playMod');
+      turnObject.playMod.amount += newMod.amount;
+    } else {
+      turnObject.playMod = parseActionObject(card, 'playMod');
     };
   };
   const discardTrashObject = card.discardTrash? parseActionObject(card, 'discardTrash') : false;

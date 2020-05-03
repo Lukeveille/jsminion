@@ -93,24 +93,19 @@ function App() {
     playMod
   };
   const playAllTreasure = () => {
-    const treasures = hand.filter(card => (card.type === 'Treasure')),
-    newPlay = [...inPlay].concat(treasures),
+    const treasures = turnObject.hand.filter(card => (card.type === 'Treasure')),
     unique = (val, i, self) => (self.indexOf(val) === i),
-    treasureNames = treasures.filter(unique),
-    newHand = hand.filter(card => (card.type !== 'Treasure'));
-
-    let newLogs = [...logs];
-
+    treasureNames = treasures.filter(unique);
     treasureNames.forEach(treasureCard => {
-      newLogs = newLogs.concat(printLog(gameState, treasures.filter(
+      turnObject.logs = turnObject.logs.concat(printLog(gameState, treasures.filter(
         card => (treasureCard.name === card.name)
       )));
     });
-    setTreasure(countValue(newPlay, 'treasure'));
-    setInPlay(newPlay);
-    setHand(newHand);
-    setLogs(newLogs);
-    if (playMod) turnObject = playCardModifier(treasures, turnObject);
+    turnObject.inPlay = turnObject.inPlay.concat(treasures);
+    turnObject.hand = hand.filter(card => (card.type !== 'Treasure'));
+    turnObject.treasure = countValue(turnObject.inPlay, 'treasure');
+    if (turnObject.playMod) turnObject = playCardModifier(treasures, turnObject);
+    setTurnState(turnObject);
   },
   gainCard = (card, count, destination) => {
     turnObject.logs = turnObject.logs.concat(
@@ -265,7 +260,7 @@ function App() {
         }
       break;
     };
-    if (playMod) turnObject = playCardModifier(card, turnObject);
+    if (turnObject.playMod) turnObject = playCardModifier([card], turnObject);
     setTurnState(turnObject);
   },
   setTurnState = turnObject => {
