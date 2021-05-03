@@ -1,0 +1,57 @@
+.button:hover {
+  outline: 1px solid #f06970;
+}
+.button {
+  cursor: pointer;
+  height: 2.4rem;
+  display: flex;
+  background-color: #121c21;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 14px;
+  margin: .4rem;
+}
+.button-box {
+  margin: .4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.table {
+  margin: .8rem;
+  margin-bottom: 0;
+  padding: 1rem .5rem;
+  background-color: #1c272d;
+  display: inline-block;
+}
+.lobby-screen {
+  text-align: left;
+  font-size: 14px;
+  margin: 5rem;
+  height: 100%;
+  width: 80%;
+  display: flex;
+}
+.players {
+  height: 75vh;
+}
+.lobby {
+  height: 35vh;
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+.short {
+  width: 9.3rem;
+}
+.long {
+  width: 19.4rem;
+  margin: .4rem .8rem;
+}
+.inline {
+  display: inline-block;
+}
+.spaced {
+  padding-right: 3rem;
+}
+.double-spaced {
+  padding-right: 6rem;
+}

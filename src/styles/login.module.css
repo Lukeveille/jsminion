@@ -1,0 +1,40 @@
+@font-face {
+  font-family: 'RobotoSlab';
+  src: url('./RobotoSlab-VariableFont_wght.ttf') format('truetype');
+}
+.username-input {
+  width: 25rem;
+  height: 2.5rem;
+  margin: 1rem;
+  padding: .25rem;
+  background-color: #1e2e36;
+  border: 1px solid #aaafb2;
+  color: #fa9a6a;
+  text-align: center;
+  font-size: 1rem;
+  font-family: 'RobotoSlab';
+  caret-color: #1e2e36;
+}
+.active {
+  outline: 1px solid #aaafb2;
+}
+.active:hover {
+  outline: 1px solid #f06970;
+}
+.button {
+  cursor: pointer;
+  height: 1.775rem;
+  display: flex;
+  width: 12.5rem;
+  background-color: #121c21;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 14px;
+  margin: auto;
+}
+.login-screen {
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
