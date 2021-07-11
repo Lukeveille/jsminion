@@ -8,6 +8,13 @@
   margin: auto;
   scrollbar-color: #777 #121c21;
 }
+input {
+  display: block;
+  margin: 1rem auto !important;
+}
+form {
+  text-align: center;
+}
 .supply-market,
 .info,
 .in-play {

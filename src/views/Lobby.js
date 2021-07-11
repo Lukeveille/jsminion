@@ -1,13 +1,19 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import styles from '../styles/lobby.module.css'
+import { useAuth } from '../Provider';
 
-export default ({lobby, setLobby, playGame}) => {
+export default () => {
+  const [lobby, setLobby] = useState(false);
   const newGameId = uuidv4().slice(0, 8);
+  const auth = useAuth();
+  const history = useHistory();
 
   return (
     <div className={styles['lobby-screen']}>
+        <span>{auth.user}</span>
+        <button onClick={auth.signOut}>Sign Out</button>
       <table className={`${styles.players} ${styles.table}`}>
         <thead className={styles.liner}>
           <tr>
@@ -36,11 +42,11 @@ export default ({lobby, setLobby, playGame}) => {
           </thead>
         </table> : ''}
         <div className={styles['button-box']}>
-          <Link href="/deck-builder">
+          {/* <Link to="/deck-builder"> */}
             <div className={`${styles.button} ${styles.short}`}>
               Choose Deck
             </div>
-          </Link>
+          {/* </Link> */}
           <div 
             className={`${styles.button} ${styles.short}`}
             onClick={() => setLobby(lobby? false : newGameId)}
@@ -51,7 +57,7 @@ export default ({lobby, setLobby, playGame}) => {
         {lobby? 
           <div
             className={`${styles.button} ${styles.long}`}
-            onClick={() => playGame()}
+            onClick={() => history.push(`/${newGameId}`)}
           >
             Start Game
           </div> : ''}

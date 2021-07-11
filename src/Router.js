@@ -6,14 +6,13 @@ const login = lazy(() => import("./views/Login"))
 const lobby = lazy(() => import("./views/Lobby"))
 const game = lazy(() => import("./views/Game"))
 
-
 class AppRouter extends React.Component {
   render() {
     return (
       <Router>
         <Switch>
           <AppRoute path="/login" component={login} noAuth />
-          <AppRoute path="/:gameId" component={game} noAuth />
+          <AppRoute path="/:gameId" component={game} />
           <AppRoute path="/" component={lobby} />
         </Switch>
       </Router>

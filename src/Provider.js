@@ -13,49 +13,47 @@ const Provider = ({ children }) => {
   )
 }
 
-const checkUser = async (cb) => {  
-  const token = localStorage.getItem('jwt')
-  const headers = { Authorization: `Bearer ${token}` }
-  if (token) {
-    return await axios.get(`${api}/users/me`, {headers}).then(res => res.data).catch(() => {
-      localStorage.removeItem('jwt')
-    })
-  }
-}
+// const checkUser = async (headers) => {  
+//   if (headers) {
+//     return await axios.get(`${api}/users/me`, {headers}).then(res => res.data).catch(() => {
+//       localStorage.removeItem('user')
+//     })
+//   }
+// }
 
 const useProvideAuth = () => {
-  const [user, setUser] = useState(null)
-  
-  const token = localStorage.getItem('jwt')
-  const headers = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token])
+  const [user, setUser] = useState(localStorage.getItem('user'))
+  // const headers = useMemo(() => ({ Authorization: `Bearer ${user?.token}` }), [user?.token])
 
-  useEffect(() => {
-    checkUser().then(user => setUser(user))
-  }, [headers])
+  // useEffect(() => {
+  //   checkUser(headers).then(user => setUser(user))
+  // }, [headers])
     
-  const signin = (data, cb) => {
-    const url = `${api}/auth/local`
-    const method = 'POST'
-
-    axios({url, method, data}).then(res => {
-      localStorage.setItem('jwt', res.data.jwt)
-      setUser(res.data.user)
-      cb()
-    })
-  }
-
-  const signout = (cb) => {
-    setUser(null)
-    localStorage.removeItem('jwt')
-    cb()
-  }
-
-  const updateUser = (data, cb) => {
+  const signIn = (data, cb) => {
+    // const url = `${api}/auth/local`
+    // const method = 'GET'
+    // axios({url: '/v2/pokemon/ditto', method, data}).then(res => {
+    //   console.log(res)
+    
+    localStorage.setItem('user', data)
     setUser(data)
-    cb()
+    // cb()
+    // })
   }
 
-  return { user, headers, signin, signout, updateUser }
+  const signOut = (cb) => {
+    setUser(null)
+    localStorage.removeItem('user')
+    // cb()
+  }
+
+  // const updateUser = (data, cb) => {
+  //   setUser(data)
+  //   cb()
+  // }
+
+  return { user, signIn, signOut }
+  // return { user, signIn, signOut, headers }
 }
 
 export const useAuth = () => useContext(authContext)
