@@ -8,15 +8,15 @@ const RouteConfig = ({
   noAuth,
   ...rest
 }) => {
-  const auth = useAuth()
+  const { currentUser } = useAuth();
   
   return <Route
     {...rest}
     render={props => {
       return (
-        noAuth && auth.user? <Redirect to={{ pathname: '/', state: { from: props.location }}} />
+        noAuth && currentUser ? <Redirect to={{ pathname: '/', state: { from: props.location }}} />
         :
-        auth.user || noAuth ? <Component {...props}></Component>
+        noAuth || currentUser ? <Component {...props}></Component>
         :
         <Redirect to={{ pathname: '/login', state: { from: props.location }}} />
       )
@@ -24,4 +24,4 @@ const RouteConfig = ({
   />
 }
 
-export default RouteConfig
+export default RouteConfig;

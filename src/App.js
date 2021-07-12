@@ -5,8 +5,8 @@ import { Suspense } from 'react';
 import Provider from './Provider';
 import Spinner from './components/Spinner';
 
-let axiosDefaults = require('axios/lib/defaults');
-axiosDefaults.baseURL = 'https://pokeapi.co/api';
+let api = require('axios/lib/defaults');
+api.baseURL = 'http://localhost:1337';
 
 function App() {
   return (

@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router';
 import styles from '../styles/login.module.css'
 import { useAuth } from '../Provider';
 
-export default ({inputRef}) => {
-  const [userLogin, setUserLogin] = useState('');
-  const auth = useAuth();
+export default () => {
+  const [userLogin, setUserLogin] = useState({ identifier: '', password: ''});
+  const { signIn } = useAuth();
+  const { push } = useHistory();
 
   return (
     <div className={styles['login-screen']}>
       <form
         onSubmit={e => {
           e.preventDefault();
-          auth.signIn(userLogin);
-          console.log(auth.user)
+          signIn(userLogin, () => push('/'));
         }}
       >
         <h3>Enter Your Username</h3>
         <input
           className={styles['username-input']}
-          value={userLogin}
-          onChange={e => {
-            if (e.target.value.length < 15) {
-              setUserLogin(e.target.value);
+          value={userLogin.identifier}
+          onChange={ ({ target: { value } }) => {
+            if (value.length < 15) {
+              setUserLogin({...userLogin, identifier: value });
             }
           }}
           onKeyDown={e => {
@@ -32,11 +33,12 @@ export default ({inputRef}) => {
         />
         <input
           placeholder="Password"
+          type="password"
           className={styles['username-input']}
-          value={userLogin}
+          value={userLogin.password}
           onChange={e => {
             if (e.target.value.length < 15) {
-              setUserLogin(e.target.value);
+              setUserLogin({...userLogin, password: e.target.value });
             }
           }}
           onKeyDown={e => {
@@ -45,10 +47,12 @@ export default ({inputRef}) => {
             }
           }}
         />
-        <div
+        <button
           className={`${styles.button} ${userLogin? styles.active : ''}`}
-          onClick={() => auth.signIn(userLogin)}
-        >Submit</div>
+          type="submit"
+        >
+          Submit
+        </button>
       </form>
     </div>
   )

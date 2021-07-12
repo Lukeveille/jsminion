@@ -1,8 +1,7 @@
-import React, { useState, createContext, useContext, useEffect, useMemo } from 'react'
-import axios from 'axios'
-import api from './utils/api'
+import React, { useState, createContext, useEffect, useContext, useMemo } from 'react';
+import axios from 'axios';
 
-const authContext = createContext()
+const authContext = createContext();
 
 const Provider = ({ children }) => {
   const auth = useProvideAuth()
@@ -13,47 +12,36 @@ const Provider = ({ children }) => {
   )
 }
 
-// const checkUser = async (headers) => {  
-//   if (headers) {
-//     return await axios.get(`${api}/users/me`, {headers}).then(res => res.data).catch(() => {
-//       localStorage.removeItem('user')
-//     })
-//   }
-// }
-
 const useProvideAuth = () => {
-  const [user, setUser] = useState(localStorage.getItem('user'))
-  // const headers = useMemo(() => ({ Authorization: `Bearer ${user?.token}` }), [user?.token])
+  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const headers = useMemo(() => ({ Authorization: `Bearer ${currentUser?.jwt}` }), [currentUser]);
 
-  // useEffect(() => {
-  //   checkUser(headers).then(user => setUser(user))
-  // }, [headers])
-    
-  const signIn = (data, cb) => {
-    // const url = `${api}/auth/local`
-    // const method = 'GET'
-    // axios({url: '/v2/pokemon/ditto', method, data}).then(res => {
-    //   console.log(res)
-    
-    localStorage.setItem('user', data)
-    setUser(data)
-    // cb()
-    // })
+  useEffect(() => {
+    (async () => {
+      await axios.get('/users/me', { headers }).then(res => res.data).catch(err => {
+        localStorage.removeItem('user');
+      })
+    })()
+  }, [headers])
+
+  const signIn = async (data, cb) => {
+    const url = '/auth/local';
+    const method = 'POST';
+    const { data: { user, jwt } } = await axios({ url, method, data })
+    user.jwt = jwt;
+
+    setCurrentUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+    cb();
   }
 
   const signOut = (cb) => {
-    setUser(null)
-    localStorage.removeItem('user')
-    // cb()
+    setCurrentUser(null);
+    localStorage.removeItem('user');
+    cb();
   }
 
-  // const updateUser = (data, cb) => {
-  //   setUser(data)
-  //   cb()
-  // }
-
-  return { user, signIn, signOut }
-  // return { user, signIn, signOut, headers }
+  return { currentUser, signIn, signOut, headers }
 }
 
 export const useAuth = () => useContext(authContext)
